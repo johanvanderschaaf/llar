@@ -23,8 +23,6 @@ const NarrativeSchema = z.object({
   legalItems: z.array(Loc),
   neighbourhoodLede: Loc,
   neighbourhoodNote: Loc,
-  costsIntro: Loc,
-  costsFootnote: Loc,
   negotiationIntro: Loc,
   negotiationItems: z.array(Loc),
   negotiationTactic: Loc,
@@ -139,11 +137,9 @@ function mergeNarrative(report: Report, n: Narrative): Report {
   r.neighbourhood.lede = n.neighbourhoodLede;
   r.neighbourhood.note = n.neighbourhoodNote;
 
-  // Urbanism is intentionally NOT AI-written: it carries verified MUC data and
-  // a legal verify-caveat, set deterministically by seedUrbanism.
-
-  r.costs.intro = n.costsIntro;
-  r.costs.footnote = n.costsFootnote;
+  // Urbanism, costs and tax/subsidies are intentionally NOT AI-written — they
+  // carry verified/maintained facts set deterministically (seedUrbanism,
+  // seedCostsTaxes).
 
   r.negotiation.intro = n.negotiationIntro;
   r.negotiation.items = n.negotiationItems;

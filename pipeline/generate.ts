@@ -18,6 +18,7 @@ import {
   emptyReport,
   seedAmenities,
   seedComps,
+  seedCostsTaxes,
   seedEnergy,
   seedFromCatastro,
   seedPriceRefs,
@@ -107,6 +108,7 @@ export async function generateReport(input: ReportInput): Promise<string> {
     report = seedFromCatastro(report, input, cat.data);
   }
   report = seedPriceRefs(report);
+  report = seedCostsTaxes(report, input.askingPriceEur);
 
   // Energy certificate (ICAEN) — keyed by cadastral reference.
   const energy = await fetchEnergy(resolvedRef);

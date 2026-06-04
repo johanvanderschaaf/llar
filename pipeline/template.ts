@@ -5,6 +5,7 @@ import type { UrbanismData } from "@/adapters/urbanism";
 import type { EnergyData } from "@/adapters/energy";
 import type { FloodData } from "@/adapters/flood";
 import { SEISMIC, RADON, crimeContext } from "@/config/static-risk";
+import { buildCostFacts, buildSubsidyPanels } from "@/config/costs";
 import type { CompListing } from "@/adapters/idealista";
 import type { CompRow } from "@/types/report";
 import type { ReportInput } from "@/types/db";
@@ -209,6 +210,18 @@ export function compsMedianPerM2(comps: CompListing[]): number | null {
   if (!vals.length) return null;
   const mid = Math.floor(vals.length / 2);
   return vals.length % 2 ? vals[mid] : Math.round((vals[mid - 1] + vals[mid]) / 2);
+}
+
+/* ---------- costs & taxes (deterministic, maintained) ---------- */
+
+export function seedCostsTaxes(report: Report, askingPriceEur?: number): Report {
+  const r: Report = structuredClone(report);
+  const { intro, facts, footnote } = buildCostFacts(askingPriceEur);
+  r.costs.intro = intro;
+  r.costs.facts = facts;
+  r.costs.footnote = footnote;
+  r.subsidies.panels = buildSubsidyPanels();
+  return r;
 }
 
 /* ---------- price reference links (buyer compares themselves) ---------- */
