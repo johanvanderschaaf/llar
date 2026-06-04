@@ -6,6 +6,8 @@ import type { EnergyData } from "@/adapters/energy";
 import type { FloodData } from "@/adapters/flood";
 import { SEISMIC, RADON, crimeContext } from "@/config/static-risk";
 import { buildCostFacts, buildSubsidyPanels } from "@/config/costs";
+import { buildBuilding } from "@/config/building";
+import { buildLegal } from "@/config/legal";
 import type { CompListing } from "@/adapters/idealista";
 import type { CompRow } from "@/types/report";
 import type { ReportInput } from "@/types/db";
@@ -212,6 +214,24 @@ export function compsMedianPerM2(comps: CompListing[]): number | null {
   return vals.length % 2 ? vals[mid] : Math.round((vals[mid - 1] + vals[mid]) / 2);
 }
 
+/* ---------- building & condition + legal (deterministic) ---------- */
+
+export function seedBuilding(report: Report, yearBuilt?: number): Report {
+  const r: Report = structuredClone(report);
+  const { panels, keyline } = buildBuilding(yearBuilt);
+  r.building.panels = panels;
+  r.building.keyline = keyline;
+  return r;
+}
+
+export function seedLegal(report: Report): Report {
+  const r: Report = structuredClone(report);
+  const { intro, items } = buildLegal();
+  r.legal.intro = intro;
+  r.legal.items = items;
+  return r;
+}
+
 /* ---------- costs & taxes (deterministic, maintained) ---------- */
 
 export function seedCostsTaxes(report: Report, askingPriceEur?: number): Report {
@@ -335,7 +355,7 @@ export function seedEnergy(report: Report, e: EnergyData): Report {
 
 export function seedRisks(
   report: Report,
-  opts: { flood?: FloodData; districtCode?: number },
+  opts: { flood?: FloodData; districtCode?: number; yearBuilt?: number },
 ): Report {
   const r: Report = structuredClone(report);
 
@@ -364,6 +384,31 @@ export function seedRisks(
   // Static (Barcelona-wide) seismic + radon.
   r.risks.push({ labelKey: "risk.seismic", tone: SEISMIC.tone, detail: SEISMIC.detail });
   r.risks.push({ labelKey: "risk.radon", tone: RADON.tone, detail: RADON.detail });
+
+  // Building-age flags derived from the Catastro year.
+  if (opts.yearBuilt) {
+    const age = new Date().getFullYear() - opts.yearBuilt;
+    if (age >= 45) {
+      r.risks.push({
+        labelKey: "risk.ite",
+        tone: "ok",
+        detail: {
+          en: `${age}-year building — a valid ITE technical inspection is mandatory; confirm it and any pending works.`,
+          es: `Edificio de ${age} años — la ITE (inspección técnica) es obligatoria; confírmala y las obras pendientes.`,
+        },
+      });
+    }
+    if (opts.yearBuilt < 2002) {
+      r.risks.push({
+        labelKey: "risk.asbestos",
+        tone: "ok",
+        detail: {
+          en: "Pre-2002 build — possible asbestos in legacy installations; usually low-cost if isolated.",
+          es: "Construcción anterior a 2002 — posible amianto en instalaciones antiguas; normalmente de bajo coste si está aislado.",
+        },
+      });
+    }
+  }
 
   // District-level crime context.
   const crime = crimeContext(opts.districtCode);

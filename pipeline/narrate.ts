@@ -16,11 +16,6 @@ const NarrativeSchema = z.object({
   verdictBody: Loc,
   verdictTag: Loc,
   snapshotNote: Loc,
-  buildingGood: Loc,
-  buildingScrutinise: Loc,
-  buildingKeyline: Loc,
-  legalIntro: Loc,
-  legalItems: z.array(Loc),
   neighbourhoodLede: Loc,
   neighbourhoodNote: Loc,
   negotiationIntro: Loc,
@@ -122,24 +117,12 @@ function mergeNarrative(report: Report, n: Narrative): Report {
   r.verdict.tag = n.verdictTag;
   r.snapshot.note = n.snapshotNote;
 
-  r.building.panels = [
-    { heading: { en: "What's good", es: "Lo bueno" }, body: n.buildingGood },
-    {
-      heading: { en: "What to scrutinise", es: "Lo que hay que escrutar" },
-      body: n.buildingScrutinise,
-    },
-  ];
-  r.building.keyline = n.buildingKeyline;
-
-  r.legal.intro = n.legalIntro;
-  r.legal.items = n.legalItems;
-
   r.neighbourhood.lede = n.neighbourhoodLede;
   r.neighbourhood.note = n.neighbourhoodNote;
 
-  // Urbanism, costs and tax/subsidies are intentionally NOT AI-written — they
-  // carry verified/maintained facts set deterministically (seedUrbanism,
-  // seedCostsTaxes).
+  // Building, legal, urbanism, costs and tax/subsidies are intentionally NOT
+  // AI-written — they carry verified/maintained facts set deterministically
+  // (seedBuilding, seedLegal, seedUrbanism, seedCostsTaxes).
 
   r.negotiation.intro = n.negotiationIntro;
   r.negotiation.items = n.negotiationItems;

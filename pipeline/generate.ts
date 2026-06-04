@@ -17,10 +17,12 @@ import { STATIC_RISK_AS_OF } from "@/config/static-risk";
 import {
   emptyReport,
   seedAmenities,
+  seedBuilding,
   seedComps,
   seedCostsTaxes,
   seedEnergy,
   seedFromCatastro,
+  seedLegal,
   seedPriceRefs,
   seedRisks,
   seedScores,
@@ -109,6 +111,8 @@ export async function generateReport(input: ReportInput): Promise<string> {
   }
   report = seedPriceRefs(report);
   report = seedCostsTaxes(report, input.askingPriceEur);
+  report = seedBuilding(report, cat.data?.unit.yearBuilt);
+  report = seedLegal(report);
 
   // Energy certificate (ICAEN) — keyed by cadastral reference.
   const energy = await fetchEnergy(resolvedRef);
@@ -154,6 +158,7 @@ export async function generateReport(input: ReportInput): Promise<string> {
   report = seedRisks(report, {
     flood: flood?.data,
     districtCode: cat.data?.unit.districtCode,
+    yearBuilt: cat.data?.unit.yearBuilt,
   });
 
   // Deterministic scores from what we have (building age, amenities; energy
