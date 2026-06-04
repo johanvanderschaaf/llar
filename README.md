@@ -1,4 +1,4 @@
-# llar — Barcelona property due-diligence dossiers
+# PisoWise — Barcelona property due-diligence reports
 
 Freemium, bilingual (EN/ES) due-diligence reports for foreign buyers evaluating a
 specific Barcelona flat. A free preview plus a paid full report with PDF download.

@@ -2,30 +2,29 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
-import { Fraunces, Hanken_Grotesk } from "next/font/google";
+import { Manrope, Space_Mono } from "next/font/google";
 import { routing } from "@/i18n/routing";
 import { brand } from "@/config/brand";
 import { TopBar } from "@/components/TopBar";
 import "../globals.css";
 
-const fraunces = Fraunces({
+const manrope = Manrope({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  style: ["normal", "italic"],
-  variable: "--font-fraunces",
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-manrope",
   display: "swap",
 });
 
-const hanken = Hanken_Grotesk({
+const spaceMono = Space_Mono({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-hanken",
+  weight: ["400", "700"],
+  variable: "--font-space-mono",
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: `${brand.name} · Property Intelligence`,
-  description: `Independent due-diligence dossiers for buying property in ${brand.market}.`,
+  title: `${brand.name} · ${brand.market}`,
+  description: `Independent due-diligence reports for buying a flat in ${brand.market}.`,
 };
 
 export function generateStaticParams() {
@@ -45,7 +44,7 @@ export default async function LocaleLayout({
   setRequestLocale(locale);
 
   return (
-    <html lang={locale} className={`${fraunces.variable} ${hanken.variable}`}>
+    <html lang={locale} className={`${manrope.variable} ${spaceMono.variable}`}>
       <body>
         <NextIntlClientProvider>
           <TopBar />

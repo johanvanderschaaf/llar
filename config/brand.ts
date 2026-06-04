@@ -7,12 +7,12 @@
  * once monetization lands in Phase 4).
  */
 export const brand = {
-  /** Wordmark shown in the top bar and document titles. */
-  name: "llar",
-  /** Small uppercase tagline beside the wordmark. */
-  tagline: "Property Intelligence",
-  /** Glyph rendered in the brand badge (single char / emoji works). */
-  glyph: "▰", // ▰
+  /** Full wordmark (metadata, emails). */
+  name: "PisoWise",
+  /** Two-tone wordmark parts: primary (ink) + accent (blue). */
+  wordmark: { primary: "Piso", accent: "Wise" },
+  /** Short tagline (optional; not shown in the compact lockup). */
+  tagline: "Barcelona",
   /** Market the product currently serves. */
   market: "Barcelona",
 } as const;

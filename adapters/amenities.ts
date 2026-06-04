@@ -96,7 +96,7 @@ export async function fetchAmenities(
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
-          "User-Agent": "llar-dossier/1.0 (property due-diligence)",
+          "User-Agent": "pisowise/1.0 (property due-diligence)",
         },
         body: "data=" + encodeURIComponent(query),
       });

@@ -1,12 +1,21 @@
-import { setRequestLocale } from "next-intl/server";
-import { ReportView } from "@/components/report/ReportView";
-import { sampleSors35 } from "@/data/sample-sors35";
+import type { Metadata } from "next";
+import { setRequestLocale, getTranslations } from "next-intl/server";
+import { Landing } from "@/components/landing/Landing";
+import { brand } from "@/config/brand";
 
-/**
- * Phase 1: the home route renders the sample dossier so the design can be
- * reviewed in EN + ES. In later phases this becomes the landing page and
- * reports move under /report/[id].
- */
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "landing" });
+  return {
+    title: `${brand.name} · ${t("hero.title")}`,
+    description: t("hero.sub"),
+  };
+}
+
 export default async function HomePage({
   params,
 }: {
@@ -14,5 +23,5 @@ export default async function HomePage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  return <ReportView report={sampleSors35} locale={locale} />;
+  return <Landing locale={locale} />;
 }

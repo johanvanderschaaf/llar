@@ -4,7 +4,7 @@ You only need to do this once. ~5 minutes.
 
 ## 1. Create the project
 1. Go to <https://supabase.com> → **New project**.
-2. Name it (e.g. `llar`), pick a region close to you (e.g. `eu-west`), set a
+2. Name it (e.g. `pisowise`), pick a region close to you (e.g. `eu-west`), set a
    strong database password (save it somewhere; not needed by the app).
 3. Wait for it to finish provisioning.
 

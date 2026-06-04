@@ -8,6 +8,74 @@
     "languageName": "English",
     "switchTo": "Español"
   },
+  "nav": {
+    "cta": "Check my flat",
+    "sample": "See a sample"
+  },
+  "landing": {
+    "hero": {
+      "eyebrow": "Due diligence · Barcelona",
+      "title": "Check any Barcelona flat before you buy.",
+      "sub": "We pull a flat's official data — cadastre, energy, urban planning, natural risks, neighbourhood — and explain it clearly. So you decide on facts, not hunches.",
+      "ctaPrimary": "Check my flat",
+      "ctaSecondary": "See a sample report"
+    },
+    "trust": {
+      "title": "Official, open sources only",
+      "note": "No portal scraping. Verifiable, date-stamped data."
+    },
+    "what": {
+      "title": "What's in the report",
+      "items": [
+        { "title": "5 scores", "desc": "Location, transport, building, price and energy at a glance." },
+        { "title": "Price & value", "desc": "The flat's €/m² and official sources to compare it. We separate asking from closing." },
+        { "title": "Natural risks", "desc": "Flood (SNCZI), seismic and radon, by exact location." },
+        { "title": "Building & condition", "desc": "Year, age, ITE status and what to check before you offer." },
+        { "title": "Legal & documents", "desc": "Nota simple, cédula, minutes, levies: what to request and why." },
+        { "title": "Neighbourhood", "desc": "Metro, healthcare, green space, markets and schools nearby." },
+        { "title": "Urban planning", "desc": "Planning qualification and possible affectations (Mapa Urbanístic)." },
+        { "title": "Energy", "desc": "Registered certificate (ICAEN): class, consumption and emissions." }
+      ]
+    },
+    "how": {
+      "title": "How it works",
+      "steps": [
+        { "title": "Enter the flat", "desc": "Address or cadastral reference. We help you find it." },
+        { "title": "We assemble the data", "desc": "We cross-check official sources and write it up clearly, reviewed before publishing." },
+        { "title": "Get your report", "desc": "Free preview; full report and PDF whenever you want." }
+      ]
+    },
+    "why": {
+      "title": "Why {brand}",
+      "items": [
+        { "title": "Independent", "desc": "We don't sell flats or charge sellers. We work for the buyer." },
+        { "title": "Official sources", "desc": "Cadastre, ICAEN, planning, and state + city-council risk data." },
+        { "title": "Honest on price", "desc": "We give you references to judge for yourself; we don't invent a number." },
+        { "title": "In your language", "desc": "Castellano, català and English." }
+      ]
+    },
+    "pricing": {
+      "title": "One price, no surprises",
+      "desc": "Free preview. Full report and downloadable PDF for {price}.",
+      "cta": "Check my flat",
+      "note": "One-off payment. No subscription."
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "items": [
+        { "q": "Where does the data come from?", "a": "Official, open sources: Cadastre, ICAEN, Mapa Urbanístic de Catalunya, SNCZI and city-council open data. We don't scrape portals." },
+        { "q": "Does it replace an architect or lawyer?", "a": "No. It's an orientation tool; it doesn't replace a technical survey, legal review or valuation. Every report says so." },
+        { "q": "How much is it?", "a": "The preview is free. The full report with PDF is {price}, a one-off payment." },
+        { "q": "Barcelona only?", "a": "For now, yes. We're starting with the city of Barcelona." }
+      ]
+    },
+    "footer": {
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "disclaimer": "Orientation tool. Not a substitute for a technical survey, legal review or valuation.",
+      "rights": "© {year} {brand}"
+    }
+  },
   "hero": {
     "eyebrow": "Independent due diligence · Barcelona"
   },

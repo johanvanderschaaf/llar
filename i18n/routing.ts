@@ -1,9 +1,10 @@
 import { defineRouting } from "next-intl/routing";
 
 export const routing = defineRouting({
-  locales: ["en", "es"],
-  defaultLocale: "en",
-  // Always show the locale prefix (/en, /es) in the URL.
+  // Locals-focused: Catalan first, then Spanish, then English.
+  locales: ["ca", "es", "en"],
+  defaultLocale: "es",
+  // Always show the locale prefix (/es, /ca, /en) in the URL.
   localePrefix: "always",
 });
 

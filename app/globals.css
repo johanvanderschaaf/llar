@@ -1,41 +1,74 @@
 @import "tailwindcss";
 
 /* ============================================================
-   llar design system — ported verbatim from the canonical
-   reference (reference/sors-35-property-dossier.html).
-   Fonts are injected via next/font as CSS variables
-   (--font-fraunces / --font-hanken) on the <body>.
+   PisoWise design system — "The Clear Signal".
+   Tokens ported from design_handoff_pisowise_brand/pisowise-brand.css.
+   Legacy variable names are kept and repointed to the PisoWise
+   palette, so every component reflows from here.
+   Fonts via next/font: --font-manrope (UI/headlines) + --font-space-mono
+   (all figures).
    ============================================================ */
 
 :root {
-  --paper: #faf7f1;
-  --paper-2: #f2ece1;
-  --ink: #1c2230;
-  --ink-soft: #4a5160;
-  --muted: #7c8294;
-  --line: #e4dccf;
-  --line-2: #d9cfbe;
-  --accent: #b65c36; /* clay / terracotta */
-  --accent-deep: #8f4525;
-  --good: #4e7a5b;
-  --ok: #be8a36;
-  --low: #b14e36;
-  --good-bg: #eaf0ea;
-  --ok-bg: #f6eedd;
-  --low-bg: #f6e6df;
-  --card: #ffffff;
-  --shadow:
-    0 1px 2px rgba(28, 34, 48, 0.04), 0 12px 32px -18px rgba(28, 34, 48, 0.22);
-  --serif: var(--font-fraunces), Georgia, serif;
-  --sans: var(--font-hanken), -apple-system, sans-serif;
+  /* PisoWise tokens (source of truth) */
+  --pw-ink: #0e1a2b;
+  --pw-ink-700: #243549;
+  --pw-ink-500: #5a6b7d;
+  --pw-ink-300: #94a2b1;
+  --pw-ink-200: #c7d0d9;
+  --pw-ink-100: #e5eaef;
+  --pw-field: #f6f8fa;
+  --pw-panel: #ffffff;
+  --pw-blue-50: #ebf2fe;
+  --pw-blue-100: #d7e5fd;
+  --pw-blue-200: #b0ccfb;
+  --pw-blue-400: #5b92f2;
+  --pw-blue: #1f6feb;
+  --pw-blue-600: #1657c4;
+  --pw-blue-700: #11459b;
+  --pw-clear: #139b6e;
+  --pw-clear-soft: #e6f7f0;
+  --pw-clear-700: #0c7152;
+  --pw-check: #c9781c;
+  --pw-check-tint: #e0922f;
+  --pw-check-soft: #fcf0df;
+  --pw-caution: #d5402b;
+  --pw-caution-soft: #fbe8e4;
+  --pw-caution-700: #a82e1e;
+  --pw-sh-1: 0 1px 2px rgba(14, 26, 43, 0.06);
+  --pw-sh-2: 0 1px 2px rgba(14, 26, 43, 0.06), 0 8px 18px -10px rgba(14, 26, 43, 0.18);
+  --pw-sh-3: 0 1px 2px rgba(14, 26, 43, 0.06), 0 24px 48px -24px rgba(14, 26, 43, 0.28);
+  --pw-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* Legacy names → repointed to PisoWise */
+  --paper: var(--pw-field);
+  --paper-2: var(--pw-blue-50);
+  --ink: var(--pw-ink);
+  --ink-soft: var(--pw-ink-700);
+  --muted: var(--pw-ink-500);
+  --line: var(--pw-ink-100);
+  --line-2: var(--pw-ink-200);
+  --accent: var(--pw-blue);
+  --accent-deep: var(--pw-blue-700);
+  --good: var(--pw-clear);
+  --ok: var(--pw-check-tint);
+  --low: var(--pw-caution);
+  --good-bg: var(--pw-clear-soft);
+  --ok-bg: var(--pw-check-soft);
+  --low-bg: var(--pw-caution-soft);
+  --card: var(--pw-panel);
+  --shadow: var(--pw-sh-2);
+  --serif: var(--font-manrope), system-ui, sans-serif;
+  --sans: var(--font-manrope), system-ui, sans-serif;
+  --mono: var(--font-space-mono), ui-monospace, Menlo, monospace;
 }
 
 @theme inline {
   --color-paper: var(--paper);
   --color-ink: var(--ink);
   --color-accent: var(--accent);
-  --font-serif: var(--serif);
   --font-sans: var(--sans);
+  --font-mono: var(--mono);
 }
 
 * {
@@ -53,7 +86,6 @@ body {
   font-size: 16px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
-  background-image: radial-gradient(circle at 12% -5%, #fff 0, transparent 45%);
 }
 .wrap {
   max-width: 920px;
@@ -63,13 +95,27 @@ body {
 h1,
 h2,
 h3 {
-  font-family: var(--serif);
-  font-weight: 500;
-  line-height: 1.12;
-  letter-spacing: -0.01em;
+  font-family: var(--sans);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--ink);
 }
+/* .serif kept as a class name for legacy markup; now Manrope (no serif). */
 .serif {
-  font-family: var(--serif);
+  font-family: var(--sans);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+/* Every figure is Space Mono (per brand). */
+.mono,
+.meta .v,
+.verdict .vscore b,
+.ring b,
+.rung .amt,
+td.num,
+.lp-price {
+  font-family: var(--mono);
 }
 
 /* fade-up load */
@@ -88,7 +134,7 @@ h3 {
 /* ---- top bar ---- */
 .topbar {
   border-bottom: 1px solid var(--line);
-  background: rgba(250, 247, 241, 0.85);
+  background: rgba(246, 248, 250, 0.85);
   backdrop-filter: blur(6px);
   position: sticky;
   top: 0;
@@ -214,74 +260,64 @@ h3 {
 }
 
 /* ---- verdict ---- */
+/* Verdict — PisoWise "Clear Signal" hero band (calm blue, not dark). */
 .verdict {
   margin: 34px 0 8px;
-  background: var(--ink);
-  color: #f4efe6;
+  background: var(--pw-blue-50);
+  color: var(--ink);
+  border: 1px solid var(--pw-blue-100);
   border-radius: 18px;
   padding: 34px 36px;
-  box-shadow: var(--shadow);
+  box-shadow: var(--pw-sh-1);
   position: relative;
   overflow: hidden;
 }
-.verdict::after {
-  content: "";
-  position: absolute;
-  right: -60px;
-  top: -60px;
-  width: 240px;
-  height: 240px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(182, 92, 54, 0.5), transparent 65%);
-}
 .verdict .lab {
   font-size: 12px;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #c9a893;
-  font-weight: 600;
+  color: var(--pw-blue-700);
+  font-weight: 700;
   margin-bottom: 14px;
-  position: relative;
 }
 .verdict h2 {
-  font-size: 26px;
-  color: #fff;
+  font-size: 28px;
+  color: var(--ink);
   margin-bottom: 12px;
-  position: relative;
   max-width: 30ch;
 }
 .verdict p {
-  color: #d8cfc2;
+  color: var(--ink-soft);
   max-width: 64ch;
-  position: relative;
 }
 .verdict .vscore {
-  position: relative;
   display: flex;
   align-items: baseline;
   gap: 10px;
   margin-top: 22px;
 }
 .verdict .vscore b {
-  font-family: var(--serif);
+  font-family: var(--mono);
   font-size: 46px;
-  font-weight: 600;
-  color: #fff;
+  font-weight: 700;
+  color: var(--pw-blue);
   line-height: 1;
+  letter-spacing: -0.03em;
 }
 .verdict .vscore span {
-  color: #c9a893;
+  color: var(--pw-ink-500);
   font-size: 14px;
 }
 .verdict .vtag {
-  position: relative;
   display: inline-block;
   margin-top: 6px;
-  background: rgba(182, 92, 54, 0.22);
-  border: 1px solid rgba(201, 168, 147, 0.4);
-  color: #f1c7ae;
-  font-size: 13px;
-  font-weight: 600;
+  background: var(--pw-blue);
+  border: none;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
   border-radius: 999px;
   padding: 6px 14px;
 }
@@ -322,10 +358,10 @@ section {
 .score {
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: 18px;
   padding: 20px 16px;
   text-align: center;
-  box-shadow: var(--shadow);
+  box-shadow: var(--pw-sh-1);
 }
 .ring {
   width: 84px;
@@ -345,13 +381,15 @@ section {
 }
 .ring b {
   position: relative;
-  font-family: var(--serif);
+  font-family: var(--mono);
   font-size: 24px;
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--ink);
 }
 .score .name {
   font-size: 12.5px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--ink-soft);
   line-height: 1.3;
 }
@@ -585,7 +623,7 @@ ul.check li b {
 }
 .rung.target {
   border-color: var(--accent);
-  background: linear-gradient(180deg, #fff, #fbf1ea);
+  background: linear-gradient(180deg, #fff, var(--pw-blue-50));
 }
 .rung.target .amt {
   color: var(--accent-deep);
@@ -657,6 +695,350 @@ footer .src {
 }
 footer strong {
   color: var(--ink-soft);
+}
+
+/* ============================================================
+   Locale switcher · buttons · landing page
+   All colours/fonts come from the design tokens above, so a
+   rebrand (editing :root tokens) reflows this automatically.
+   ============================================================ */
+
+.locale-switch {
+  display: inline-flex;
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--card);
+}
+.locale-switch button {
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 6px 11px;
+  border: none;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+.locale-switch button.is-active {
+  background: var(--ink);
+  color: var(--paper);
+}
+.locale-switch button:not(.is-active):hover {
+  color: var(--accent-deep);
+}
+
+/* logo (PisoWise mark + wordmark) */
+.pw-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  text-decoration: none;
+}
+.pw-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--pw-ink);
+  border-radius: 26%;
+  flex: none;
+}
+.pw-mark svg {
+  width: 56%;
+  height: 56%;
+  display: block;
+}
+.pw-wordmark {
+  font-family: var(--sans);
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: -0.03em;
+  color: var(--pw-ink);
+  line-height: 1;
+}
+.pw-wordmark span {
+  color: var(--pw-blue);
+}
+.pw-wordmark.on-dark {
+  color: #fff;
+}
+.pw-wordmark.on-dark span {
+  color: var(--pw-blue-400);
+}
+
+/* buttons (PisoWise .pw-btn spec) */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--sans);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  border: 1.5px solid transparent;
+  border-radius: var(--pw-r-lg, 18px);
+  padding: 14px 26px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--pw-fast, 130ms) var(--pw-ease),
+    border-color 130ms var(--pw-ease), transform 130ms var(--pw-ease),
+    box-shadow 200ms var(--pw-ease);
+}
+.btn-primary {
+  background: var(--pw-blue);
+  color: #fff;
+}
+.btn-primary:hover {
+  background: var(--pw-blue-600);
+}
+.btn-primary:active {
+  background: var(--pw-blue-700);
+  transform: translateY(1px);
+}
+.btn-ghost {
+  background: var(--pw-panel);
+  color: var(--ink);
+  border-color: var(--pw-ink-200);
+}
+.btn-ghost:hover {
+  border-color: var(--pw-ink);
+}
+/* top-bar CTA — compact primary button */
+.nav-cta {
+  text-decoration: none;
+  background: var(--pw-blue);
+  color: #fff;
+  border: 1.5px solid transparent;
+  border-radius: var(--pw-r-md, 12px);
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.nav-cta:hover {
+  background: var(--pw-blue-600);
+  color: #fff;
+}
+
+/* landing — neutralise the global <section> border/padding */
+.lp-hero,
+.lp-section,
+.lp-footer {
+  border-top: none;
+  padding: 0;
+}
+.lp-section {
+  padding: 64px 0;
+}
+.lp-alt {
+  background: var(--paper-2);
+}
+.lp-h2 {
+  font-size: clamp(24px, 4vw, 32px);
+  margin-bottom: 28px;
+}
+
+/* hero */
+.lp-hero {
+  padding: 72px 0 56px;
+  background-image: radial-gradient(circle at 80% -10%, #fff 0, transparent 55%);
+}
+.lp-h1 {
+  font-size: clamp(36px, 6.5vw, 60px);
+  max-width: 18ch;
+  margin: 6px 0 18px;
+}
+.lp-sub {
+  font-size: 19px;
+  color: var(--ink-soft);
+  max-width: 60ch;
+  margin-bottom: 28px;
+}
+.lp-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.lp-trust {
+  margin-top: 44px;
+  padding-top: 26px;
+  border-top: 1px solid var(--line);
+}
+.lp-trust-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.lp-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+  margin: 12px 0 8px;
+}
+.lp-source {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 17px;
+  color: var(--ink-soft);
+}
+.lp-trust-note {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* what — feature grid */
+.lp-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.lp-card h3 {
+  font-size: 17px;
+  margin-bottom: 6px;
+}
+.lp-card p {
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+/* how — steps */
+.lp-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+.lp-step-num {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--serif);
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+.lp-step h3 {
+  font-size: 19px;
+  margin-bottom: 6px;
+}
+.lp-step p {
+  color: var(--ink-soft);
+}
+
+/* why */
+.lp-why {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px 40px;
+}
+.lp-why-item {
+  border-left: 3px solid var(--accent);
+  padding-left: 18px;
+}
+.lp-why-item h3 {
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+.lp-why-item p {
+  color: var(--ink-soft);
+}
+
+/* pricing */
+.lp-price-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  padding: 40px;
+  max-width: 520px;
+  margin: 0 auto;
+  text-align: center;
+}
+.lp-price {
+  font-family: var(--serif);
+  font-size: 52px;
+  font-weight: 600;
+  color: var(--accent-deep);
+  line-height: 1;
+  margin: 6px 0 10px;
+}
+.lp-price-desc {
+  color: var(--ink-soft);
+  max-width: 40ch;
+  margin: 0 auto 20px;
+}
+.lp-price-note {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 14px;
+}
+
+/* faq */
+.lp-faq {
+  display: grid;
+  gap: 18px;
+}
+.lp-faq-item h3 {
+  font-size: 17px;
+  margin-bottom: 4px;
+}
+.lp-faq-item p {
+  color: var(--ink-soft);
+}
+
+/* landing footer */
+.lp-footer {
+  padding: 40px 0 60px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+}
+.lp-foot-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.lp-foot-links {
+  display: flex;
+  gap: 18px;
+}
+.lp-foot-links a {
+  color: var(--ink-soft);
+  font-size: 14px;
+  text-decoration: none;
+}
+.lp-foot-links a:hover {
+  color: var(--accent-deep);
+}
+.lp-foot-disclaimer {
+  font-size: 12.5px;
+  max-width: 70ch;
+  line-height: 1.6;
+}
+.lp-foot-rights {
+  font-size: 12.5px;
+  margin-top: 8px;
+}
+
+@media (max-width: 880px) {
+  .lp-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .lp-steps {
+    grid-template-columns: 1fr;
+  }
+  .lp-why {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 760px) {

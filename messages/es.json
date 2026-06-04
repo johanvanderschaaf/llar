@@ -8,6 +8,74 @@
     "languageName": "Español",
     "switchTo": "English"
   },
+  "nav": {
+    "cta": "Analizar mi piso",
+    "sample": "Ver ejemplo"
+  },
+  "landing": {
+    "hero": {
+      "eyebrow": "Diligencia debida · Barcelona",
+      "title": "Comprueba cualquier piso de Barcelona antes de comprar.",
+      "sub": "Reunimos los datos oficiales de un piso —Catastro, energía, urbanismo, riesgos naturales, barrio— y te los explicamos con claridad. Para que decidas con información, no con corazonadas.",
+      "ctaPrimary": "Analizar mi piso",
+      "ctaSecondary": "Ver un informe de ejemplo"
+    },
+    "trust": {
+      "title": "Solo fuentes oficiales y abiertas",
+      "note": "Nada de scraping de portales. Datos verificables y con fecha."
+    },
+    "what": {
+      "title": "Qué incluye el informe",
+      "items": [
+        { "title": "5 puntuaciones", "desc": "Ubicación, transporte, edificio, precio y energía, de un vistazo." },
+        { "title": "Precio y valor", "desc": "El €/m² del piso y fuentes oficiales para compararlo. Distinguimos oferta y cierre." },
+        { "title": "Riesgos naturales", "desc": "Inundación (SNCZI), sísmico y radón, según la ubicación exacta." },
+        { "title": "Edificio y estado", "desc": "Año, antigüedad, ITE y qué revisar antes de ofertar." },
+        { "title": "Legal y documentos", "desc": "Nota simple, cédula, actas, derramas: qué pedir y por qué." },
+        { "title": "Barrio y servicios", "desc": "Metro, sanidad, zonas verdes, mercados y colegios cercanos." },
+        { "title": "Urbanismo", "desc": "Calificación urbanística y posibles afectaciones (Mapa Urbanístic)." },
+        { "title": "Energía", "desc": "Certificado registrado (ICAEN): clase, consumo y emisiones." }
+      ]
+    },
+    "how": {
+      "title": "Cómo funciona",
+      "steps": [
+        { "title": "Introduce el piso", "desc": "Dirección o referencia catastral. Te ayudamos a encontrarlo." },
+        { "title": "Reunimos los datos", "desc": "Cruzamos fuentes oficiales y lo redactamos con claridad, revisado antes de publicar." },
+        { "title": "Recibe tu informe", "desc": "Vista previa gratis; informe completo y PDF cuando quieras." }
+      ]
+    },
+    "why": {
+      "title": "Por qué {brand}",
+      "items": [
+        { "title": "Independiente", "desc": "No vendemos pisos ni cobramos a vendedores. Trabajamos para el comprador." },
+        { "title": "Fuentes oficiales", "desc": "Catastro, ICAEN, urbanismo, y riesgos del Estado y del Ayuntamiento." },
+        { "title": "Honesto con el precio", "desc": "Te damos referencias para que valores tú; no inventamos una cifra." },
+        { "title": "En tu idioma", "desc": "Castellano, català y English." }
+      ]
+    },
+    "pricing": {
+      "title": "Un precio, sin sorpresas",
+      "desc": "Vista previa gratis. Informe completo y PDF descargable por {price}.",
+      "cta": "Analizar mi piso",
+      "note": "Pago único. Sin suscripción."
+    },
+    "faq": {
+      "title": "Preguntas frecuentes",
+      "items": [
+        { "q": "¿De dónde salen los datos?", "a": "De fuentes oficiales y abiertas: Catastro, ICAEN, Mapa Urbanístic de Catalunya, SNCZI y datos abiertos del Ayuntamiento. No hacemos scraping de portales." },
+        { "q": "¿Sustituye a un arquitecto o abogado?", "a": "No. Es una herramienta de orientación; no reemplaza una inspección técnica, revisión legal ni tasación. Cada informe lo indica." },
+        { "q": "¿Cuánto cuesta?", "a": "La vista previa es gratis. El informe completo con PDF cuesta {price}, pago único." },
+        { "q": "¿Solo Barcelona?", "a": "De momento, sí. Empezamos por la ciudad de Barcelona." }
+      ]
+    },
+    "footer": {
+      "privacy": "Privacidad",
+      "terms": "Términos",
+      "disclaimer": "Herramienta de orientación. No sustituye una inspección técnica, revisión legal ni tasación.",
+      "rights": "© {year} {brand}"
+    }
+  },
   "hero": {
     "eyebrow": "Diligencia debida independiente · Barcelona"
   },

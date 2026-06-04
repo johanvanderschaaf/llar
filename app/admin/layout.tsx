@@ -1,21 +1,22 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Fraunces, Hanken_Grotesk } from "next/font/google";
+import { Manrope, Space_Mono } from "next/font/google";
 import { createClient } from "@/lib/supabase/server";
 import { brand } from "@/config/brand";
+import { Mark, Wordmark } from "@/components/Brand";
 import { signOutAction } from "./actions";
 import "../globals.css";
 
-const fraunces = Fraunces({
+const manrope = Manrope({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-fraunces",
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-manrope",
   display: "swap",
 });
-const hanken = Hanken_Grotesk({
+const spaceMono = Space_Mono({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-hanken",
+  weight: ["400", "700"],
+  variable: "--font-space-mono",
   display: "swap",
 });
 
@@ -35,15 +36,26 @@ export default async function AdminLayout({
   } = await supabase.auth.getUser();
 
   return (
-    <html lang="en" className={`${fraunces.variable} ${hanken.variable}`}>
+    <html lang="en" className={`${manrope.variable} ${spaceMono.variable}`}>
       <body>
         <div className="topbar">
           <div className="wrap" style={{ maxWidth: 1100 }}>
-            <div className="brand">
-              <span className="glyph">{brand.glyph}</span>
-              {brand.name}
-              <small>Operator</small>
-            </div>
+            <span className="pw-lockup">
+              <Mark size={26} />
+              <Wordmark />
+              <small
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                  color: "var(--muted)",
+                  marginLeft: 4,
+                }}
+              >
+                Operator
+              </small>
+            </span>
             <div className="topbar-right">
               {user ? (
                 <>

@@ -1,0 +1,187 @@
+{
+  "brand": {
+    "tagline": "Property Intelligence",
+    "badge": "Dossier del comprador"
+  },
+  "common": {
+    "toVerify": "Per verificar",
+    "languageName": "Català",
+    "switchTo": "English"
+  },
+  "nav": {
+    "cta": "Analitzar el meu pis",
+    "sample": "Veure exemple"
+  },
+  "landing": {
+    "hero": {
+      "eyebrow": "Diligència deguda · Barcelona",
+      "title": "Comprova qualsevol pis de Barcelona abans de comprar.",
+      "sub": "Reunim les dades oficials d'un pis —Cadastre, energia, urbanisme, riscos naturals, barri— i te les expliquem amb claredat. Perquè decideixis amb informació, no amb intuïcions.",
+      "ctaPrimary": "Analitzar el meu pis",
+      "ctaSecondary": "Veure un informe d'exemple"
+    },
+    "trust": {
+      "title": "Només fonts oficials i obertes",
+      "note": "Res de scraping de portals. Dades verificables i datades."
+    },
+    "what": {
+      "title": "Què inclou l'informe",
+      "items": [
+        { "title": "5 puntuacions", "desc": "Ubicació, transport, edifici, preu i energia, d'un cop d'ull." },
+        { "title": "Preu i valor", "desc": "El €/m² del pis i fonts oficials per comparar-lo. Distingim sortida i tancament." },
+        { "title": "Riscos naturals", "desc": "Inundació (SNCZI), sísmic i radó, segons la ubicació exacta." },
+        { "title": "Edifici i estat", "desc": "Any, antiguitat, ITE i què revisar abans d'ofertar." },
+        { "title": "Legal i documents", "desc": "Nota simple, cèdula, actes, derrames: què demanar i per què." },
+        { "title": "Barri i serveis", "desc": "Metro, sanitat, zones verdes, mercats i escoles a prop." },
+        { "title": "Urbanisme", "desc": "Qualificació urbanística i possibles afectacions (Mapa Urbanístic)." },
+        { "title": "Energia", "desc": "Certificat registrat (ICAEN): classe, consum i emissions." }
+      ]
+    },
+    "how": {
+      "title": "Com funciona",
+      "steps": [
+        { "title": "Introdueix el pis", "desc": "Adreça o referència cadastral. T'ajudem a trobar-lo." },
+        { "title": "Reunim les dades", "desc": "Creuem fonts oficials i ho redactem amb claredat, revisat abans de publicar." },
+        { "title": "Rep el teu informe", "desc": "Vista prèvia gratuïta; informe complet i PDF quan vulguis." }
+      ]
+    },
+    "why": {
+      "title": "Per què {brand}",
+      "items": [
+        { "title": "Independent", "desc": "No venem pisos ni cobrem als venedors. Treballem per al comprador." },
+        { "title": "Fonts oficials", "desc": "Cadastre, ICAEN, urbanisme, i riscos de l'Estat i de l'Ajuntament." },
+        { "title": "Honest amb el preu", "desc": "Et donem referències perquè valoris tu; no inventem cap xifra." },
+        { "title": "En el teu idioma", "desc": "Castellano, català i English." }
+      ]
+    },
+    "pricing": {
+      "title": "Un preu, sense sorpreses",
+      "desc": "Vista prèvia gratuïta. Informe complet i PDF descarregable per {price}.",
+      "cta": "Analitzar el meu pis",
+      "note": "Pagament únic. Sense subscripció."
+    },
+    "faq": {
+      "title": "Preguntes freqüents",
+      "items": [
+        { "q": "D'on surten les dades?", "a": "De fonts oficials i obertes: Cadastre, ICAEN, Mapa Urbanístic de Catalunya, SNCZI i dades obertes de l'Ajuntament. No fem scraping de portals." },
+        { "q": "Substitueix un arquitecte o advocat?", "a": "No. És una eina d'orientació; no reemplaça una inspecció tècnica, revisió legal ni taxació. Cada informe ho indica." },
+        { "q": "Quant costa?", "a": "La vista prèvia és gratuïta. L'informe complet amb PDF costa {price}, pagament únic." },
+        { "q": "Només Barcelona?", "a": "De moment, sí. Comencem per la ciutat de Barcelona." }
+      ]
+    },
+    "footer": {
+      "privacy": "Privacitat",
+      "terms": "Termes",
+      "disclaimer": "Eina d'orientació. No substitueix una inspecció tècnica, revisió legal ni taxació.",
+      "rights": "© {year} {brand}"
+    }
+  },
+  "hero": {
+    "eyebrow": "Diligència deguda independent · Barcelona"
+  },
+  "meta": {
+    "asking": "Preu de sortida",
+    "pricePerM2": "Preu / m²",
+    "size": "Mida",
+    "built": "Construït",
+    "energy": "Energia",
+    "floor": "Planta"
+  },
+  "verdict": {
+    "label": "La conclusió",
+    "overallSuffix": "/ 100 global"
+  },
+  "sections": {
+    "scores": "Puntuacions",
+    "scoresNote": "0–100 · més alt és millor",
+    "snapshot": "Fitxa de l'immoble",
+    "price": "Preu i valor",
+    "priceNote": "el principal",
+    "building": "Edifici i estat",
+    "risks": "Risc i seguretat",
+    "legal": "Legal i documents a sol·licitar",
+    "neighbourhood": "El barri",
+    "urbanism": "Urbanisme i accés (ZBE)",
+    "costs": "Costos per a compradors internacionals",
+    "subsidies": "Impostos i ajuts",
+    "negotiation": "Guia de negociació",
+    "checklist": "Abans d'ofertar — llista de comprovació"
+  },
+  "scoreNames": {
+    "location": "Ubicació i estil de vida",
+    "transport": "Transport i accessos",
+    "building": "Edifici i estructura",
+    "price": "Preu i valor",
+    "energy": "Energia"
+  },
+  "snapshot": {
+    "address": "Adreça",
+    "neighbourhood": "Barri",
+    "builtArea": "Superfície construïda",
+    "usableArea": "Superfície útil",
+    "bedsBaths": "Habitacions / banys",
+    "floor": "Planta",
+    "lift": "Ascensor",
+    "terrace": "Terrassa",
+    "heating": "Calefacció / A/A",
+    "yearBuilt": "Any de construcció",
+    "condition": "Estat",
+    "cadastralRef": "Ref. cadastral"
+  },
+  "price": {
+    "benchHeading": "Referències i evidència comparable",
+    "ladderHeading": "Escala d'oferta suggerida",
+    "referencesHeading": "Comprova el preu tu mateix — fonts de referència",
+    "referencesNote": "No assignem un valor en nom teu. Fes servir aquestes fonts oficials i publicades per comparar el preu de sortida amb el mercat i decidir per tu mateix.",
+    "refKind": {
+      "official": "oficial",
+      "portal": "estadística portal",
+      "search": "anuncis"
+    },
+    "table": {
+      "reference": "Referència",
+      "price": "Preu",
+      "size": "Mida",
+      "perM2": "€/m²",
+      "note": "Nota"
+    },
+    "ladder": {
+      "open": "Obertura",
+      "target": "Tancament objectiu",
+      "ceiling": "Sostre"
+    }
+  },
+  "risk": {
+    "flood": "Inundació",
+    "seismic": "Sísmic",
+    "radon": "Radó",
+    "energy": "Qualificació energètica",
+    "ite": "ITE / edat de l'edifici",
+    "asbestos": "Amiant (anterior a 2002)",
+    "crime": "Delinqüència del barri"
+  },
+  "riskPill": {
+    "good": "Baix",
+    "ok": "Vigilar",
+    "low": "Alt"
+  },
+  "neigh": {
+    "metro": "Metro",
+    "health": "Sanitat",
+    "green": "Zones verdes",
+    "shopping": "Compra diària",
+    "market": "Mercat",
+    "schools": "Escoles"
+  },
+  "costs": {
+    "itp": "Impost de transmissions (ITP)",
+    "notary": "Notaria + Registre",
+    "gestoria": "Gestoria / legal",
+    "valuation": "Taxació hipotecària",
+    "allIn": "Estimació total",
+    "before": "Abans de començar"
+  },
+  "footer": {
+    "generated": "Generat el {date}"
+  }
+}
