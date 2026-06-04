@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# llar — Barcelona property due-diligence dossiers
 
-## Getting Started
+Freemium, bilingual (EN/ES) due-diligence reports for foreign buyers evaluating a
+specific Barcelona flat. A free preview plus a paid full report with PDF download.
 
-First, run the development server:
+> **Brand & price are placeholders.** Everything brand-related (name, wordmark,
+> tagline, glyph) and the report price live in **`config/brand.ts`** — change them
+> there to rebrand or reprice in one place.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Status
+
+**Phase 1 (skeleton) — done.** Next.js + Tailwind v4 + next-intl scaffold; the
+canonical reference design (`reference/sors-35-property-dossier.html`) is ported
+into React components and rendered from a hardcoded sample report
+(`data/sample-sors35.ts`) in both English and Spanish.
+
+Upcoming: data layer (Supabase + source adapters + operator dashboard) → AI
+narrative → Stripe/PDF monetization → landing/SEO/legal polish.
+
+## Tech
+
+- **Next.js 16** (App Router, TypeScript) — note: this repo pins a Next version
+  whose docs are bundled in `node_modules/next/dist/docs/`; consult them, the
+  `middleware` convention is now `proxy.ts`.
+- **Tailwind v4** (CSS-first) — design tokens + ported component classes live in
+  `app/globals.css`.
+- **next-intl** — locale-prefixed routing (`/en`, `/es`); UI strings in
+  `messages/{en,es}.json`; AI narrative stored per-language inside each report.
+- Fonts: **Fraunces** + **Hanken Grotesk** via `next/font`.
+
+## Project layout
+
+```
+app/[locale]/            localized routes (layout, home = sample report)
+app/[locale]/report/[id] canonical report route (sample only for now)
+components/               TopBar, LanguageToggle
+components/report/        ReportView + LockedSection (premium teaser)
+config/brand.ts          brand + price (single rebrand surface)
+config/scoring.ts        score weights + overall computation
+data/sample-sors35.ts    the Sors 35 sample report (EN + ES)
+types/report.ts          the structured Report contract
+i18n/                    next-intl routing/request/navigation
+messages/                en.json / es.json UI strings
+proxy.ts                 locale middleware (Next 16 "proxy")
+reference/               the canonical design HTML (source of truth)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Local development
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm install
+cp .env.local.example .env.local   # no keys needed for Phase 1
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Open:
 
-## Learn More
+- http://localhost:3000/en — English dossier
+- http://localhost:3000/es — Spanish dossier
 
-To learn more about Next.js, take a look at the following resources:
+`/` redirects to the browser-preferred locale. Use the toggle in the top bar to
+switch languages.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run build   # production build + type-check
+npm run lint
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Deploy (Vercel)
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Push to a Git repo and import the project into Vercel.
+2. Add the env vars from `.env.local.example` (Production + Preview) as they
+   become relevant per phase.
+3. Vercel auto-detects Next.js; no extra build config required.

@@ -1,0 +1,119 @@
+{
+  "brand": {
+    "tagline": "Property Intelligence",
+    "badge": "Buyer Dossier"
+  },
+  "common": {
+    "toVerify": "To verify",
+    "languageName": "English",
+    "switchTo": "Español"
+  },
+  "hero": {
+    "eyebrow": "Independent due diligence · Barcelona"
+  },
+  "meta": {
+    "asking": "Asking price",
+    "pricePerM2": "Price / m²",
+    "size": "Size",
+    "built": "Built",
+    "energy": "Energy",
+    "floor": "Floor"
+  },
+  "verdict": {
+    "label": "The bottom line",
+    "overallSuffix": "/ 100 overall"
+  },
+  "sections": {
+    "scores": "Scores",
+    "scoresNote": "0–100 · higher is better",
+    "snapshot": "Property snapshot",
+    "price": "Price & value",
+    "priceNote": "the main event",
+    "building": "Building & condition",
+    "risks": "Risk & safety",
+    "legal": "Legal & documents to request",
+    "neighbourhood": "The neighbourhood",
+    "urbanism": "Urbanism & access (ZBE)",
+    "costs": "Costs for international buyers",
+    "subsidies": "Tax & subsidies",
+    "negotiation": "Negotiation playbook",
+    "checklist": "Before you offer — checklist"
+  },
+  "scoreNames": {
+    "location": "Location & Lifestyle",
+    "transport": "Transport & Access",
+    "building": "Building & Structure",
+    "price": "Price & Value",
+    "energy": "Energy"
+  },
+  "snapshot": {
+    "address": "Address",
+    "neighbourhood": "Neighbourhood",
+    "builtArea": "Built area",
+    "usableArea": "Usable (útil)",
+    "bedsBaths": "Bedrooms / baths",
+    "floor": "Floor",
+    "lift": "Lift",
+    "terrace": "Terrace",
+    "heating": "Heating / AC",
+    "yearBuilt": "Year built",
+    "condition": "Condition",
+    "cadastralRef": "Cadastral ref."
+  },
+  "price": {
+    "benchHeading": "Benchmarks & comparable evidence",
+    "ladderHeading": "Suggested offer ladder",
+    "referencesHeading": "Check the price yourself — reference sources",
+    "referencesNote": "We don't assign a value on your behalf. Use these official and published sources to compare the asking price against the market and decide for yourself.",
+    "refKind": {
+      "official": "official",
+      "portal": "portal stats",
+      "search": "listings"
+    },
+    "table": {
+      "reference": "Reference",
+      "price": "Price",
+      "size": "Size",
+      "perM2": "€/m²",
+      "note": "Note"
+    },
+    "ladder": {
+      "open": "Open",
+      "target": "Target close",
+      "ceiling": "Ceiling"
+    }
+  },
+  "risk": {
+    "flood": "Flood",
+    "seismic": "Seismic",
+    "radon": "Radon",
+    "energy": "Energy rating",
+    "ite": "ITE / building age",
+    "asbestos": "Asbestos (pre-2002)",
+    "crime": "Neighbourhood crime"
+  },
+  "riskPill": {
+    "good": "Low",
+    "ok": "Watch",
+    "low": "High"
+  },
+  "neigh": {
+    "metro": "Metro",
+    "health": "Healthcare",
+    "green": "Green space",
+    "shopping": "Daily shopping",
+    "market": "Food market",
+    "schools": "Schools"
+  },
+  "costs": {
+    "itp": "ITP transfer tax",
+    "notary": "Notary + Land Registry",
+    "gestoria": "Gestoría / legal",
+    "valuation": "Mortgage valuation",
+    "allIn": "All-in estimate",
+    "before": "Before you start"
+  },
+  "footer": {
+    "generated": "Generated {date}"
+  }
+}

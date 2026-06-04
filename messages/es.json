@@ -1,0 +1,119 @@
+{
+  "brand": {
+    "tagline": "Property Intelligence",
+    "badge": "Dosier del comprador"
+  },
+  "common": {
+    "toVerify": "Por verificar",
+    "languageName": "Español",
+    "switchTo": "English"
+  },
+  "hero": {
+    "eyebrow": "Diligencia debida independiente · Barcelona"
+  },
+  "meta": {
+    "asking": "Precio de oferta",
+    "pricePerM2": "Precio / m²",
+    "size": "Tamaño",
+    "built": "Construido",
+    "energy": "Energía",
+    "floor": "Planta"
+  },
+  "verdict": {
+    "label": "La conclusión",
+    "overallSuffix": "/ 100 global"
+  },
+  "sections": {
+    "scores": "Puntuaciones",
+    "scoresNote": "0–100 · más alto es mejor",
+    "snapshot": "Ficha del inmueble",
+    "price": "Precio y valor",
+    "priceNote": "lo principal",
+    "building": "Edificio y estado",
+    "risks": "Riesgo y seguridad",
+    "legal": "Legal y documentos a solicitar",
+    "neighbourhood": "El barrio",
+    "urbanism": "Urbanismo y acceso (ZBE)",
+    "costs": "Costes para compradores internacionales",
+    "subsidies": "Impuestos y ayudas",
+    "negotiation": "Guía de negociación",
+    "checklist": "Antes de ofertar — lista de comprobación"
+  },
+  "scoreNames": {
+    "location": "Ubicación y estilo de vida",
+    "transport": "Transporte y accesos",
+    "building": "Edificio y estructura",
+    "price": "Precio y valor",
+    "energy": "Energía"
+  },
+  "snapshot": {
+    "address": "Dirección",
+    "neighbourhood": "Barrio",
+    "builtArea": "Superficie construida",
+    "usableArea": "Superficie útil",
+    "bedsBaths": "Habitaciones / baños",
+    "floor": "Planta",
+    "lift": "Ascensor",
+    "terrace": "Terraza",
+    "heating": "Calefacción / A/A",
+    "yearBuilt": "Año de construcción",
+    "condition": "Estado",
+    "cadastralRef": "Ref. catastral"
+  },
+  "price": {
+    "benchHeading": "Referencias y evidencia comparable",
+    "ladderHeading": "Escalera de oferta sugerida",
+    "referencesHeading": "Comprueba el precio tú mismo — fuentes de referencia",
+    "referencesNote": "No asignamos un valor en tu nombre. Usa estas fuentes oficiales y publicadas para comparar el precio de oferta con el mercado y decidir por ti mismo.",
+    "refKind": {
+      "official": "oficial",
+      "portal": "estadística portal",
+      "search": "anuncios"
+    },
+    "table": {
+      "reference": "Referencia",
+      "price": "Precio",
+      "size": "Tamaño",
+      "perM2": "€/m²",
+      "note": "Nota"
+    },
+    "ladder": {
+      "open": "Apertura",
+      "target": "Cierre objetivo",
+      "ceiling": "Techo"
+    }
+  },
+  "risk": {
+    "flood": "Inundación",
+    "seismic": "Sísmico",
+    "radon": "Radón",
+    "energy": "Calificación energética",
+    "ite": "ITE / edad del edificio",
+    "asbestos": "Amianto (anterior a 2002)",
+    "crime": "Delincuencia del barrio"
+  },
+  "riskPill": {
+    "good": "Bajo",
+    "ok": "Vigilar",
+    "low": "Alto"
+  },
+  "neigh": {
+    "metro": "Metro",
+    "health": "Sanidad",
+    "green": "Zonas verdes",
+    "shopping": "Compra diaria",
+    "market": "Mercado",
+    "schools": "Colegios"
+  },
+  "costs": {
+    "itp": "Impuesto de transmisiones (ITP)",
+    "notary": "Notaría + Registro",
+    "gestoria": "Gestoría / legal",
+    "valuation": "Tasación hipotecaria",
+    "allIn": "Estimación total",
+    "before": "Antes de empezar"
+  },
+  "footer": {
+    "generated": "Generado el {date}"
+  }
+}
