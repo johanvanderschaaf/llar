@@ -31,12 +31,11 @@
   },
   "preview": {
     "free": "Vista previa gratuita",
-    "note": "Esto es una vista previa. El análisis detallado y el PDF se desbloquean pronto.",
+    "note": "Vista previa gratuita. Desbloquea el informe completo y el PDF al instante.",
     "lockTitle": "Desbloquea el análisis completo",
     "lockCta": "Disponible al desbloquear",
     "unlockTitle": "Desbloquea el informe completo y el PDF",
     "unlockCta": "Desbloquear por {price}",
-    "preparing": "El análisis detallado se está preparando. Te avisaremos cuando esté listo para desbloquear.",
     "tagGood": "Merece una visita",
     "tagOk": "Revísalo con cuidado",
     "tagLow": "Con cautela"

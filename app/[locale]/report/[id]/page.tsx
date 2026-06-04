@@ -5,7 +5,8 @@ import { sampleSors35 } from "@/data/sample-sors35";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { hasPaidOrder } from "@/lib/orders";
-import { hasStripe } from "@/lib/stripe";
+import { hasAnthropicKey } from "@/lib/anthropic";
+import { generateNarrative } from "@/pipeline/narrate";
 import type { ReportRow } from "@/types/db";
 
 export const dynamic = "force-dynamic";
@@ -46,14 +47,24 @@ export default async function ReportPage({
   const paid = await hasPaidOrder(id);
   const full = Boolean(user) || paid;
 
+  // Lazily generate the AI narrative the first time the FULL report is viewed
+  // (no operator step needed). Cost is only ever paid for unlocked reports.
+  let data = report.data;
+  if (full && hasAnthropicKey() && !data.verdict?.headline?.en) {
+    try {
+      data = await generateNarrative(data, report.input);
+      await db.from("reports").update({ data }).eq("id", id);
+    } catch {
+      // Leave the deterministic data if narration fails; don't block the report.
+    }
+  }
+
   return (
     <ReportView
-      report={report.data}
+      report={data}
       locale={locale}
       mode={full ? "full" : "preview"}
       reportId={id}
-      purchasable={report.status === "published"}
-      stripeEnabled={hasStripe()}
     />
   );
 }

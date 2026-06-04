@@ -71,15 +71,11 @@ export async function ReportView({
   locale,
   mode = "full",
   reportId,
-  purchasable = false,
-  stripeEnabled = false,
 }: {
   report: Report;
   locale: string;
   mode?: "full" | "preview";
   reportId?: string;
-  purchasable?: boolean;
-  stripeEnabled?: boolean;
 }) {
   const t = await getTranslations();
   const preview = mode === "preview";
@@ -87,7 +83,6 @@ export async function ReportView({
     locale === "en" ? "en-IE" : locale === "ca" ? "ca-ES" : "es-ES",
     { style: "currency", currency: pricing.currency },
   ).format(reportPriceEur());
-  const canUnlock = preview && purchasable && stripeEnabled && Boolean(reportId);
   const overall = report.verdict.overall;
   const previewTag =
     overall >= 70
@@ -160,25 +155,19 @@ export async function ReportView({
         </div>
       </div>
 
-      {/* PREVIEW — unlock banner */}
-      {preview ? (
+      {/* PREVIEW — paywall banner (always visible until unlocked) */}
+      {preview && reportId ? (
         <div className="unlock-banner fx">
-          {canUnlock ? (
-            <>
-              <div>
-                <div className="unlock-title">{t("preview.unlockTitle")}</div>
-                <div className="unlock-sub">{t("preview.note")}</div>
-              </div>
-              <UnlockButton
-                reportId={reportId!}
-                locale={locale}
-                label={t("preview.unlockCta", { price: priceLabel })}
-                pendingLabel="…"
-              />
-            </>
-          ) : (
-            <div className="unlock-sub">{t("preview.preparing")}</div>
-          )}
+          <div>
+            <div className="unlock-title">{t("preview.unlockTitle")}</div>
+            <div className="unlock-sub">{t("preview.note")}</div>
+          </div>
+          <UnlockButton
+            reportId={reportId}
+            locale={locale}
+            label={t("preview.unlockCta", { price: priceLabel })}
+            pendingLabel="…"
+          />
         </div>
       ) : null}
 

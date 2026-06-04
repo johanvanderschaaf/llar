@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { generateReport } from "@/pipeline/generate";
 import { routing } from "@/i18n/routing";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getStripe, reportPriceCents, stripeLocale } from "@/lib/stripe";
+import { getStripe, hasStripe, reportPriceCents, stripeLocale } from "@/lib/stripe";
 import type { ReportInput, ReportRow } from "@/types/db";
 
 function numOrUndef(v: FormDataEntryValue | null): number | undefined {
@@ -47,6 +47,10 @@ export async function startAnalysisAction(formData: FormData) {
  * Records an order, then redirects to Stripe's hosted checkout.
  */
 export async function createCheckoutAction(reportId: string, locale: string) {
+  // No Stripe keys yet → bounce back gracefully (the paywall still shows).
+  if (!hasStripe()) {
+    redirect(`/${locale}/report/${reportId}?checkout=unconfigured`);
+  }
   const db = createAdminClient();
   const { data: row } = await db
     .from("reports")
@@ -54,8 +58,8 @@ export async function createCheckoutAction(reportId: string, locale: string) {
     .eq("id", reportId)
     .maybeSingle();
   const report = row as Pick<ReportRow, "id" | "status" | "input" | "data"> | null;
-  if (!report || report.status !== "published") {
-    redirect(`/${locale}/report/${reportId}`);
+  if (!report) {
+    redirect(`/${locale}`);
   }
 
   const base = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";

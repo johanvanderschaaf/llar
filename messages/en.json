@@ -31,12 +31,11 @@
   },
   "preview": {
     "free": "Free preview",
-    "note": "This is a preview. The detailed analysis and PDF unlock soon.",
+    "note": "Free preview. Unlock the full report and PDF instantly.",
     "lockTitle": "Unlock the full analysis",
     "lockCta": "Available on unlock",
     "unlockTitle": "Unlock the full report and PDF",
     "unlockCta": "Unlock for {price}",
-    "preparing": "The detailed analysis is being prepared. We'll let you know when it's ready to unlock.",
     "tagGood": "Worth a viewing",
     "tagOk": "Check carefully",
     "tagLow": "Proceed with caution"
