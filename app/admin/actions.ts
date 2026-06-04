@@ -24,6 +24,7 @@ export async function createReportAction(formData: FormData) {
     askingPriceEur: numOrUndef(formData.get("askingPriceEur")),
     builtM2: numOrUndef(formData.get("builtM2")),
     usableM2: numOrUndef(formData.get("usableM2")),
+    source: "operator",
   };
   const id = await generateReport(input);
   redirect(`/admin/reports/${id}`);

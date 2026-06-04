@@ -11,6 +11,10 @@ export interface ReportInput {
   askingPriceEur?: number;
   builtM2?: number;
   usableM2?: number;
+  /** Buyer email (guest), captured on the public form for delivery/follow-up. */
+  email?: string;
+  /** Who initiated the report. */
+  source?: "buyer" | "operator";
 }
 
 export type ReportStatus = "draft" | "in_review" | "published";

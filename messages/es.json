@@ -12,6 +12,32 @@
     "cta": "Analizar mi piso",
     "sample": "Ver ejemplo"
   },
+  "form": {
+    "title": "Analiza tu piso",
+    "sub": "Busca la dirección en Barcelona y elige el piso exacto. Generamos una vista previa gratuita al instante.",
+    "street": "Calle (Barcelona)",
+    "streetPlaceholder": "Empieza a escribir, p. ej. Mallorca",
+    "number": "Número",
+    "find": "Buscar pisos",
+    "finding": "Buscando…",
+    "selectUnit": "Elige el piso",
+    "noRecords": "No hay registros del Catastro en esa calle/número. Revisa el número o introduce la referencia catastral abajo.",
+    "manualSummary": "O introduce la referencia catastral directamente",
+    "askingPrice": "Precio de oferta (€)",
+    "email": "Email (opcional)",
+    "emailHint": "Para guardarte el informe y avisarte cuando esté el análisis completo.",
+    "selected": "Seleccionado:",
+    "submit": "Generar vista previa →"
+  },
+  "preview": {
+    "free": "Vista previa gratuita",
+    "note": "Esto es una vista previa. El análisis detallado y el PDF se desbloquean pronto.",
+    "lockTitle": "Desbloquea el análisis completo",
+    "lockCta": "Disponible muy pronto",
+    "tagGood": "Merece una visita",
+    "tagOk": "Revísalo con cuidado",
+    "tagLow": "Con cautela"
+  },
   "landing": {
     "hero": {
       "eyebrow": "Diligencia debida · Barcelona",

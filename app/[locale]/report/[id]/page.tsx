@@ -9,9 +9,10 @@ import type { ReportRow } from "@/types/db";
 export const dynamic = "force-dynamic";
 
 /**
- * Public report route. Serves the Phase 1 demo sample, plus reports from the
- * database: published reports are public; unpublished ones are visible only to
- * a signed-in operator (preview).
+ * Public report route. Serves the demo sample, plus reports from the database:
+ * - published → full report (public).
+ * - unpublished → free PREVIEW for anyone with the link (premium sections
+ *   locked); the operator sees the full report.
  */
 export default async function ReportPage({
   params,
@@ -34,14 +35,20 @@ export default async function ReportPage({
   if (!row) notFound();
   const report = row as ReportRow;
 
-  if (report.status !== "published") {
-    // Gate unpublished previews to the operator.
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) notFound();
+  if (report.status === "published") {
+    return <ReportView report={report.data} locale={locale} />;
   }
 
-  return <ReportView report={report.data} locale={locale} />;
+  // Unpublished: operators get the full report; buyers get the free preview.
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  return (
+    <ReportView
+      report={report.data}
+      locale={locale}
+      mode={user ? "full" : "preview"}
+    />
+  );
 }

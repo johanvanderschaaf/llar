@@ -12,6 +12,32 @@
     "cta": "Analitzar el meu pis",
     "sample": "Veure exemple"
   },
+  "form": {
+    "title": "Analitza el teu pis",
+    "sub": "Cerca l'adreça a Barcelona i tria el pis exacte. Generem una vista prèvia gratuïta a l'instant.",
+    "street": "Carrer (Barcelona)",
+    "streetPlaceholder": "Comença a escriure, p. ex. Mallorca",
+    "number": "Número",
+    "find": "Cercar pisos",
+    "finding": "Cercant…",
+    "selectUnit": "Tria el pis",
+    "noRecords": "No hi ha registres del Cadastre en aquest carrer/número. Revisa el número o introdueix la referència cadastral a sota.",
+    "manualSummary": "O introdueix la referència cadastral directament",
+    "askingPrice": "Preu de sortida (€)",
+    "email": "Correu (opcional)",
+    "emailHint": "Per guardar-te l'informe i avisar-te quan tinguis l'anàlisi completa.",
+    "selected": "Seleccionat:",
+    "submit": "Generar vista prèvia →"
+  },
+  "preview": {
+    "free": "Vista prèvia gratuïta",
+    "note": "Això és una vista prèvia. L'anàlisi detallada i el PDF es desbloquegen aviat.",
+    "lockTitle": "Desbloqueja l'anàlisi completa",
+    "lockCta": "Disponible ben aviat",
+    "tagGood": "Val la pena visitar-lo",
+    "tagOk": "Revisa-ho amb cura",
+    "tagLow": "Amb cautela"
+  },
   "landing": {
     "hero": {
       "eyebrow": "Diligència deguda · Barcelona",

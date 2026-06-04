@@ -1,15 +1,12 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
 import { searchStreets } from "@/adapters/catastro-search";
 
-/** GET /api/catastro/streets?q=sor → street suggestions (operator-only). */
+/**
+ * GET /api/catastro/streets?q=sor → street suggestions.
+ * Public: proxies the public Catastro callejero so the buyer form can
+ * autocomplete addresses without an account.
+ */
 export async function GET(request: Request) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-
   const q = new URL(request.url).searchParams.get("q") ?? "";
   try {
     const streets = await searchStreets(q);

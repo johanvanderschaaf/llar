@@ -11,7 +11,7 @@ export async function TopBar() {
         <Logo />
         <div className="topbar-right">
           <LocaleSwitcher />
-          <Link href="/report/sample-sors35" className="nav-cta">
+          <Link href="/start" className="nav-cta">
             {t("nav.cta")}
           </Link>
         </div>

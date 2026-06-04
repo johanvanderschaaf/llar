@@ -1,7 +1,9 @@
+import type { ReactNode } from "react";
 import { getTranslations } from "next-intl/server";
 import type { Report, Fact, Localized } from "@/types/report";
 import { bandFor } from "@/config/scoring";
 import { L } from "@/lib/localized";
+import { LockedSection } from "./LockedSection";
 
 /* ---------- small presentational helpers ---------- */
 
@@ -64,11 +66,35 @@ function Checklist({ items, locale }: { items: Localized[]; locale: string }) {
 export async function ReportView({
   report,
   locale,
+  mode = "full",
 }: {
   report: Report;
   locale: string;
+  mode?: "full" | "preview";
 }) {
   const t = await getTranslations();
+  const preview = mode === "preview";
+  const overall = report.verdict.overall;
+  const previewTag =
+    overall >= 70
+      ? t("preview.tagGood")
+      : overall >= 50
+        ? t("preview.tagOk")
+        : t("preview.tagLow");
+  // Wrap a premium section behind the paywall teaser in preview mode.
+  const lock = (children: ReactNode) =>
+    preview ? (
+      <LockedSection
+        locked
+        eyebrow={t("preview.free")}
+        title={t("preview.lockTitle")}
+        cta={t("preview.lockCta")}
+      >
+        {children}
+      </LockedSection>
+    ) : (
+      children
+    );
   const dateFmt = new Intl.DateTimeFormat(locale === "es" ? "es-ES" : "en-GB", {
     day: "numeric",
     month: "long",
@@ -98,15 +124,25 @@ export async function ReportView({
 
       {/* VERDICT */}
       <div className="verdict fx" style={{ animationDelay: ".05s" }}>
-        <div className="lab">{t("verdict.label")}</div>
-        <h2 className="serif">{L(report.verdict.headline, locale)}</h2>
-        <p>{L(report.verdict.body, locale)}</p>
+        <div className="lab">
+          {preview ? t("preview.free") : t("verdict.label")}
+        </div>
+        {preview ? (
+          <p style={{ marginBottom: 4 }}>{t("preview.note")}</p>
+        ) : (
+          <>
+            <h2 className="serif">{L(report.verdict.headline, locale)}</h2>
+            <p>{L(report.verdict.body, locale)}</p>
+          </>
+        )}
         <div className="vscore">
-          <b>{report.verdict.overall}</b>
+          <b>{overall}</b>
           <span>{t("verdict.overallSuffix")}</span>
         </div>
         <div>
-          <span className="vtag">{L(report.verdict.tag, locale)}</span>
+          <span className="vtag">
+            {preview ? previewTag : L(report.verdict.tag, locale)}
+          </span>
         </div>
       </div>
 
@@ -152,7 +188,8 @@ export async function ReportView({
         </p>
       </section>
 
-      {/* 03 PRICE & VALUE */}
+      {/* 03 PRICE & VALUE (premium) */}
+      {lock(
       <section className="fx">
         <SectionHead
           num="03"
@@ -257,8 +294,10 @@ export async function ReportView({
           </>
         ) : null}
       </section>
+      )}
 
-      {/* 04 BUILDING & CONDITION */}
+      {/* 04 BUILDING & CONDITION (premium) */}
+      {lock(
       <section className="fx">
         <SectionHead num="04" title={t("sections.building")} />
         <div className="grid-2">
@@ -273,6 +312,7 @@ export async function ReportView({
           {L(report.building.keyline, locale)}
         </div>
       </section>
+      )}
 
       {/* 05 RISK & SAFETY */}
       <section className="fx">
@@ -286,12 +326,14 @@ export async function ReportView({
         ))}
       </section>
 
-      {/* 06 LEGAL */}
+      {/* 06 LEGAL (premium) */}
+      {lock(
       <section className="fx">
         <SectionHead num="06" title={t("sections.legal")} />
         <p className="body">{L(report.legal.intro, locale)}</p>
         <Checklist items={report.legal.items} locale={locale} />
       </section>
+      )}
 
       {/* 07 NEIGHBOURHOOD */}
       <section className="fx">
@@ -345,7 +387,8 @@ export async function ReportView({
         </div>
       </section>
 
-      {/* 11 NEGOTIATION */}
+      {/* 11 NEGOTIATION (premium) */}
+      {lock(
       <section className="fx">
         <SectionHead num="11" title={t("sections.negotiation")} />
         <p className="body">{L(report.negotiation.intro, locale)}</p>
@@ -354,12 +397,15 @@ export async function ReportView({
           {L(report.negotiation.tactic, locale)}
         </div>
       </section>
+      )}
 
-      {/* 12 CHECKLIST */}
+      {/* 12 CHECKLIST (premium) */}
+      {lock(
       <section className="fx">
         <SectionHead num="12" title={t("sections.checklist")} />
         <Checklist items={report.checklist} locale={locale} />
       </section>
+      )}
 
       {/* FOOTER */}
       <footer className="fx">

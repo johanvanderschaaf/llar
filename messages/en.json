@@ -12,6 +12,32 @@
     "cta": "Check my flat",
     "sample": "See a sample"
   },
+  "form": {
+    "title": "Check your flat",
+    "sub": "Search the address in Barcelona and pick the exact flat. We generate a free preview instantly.",
+    "street": "Street (Barcelona)",
+    "streetPlaceholder": "Start typing, e.g. Mallorca",
+    "number": "Number",
+    "find": "Find flats",
+    "finding": "Searching…",
+    "selectUnit": "Pick the flat",
+    "noRecords": "No Catastro records at that street/number. Check the number or enter the cadastral reference below.",
+    "manualSummary": "Or enter a cadastral reference directly",
+    "askingPrice": "Asking price (€)",
+    "email": "Email (optional)",
+    "emailHint": "To save your report and tell you when the full analysis is ready.",
+    "selected": "Selected:",
+    "submit": "Generate preview →"
+  },
+  "preview": {
+    "free": "Free preview",
+    "note": "This is a preview. The detailed analysis and PDF unlock soon.",
+    "lockTitle": "Unlock the full analysis",
+    "lockCta": "Available very soon",
+    "tagGood": "Worth a viewing",
+    "tagOk": "Check carefully",
+    "tagLow": "Proceed with caution"
+  },
   "landing": {
     "hero": {
       "eyebrow": "Due diligence · Barcelona",

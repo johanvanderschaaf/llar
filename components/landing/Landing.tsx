@@ -41,12 +41,12 @@ export async function Landing({ locale }: { locale: string }) {
           <h1 className="serif lp-h1">{t("hero.title")}</h1>
           <p className="lp-sub">{t("hero.sub")}</p>
           <div className="lp-cta-row">
-            <Link href={SAMPLE} className="btn btn-primary">
+            <Link href="/start" className="btn btn-primary">
               {t("hero.ctaPrimary")}
             </Link>
-            <a href="#how" className="btn btn-ghost">
+            <Link href={SAMPLE} className="btn btn-ghost">
               {t("hero.ctaSecondary")}
-            </a>
+            </Link>
           </div>
           <div className="lp-trust">
             <span className="lp-trust-title">{t("trust.title")}</span>
@@ -117,7 +117,7 @@ export async function Landing({ locale }: { locale: string }) {
             </h2>
             <div className="lp-price">{price}</div>
             <p className="lp-price-desc">{t("pricing.desc", { price })}</p>
-            <Link href={SAMPLE} className="btn btn-primary">
+            <Link href="/start" className="btn btn-primary">
               {t("pricing.cta")}
             </Link>
             <p className="lp-price-note">{t("pricing.note")}</p>
