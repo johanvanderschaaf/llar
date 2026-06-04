@@ -2,8 +2,11 @@ import type { ReactNode } from "react";
 import { getTranslations } from "next-intl/server";
 import type { Report, Fact, Localized } from "@/types/report";
 import { bandFor } from "@/config/scoring";
+import { pricing } from "@/config/brand";
 import { L } from "@/lib/localized";
+import { reportPriceEur } from "@/lib/stripe";
 import { LockedSection } from "./LockedSection";
+import { UnlockButton } from "./UnlockButton";
 
 /* ---------- small presentational helpers ---------- */
 
@@ -67,13 +70,24 @@ export async function ReportView({
   report,
   locale,
   mode = "full",
+  reportId,
+  purchasable = false,
+  stripeEnabled = false,
 }: {
   report: Report;
   locale: string;
   mode?: "full" | "preview";
+  reportId?: string;
+  purchasable?: boolean;
+  stripeEnabled?: boolean;
 }) {
   const t = await getTranslations();
   const preview = mode === "preview";
+  const priceLabel = new Intl.NumberFormat(
+    locale === "en" ? "en-IE" : locale === "ca" ? "ca-ES" : "es-ES",
+    { style: "currency", currency: pricing.currency },
+  ).format(reportPriceEur());
+  const canUnlock = preview && purchasable && stripeEnabled && Boolean(reportId);
   const overall = report.verdict.overall;
   const previewTag =
     overall >= 70
@@ -145,6 +159,28 @@ export async function ReportView({
           </span>
         </div>
       </div>
+
+      {/* PREVIEW — unlock banner */}
+      {preview ? (
+        <div className="unlock-banner fx">
+          {canUnlock ? (
+            <>
+              <div>
+                <div className="unlock-title">{t("preview.unlockTitle")}</div>
+                <div className="unlock-sub">{t("preview.note")}</div>
+              </div>
+              <UnlockButton
+                reportId={reportId!}
+                locale={locale}
+                label={t("preview.unlockCta", { price: priceLabel })}
+                pendingLabel="…"
+              />
+            </>
+          ) : (
+            <div className="unlock-sub">{t("preview.preparing")}</div>
+          )}
+        </div>
+      ) : null}
 
       {/* 01 SCORES */}
       <section className="fx">

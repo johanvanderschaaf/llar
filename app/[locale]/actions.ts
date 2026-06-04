@@ -3,7 +3,9 @@
 import { redirect } from "next/navigation";
 import { generateReport } from "@/pipeline/generate";
 import { routing } from "@/i18n/routing";
-import type { ReportInput } from "@/types/db";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { getStripe, reportPriceCents, stripeLocale } from "@/lib/stripe";
+import type { ReportInput, ReportRow } from "@/types/db";
 
 function numOrUndef(v: FormDataEntryValue | null): number | undefined {
   const n = Number(String(v ?? "").replace(/[^\d.]/g, ""));
@@ -37,4 +39,55 @@ export async function startAnalysisAction(formData: FormData) {
 
   const id = await generateReport(input);
   redirect(`/${locale}/report/${id}`);
+}
+
+/**
+ * Start Stripe Checkout to unlock a report's full analysis + PDF.
+ * Only available once the operator has published the report (AI/review done).
+ * Records an order, then redirects to Stripe's hosted checkout.
+ */
+export async function createCheckoutAction(reportId: string, locale: string) {
+  const db = createAdminClient();
+  const { data: row } = await db
+    .from("reports")
+    .select("id, status, input, data")
+    .eq("id", reportId)
+    .maybeSingle();
+  const report = row as Pick<ReportRow, "id" | "status" | "input" | "data"> | null;
+  if (!report || report.status !== "published") {
+    redirect(`/${locale}/report/${reportId}`);
+  }
+
+  const base = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
+  const stripe = getStripe();
+  const title = report.data?.hero?.title ?? "Informe";
+
+  const session = await stripe.checkout.sessions.create({
+    mode: "payment",
+    line_items: [
+      {
+        quantity: 1,
+        price_data: {
+          currency: "eur",
+          unit_amount: reportPriceCents(),
+          product_data: { name: `PisoWise — ${title}` },
+        },
+      },
+    ],
+    metadata: { reportId },
+    customer_email: report.input?.email || undefined,
+    locale: stripeLocale(locale),
+    success_url: `${base}/${locale}/report/${reportId}?paid=1`,
+    cancel_url: `${base}/${locale}/report/${reportId}`,
+  });
+
+  await db.from("orders").insert({
+    report_id: reportId,
+    buyer_email: report.input?.email ?? null,
+    status: "checkout",
+    stripe_session_id: session.id,
+    amount_eur: reportPriceCents() / 100,
+  });
+
+  redirect(session.url!);
 }

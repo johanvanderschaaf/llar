@@ -33,7 +33,10 @@
     "free": "Vista prèvia gratuïta",
     "note": "Això és una vista prèvia. L'anàlisi detallada i el PDF es desbloquegen aviat.",
     "lockTitle": "Desbloqueja l'anàlisi completa",
-    "lockCta": "Disponible ben aviat",
+    "lockCta": "Disponible en desbloquejar",
+    "unlockTitle": "Desbloqueja l'informe complet i el PDF",
+    "unlockCta": "Desbloquejar per {price}",
+    "preparing": "L'anàlisi detallada s'està preparant. T'avisarem quan estigui llesta per desbloquejar.",
     "tagGood": "Val la pena visitar-lo",
     "tagOk": "Revisa-ho amb cura",
     "tagLow": "Amb cautela"

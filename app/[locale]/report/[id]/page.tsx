@@ -4,6 +4,8 @@ import { ReportView } from "@/components/report/ReportView";
 import { sampleSors35 } from "@/data/sample-sors35";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { hasPaidOrder } from "@/lib/orders";
+import { hasStripe } from "@/lib/stripe";
 import type { ReportRow } from "@/types/db";
 
 export const dynamic = "force-dynamic";
@@ -35,20 +37,23 @@ export default async function ReportPage({
   if (!row) notFound();
   const report = row as ReportRow;
 
-  if (report.status === "published") {
-    return <ReportView report={report.data} locale={locale} />;
-  }
-
-  // Unpublished: operators get the full report; buyers get the free preview.
+  // Full access for the operator or anyone who has paid; everyone else gets the
+  // free preview (premium sections locked behind the paywall).
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  const paid = await hasPaidOrder(id);
+  const full = Boolean(user) || paid;
+
   return (
     <ReportView
       report={report.data}
       locale={locale}
-      mode={user ? "full" : "preview"}
+      mode={full ? "full" : "preview"}
+      reportId={id}
+      purchasable={report.status === "published"}
+      stripeEnabled={hasStripe()}
     />
   );
 }

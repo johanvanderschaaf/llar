@@ -640,6 +640,35 @@ ul.check li b {
   color: var(--ink);
 }
 
+/* preview unlock banner */
+.unlock-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin: 18px 0 4px;
+  padding: 20px 24px;
+  background: var(--pw-ink);
+  border-radius: 18px;
+  box-shadow: var(--pw-sh-2);
+}
+.unlock-banner .unlock-title {
+  color: #fff;
+  font-weight: 800;
+  font-size: 18px;
+  letter-spacing: -0.02em;
+}
+.unlock-banner .unlock-sub {
+  color: var(--pw-ink-300);
+  font-size: 14px;
+  margin-top: 2px;
+  max-width: 52ch;
+}
+.btn-unlock {
+  white-space: nowrap;
+}
+
 /* locked / premium-teaser state (echoes the reference's greyed blocks) */
 .locked {
   position: relative;
