@@ -1,7 +1,9 @@
-import type { Report, Localized, Score } from "@/types/report";
+import type { Report, Localized, Score, UrbanismItem } from "@/types/report";
 import type { CatastroData } from "@/adapters/catastro";
 import type { AmenityData, NearestPlace } from "@/adapters/amenities";
 import type { UrbanismData } from "@/adapters/urbanism";
+import type { AffectationData } from "@/adapters/affectation";
+import type { HeritageData, HeritageLevel } from "@/adapters/heritage";
 import type { EnergyData } from "@/adapters/energy";
 import type { FloodData } from "@/adapters/flood";
 import { SEISMIC, RADON, crimeContext } from "@/config/static-risk";
@@ -29,6 +31,7 @@ export function emptyReport(id: string, cadastralRef: string): Report {
       overall: 0,
       tag: { ...EMPTY },
     },
+    alerts: [],
     scores: [],
     snapshot: { facts: [], note: { ...EMPTY } },
     price: {
@@ -42,7 +45,7 @@ export function emptyReport(id: string, cadastralRef: string): Report {
     risks: [],
     legal: { intro: { ...EMPTY }, items: [] },
     neighbourhood: { lede: { ...EMPTY }, facts: [], note: { ...EMPTY } },
-    urbanism: { body: { ...EMPTY } },
+    urbanism: { items: [] },
     costs: { intro: { ...EMPTY }, facts: [], footnote: { ...EMPTY } },
     subsidies: { panels: [] },
     negotiation: { intro: { ...EMPTY }, items: [], tactic: { ...EMPTY } },
@@ -430,27 +433,230 @@ export function seedRisks(
 
 /* ---------- urbanistic situation → section 08 ---------- */
 
-export function seedUrbanism(report: Report, u: UrbanismData): Report {
-  const r: Report = structuredClone(report);
-  const cls = u.classification;
-  const q = u.qualification;
-  const code = u.qualCode ? ` (MUC ${u.qualCode})` : "";
-
-  const affEn = u.possibleAffectation
-    ? "⚠ The qualification corresponds to a system (road / facility / green space), so the parcel may carry an urbanistic affectation — verify this urgently before offering."
-    : "The parcel sits in a buildable zone, with no system affectation detected.";
-  const affEs = u.possibleAffectation
-    ? "⚠ La calificación corresponde a un sistema (viario / equipamiento / zona verde), por lo que la parcela puede tener una afectación urbanística: verifícalo con urgencia antes de ofertar."
-    : "La parcela está en una zona edificable, sin afectación por sistema detectada.";
-
-  r.urbanism.body = {
-    en: `${cls ? `Land classification: ${cls}. ` : ""}${
-      q ? `Planning qualification: ${q}${code}. ` : ""
-    }${affEn} All of Barcelona inside the Rondes is within the ZBE low-emissions zone (only relevant if you keep a non-compliant car). This is orientation only — confirm the definitive status with an official certificat urbanístic from the Ajuntament before committing.`,
-    es: `${cls ? `Clasificación del suelo: ${cls}. ` : ""}${
-      q ? `Calificación urbanística: ${q}${code}. ` : ""
-    }${affEs} Toda Barcelona dentro de las Rondas está en la ZBE (Zona de Bajas Emisiones; solo relevante si mantienes un coche sin etiqueta). Esto es orientativo: confirma el estado definitivo con un certificado urbanístico oficial del Ayuntamiento antes de comprometerte.`,
+/** Translate the affected systems into a plain phrase ("a public facility"). */
+function plainSystems(affs: UrbanismData["affectations"]): Localized {
+  const cats = new Set<string>();
+  for (const a of affs) {
+    const g = `${a.group ?? ""} ${a.family ?? ""} ${a.name ?? ""}`.toLowerCase();
+    if (/equipament/.test(g)) cats.add("facility");
+    else if (/vi[aà]ri|vial|carrer/.test(g)) cats.add("road");
+    else if (/verd|parc|lliure|jard/.test(g)) cats.add("green");
+    else if (/ferro|infra|servei|t[èe]cnic|hidr|port/.test(g)) cats.add("infra");
+    else cats.add("public");
+  }
+  const EN: Record<string, string> = {
+    facility: "a public facility",
+    road: "a road or street layout",
+    green: "a public green space",
+    infra: "public infrastructure",
+    public: "a public use",
   };
+  const ES: Record<string, string> = {
+    facility: "un equipamiento público",
+    road: "viario o ensanche de calle",
+    green: "una zona verde pública",
+    infra: "infraestructura pública",
+    public: "un uso público",
+  };
+  const list = [...cats];
+  return {
+    en: list.map((c) => EN[c]).join(" and ") || "a public use",
+    es: list.map((c) => ES[c]).join(" y ") || "un uso público",
+  };
+}
+
+/**
+ * Seed the urbanism section as a list of plain-language status rows (one per
+ * planning aspect) plus the top-of-report affectation alert.
+ *
+ * The affectation verdict prefers the official Ajuntament AFH service (`a`):
+ * category A → affected, C/D → specific circumstances, B → clear. When the AFH
+ * service is unavailable, it falls back to the qualification inference in `u`.
+ */
+export function seedUrbanism(
+  report: Report,
+  u: UrbanismData,
+  a?: AffectationData,
+): Report {
+  const r: Report = structuredClone(report);
+  const items: UrbanismItem[] = [];
+
+  // Unified verdict: AFH category if present, else the qualification inference.
+  const level: "affected" | "specific" | "clear" = a
+    ? a.category === "A"
+      ? "affected"
+      : a.category === "B"
+        ? "clear"
+        : "specific"
+    : u.possibleAffectation
+      ? "affected"
+      : "clear";
+  const confirmed = Boolean(a); // AFH = confirmed; inference = "appears".
+  const plain = plainSystems(u.affectations);
+  const codes = u.affectations.map((af) => af.clau).join(", ");
+  const codeTag = codes
+    ? { en: ` (zoning code ${codes})`, es: ` (código ${codes})` }
+    : { en: "", es: "" };
+
+  // 1) Affectation — the headline planning aspect.
+  items.push({
+    key: "affectation",
+    tone: level === "affected" ? "caution" : level === "specific" ? "check" : "clear",
+    label: { en: "Planning affectation", es: "Afectación urbanística" },
+    text:
+      level === "affected"
+        ? {
+            en: `${confirmed ? "The city officially flags this property as affected" : "Part of the plot appears reserved for public use"} — part of the plot is reserved for ${plain.en}. This can restrict renovations, cap the resale value, or in extreme cases lead to expropriation. Confirm before offering with an official planning certificate (certificat urbanístic).${codeTag.en}`,
+            es: `${confirmed ? "El ayuntamiento marca oficialmente esta propiedad como afectada" : "Parte de la parcela parece reservada para uso público"} — parte de la parcela está reservada para ${plain.es}. Puede limitar reformas, reducir el valor de reventa o, en casos extremos, llevar a expropiación. Confírmalo antes de ofertar con un certificado urbanístico oficial.${codeTag.es}`,
+          }
+        : level === "specific"
+          ? {
+              en: "The city notes specific planning circumstances here (for example a plan being processed, an area under redevelopment, or suspended permits). Check what applies before offering.",
+              es: "El ayuntamiento señala circunstancias urbanísticas específicas (por ejemplo un planeamiento en trámite, un ámbito en transformación o licencias suspendidas). Comprueba qué aplica antes de ofertar.",
+            }
+          : {
+              en: "No planning affectation was found that would limit using this as a home.",
+              es: "No se ha encontrado ninguna afectación urbanística que impida usarla como vivienda.",
+            },
+  });
+
+  // 2) Zoning — reassuring context, only when we resolved a qualification.
+  if (u.qualCode || u.classification) {
+    items.push({
+      key: "zoning",
+      tone: "clear",
+      label: { en: "Zoning", es: "Calificación" },
+      text: {
+        en: `Residential, build-ready land — standard for a city flat.${u.qualCode ? ` (zoning code ${u.qualCode})` : ""}`,
+        es: `Suelo residencial y consolidado — lo normal para un piso urbano.${u.qualCode ? ` (código ${u.qualCode})` : ""}`,
+      },
+    });
+  }
+
+  // 3) Low Emission Zone — static city-wide context.
+  items.push({
+    key: "lez",
+    tone: "info",
+    label: {
+      en: "Low Emission Zone (ZBE)",
+      es: "Zona de Bajas Emisiones (ZBE)",
+    },
+    text: {
+      en: "Like all of central Barcelona, this address is inside the Low Emission Zone. Only relevant if you keep a car without an emissions sticker.",
+      es: "Como toda Barcelona central, esta dirección está dentro de la Zona de Bajas Emisiones. Solo importa si mantienes un coche sin etiqueta ambiental.",
+    },
+  });
+
+  r.urbanism = { items };
+
+  // Surface a serious finding at the top of the report, not just in the section.
+  if (level === "affected") {
+    r.alerts = [
+      ...(r.alerts ?? []),
+      {
+        tone: "caution",
+        title: {
+          en: confirmed ? "Planning affectation" : "Possible planning affectation",
+          es: confirmed ? "Afectación urbanística" : "Posible afectación urbanística",
+        },
+        detail: {
+          en: `${confirmed ? "The city flags this property as affected" : "Part of the plot appears reserved for public use"} — part is reserved for ${plain.en}. It can restrict works, cap the value, or lead to expropriation. Confirm with an official planning certificate (certificat urbanístic) before offering.`,
+          es: `${confirmed ? "El ayuntamiento marca esta propiedad como afectada" : "Parte de la parcela parece reservada para uso público"} — parte está reservada para ${plain.es}. Puede limitar obras, reducir el valor o llevar a expropiación. Confírmalo con un certificado urbanístico oficial antes de ofertar.`,
+        },
+      },
+    ];
+  } else if (level === "specific") {
+    r.alerts = [
+      ...(r.alerts ?? []),
+      {
+        tone: "check",
+        title: {
+          en: "Specific planning circumstances",
+          es: "Circunstancias urbanísticas específicas",
+        },
+        detail: {
+          en: "The city notes specific circumstances for this property (a plan being processed, an area under redevelopment, or suspended permits). Check what applies before offering.",
+          es: "El ayuntamiento señala circunstancias específicas (un planeamiento en trámite, un ámbito en transformación o licencias suspendidas). Comprueba qué aplica antes de ofertar.",
+        },
+      },
+    ];
+  }
+  return r;
+}
+
+// Plain-language gloss for each catalog level (official Catalan term as a tag).
+const HERITAGE_LEVEL: Record<HeritageLevel, Localized> = {
+  A: {
+    en: "a nationally protected landmark — the strictest level (Bé Cultural d'Interès Nacional)",
+    es: "un bien protegido de interés nacional — el nivel más estricto (Bé Cultural d'Interès Nacional)",
+  },
+  B: {
+    en: "a locally protected building (Bé Cultural d'Interès Local)",
+    es: "un bien protegido de interés local (Bé Cultural d'Interès Local)",
+  },
+  C: {
+    en: "a building of urban-planning interest — lighter protection (Bé d'Interès Urbanístic)",
+    es: "un bien de interés urbanístico — protección más leve (Bé d'Interès Urbanístic)",
+  },
+  D: {
+    en: "a building of documentary interest — the lightest protection (Bé d'Interès Documental)",
+    es: "un bien de interés documental — la protección más leve (Bé d'Interès Documental)",
+  },
+};
+
+/**
+ * Add a heritage status row to the urbanism section, and raise a top-of-report
+ * alert for a building-specific listing (A/B → caution, C/D → check). An
+ * area-wide ensemble (e.g. the whole Eixample) is reported as a neutral context
+ * row, never an alert — almost every Eixample finca is inside one.
+ * Run AFTER seedUrbanism, which initialises the items list this appends to.
+ */
+export function seedHeritage(report: Report, h: HeritageData): Report {
+  const r: Report = structuredClone(report);
+
+  if (h.level) {
+    const lvl = HERITAGE_LEVEL[h.level];
+    const name = h.name ? `${h.name}: ` : "";
+    const meta = [h.style, h.epoch].filter(Boolean).join(", ");
+    const metaClause = meta ? ` (${meta})` : "";
+    const high = h.level === "A" || h.level === "B";
+
+    r.urbanism.items.push({
+      key: "heritage",
+      tone: high ? "caution" : "check",
+      label: { en: "Heritage", es: "Patrimonio" },
+      text: {
+        en: `This building is heritage-listed — ${name}${lvl.en}${metaClause}. Listing restricts façade and often interior changes; expect special permits and higher, slower renovations. Check the catalog file before offering.`,
+        es: `Este edificio está catalogado — ${name}${lvl.es}${metaClause}. La protección limita los cambios en fachada y a menudo en el interior; prevé permisos especiales y reformas más caras y lentas. Consulta la ficha del catálogo antes de ofertar.`,
+      },
+    });
+
+    r.alerts = [
+      ...(r.alerts ?? []),
+      {
+        tone: high ? "caution" : "check",
+        title: {
+          en: high ? "Heritage-protected building" : "Catalogued building",
+          es: high ? "Edificio protegido (patrimonio)" : "Edificio catalogado",
+        },
+        detail: {
+          en: `${h.name ? `${h.name}. ` : ""}This building is ${lvl.en}. Heritage protection restricts works (façade/interior), needs special permits, and raises renovation cost and time. Check the catalog file before offering.`,
+          es: `${h.name ? `${h.name}. ` : ""}Este edificio es ${lvl.es}. La protección patrimonial limita las obras (fachada/interior), exige permisos especiales y aumenta el coste y el plazo de reforma. Consulta la ficha del catálogo antes de ofertar.`,
+        },
+      },
+    ];
+  } else if (h.inEnsemble) {
+    const ens = h.ensembleName ?? "a protected ensemble";
+    r.urbanism.items.push({
+      key: "heritage",
+      tone: "info",
+      label: { en: "Heritage", es: "Patrimonio" },
+      text: {
+        en: `The building is in a protected conservation area (${ens}). Façade changes are regulated, but there's no individual listing on this building.`,
+        es: `El edificio está en un conjunto protegido (${ens}). Los cambios en fachada están regulados, pero no hay catalogación específica de este edificio.`,
+      },
+    });
+  }
   return r;
 }
 

@@ -152,7 +152,7 @@
     "risks": "Riesgo y seguridad",
     "legal": "Legal y documentos a solicitar",
     "neighbourhood": "El barrio",
-    "urbanism": "Urbanismo y acceso (ZBE)",
+    "urbanism": "Urbanismo y restricciones",
     "costs": "Costes e impuestos",
     "subsidies": "Deducciones y ayudas",
     "negotiation": "Guía de negociación",
@@ -215,6 +215,15 @@
     "good": "Bajo",
     "ok": "Vigilar",
     "low": "Alto"
+  },
+  "alerts": {
+    "label": "Requiere verificación"
+  },
+  "planTone": {
+    "caution": "Atención",
+    "check": "A revisar",
+    "clear": "Estándar",
+    "info": "Info"
   },
   "neigh": {
     "metro": "Metro",

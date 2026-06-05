@@ -152,7 +152,7 @@
     "risks": "Risc i seguretat",
     "legal": "Legal i documents a sol·licitar",
     "neighbourhood": "El barri",
-    "urbanism": "Urbanisme i accés (ZBE)",
+    "urbanism": "Urbanisme i restriccions",
     "costs": "Costos i impostos",
     "subsidies": "Deduccions i ajuts",
     "negotiation": "Guia de negociació",
@@ -215,6 +215,15 @@
     "good": "Baix",
     "ok": "Vigilar",
     "low": "Alt"
+  },
+  "alerts": {
+    "label": "Requereix verificació"
+  },
+  "planTone": {
+    "caution": "Atenció",
+    "check": "A revisar",
+    "clear": "Estàndard",
+    "info": "Info"
   },
   "neigh": {
     "metro": "Metro",

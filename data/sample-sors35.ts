@@ -421,10 +421,35 @@ export const sampleSors35: Report = {
   },
 
   urbanism: {
-    body: {
-      en: "All of Gràcia sits inside Barcelona's Zona de Baixes Emissions (ZBE Rondes) — vehicles without an environmental label can't circulate on weekdays. This only matters if you'd keep a non-compliant car; it has no effect on the home itself. No urbanistic red flags expected for a mid-block flat in consolidated Gràcia, but the official POUM map is worth a final check.",
-      es: "Toda Gràcia está dentro de la Zona de Baixes Emissions de Barcelona (ZBE Rondes): los vehículos sin etiqueta ambiental no pueden circular entre semana. Esto solo importa si mantienes un coche no apto; no afecta a la vivienda en sí. No se esperan señales de alarma urbanísticas para un piso a media manzana en la Gràcia consolidada, pero conviene una última comprobación en el mapa oficial del POUM.",
-    },
+    items: [
+      {
+        key: "affectation",
+        tone: "clear",
+        label: { en: "Planning affectation", es: "Afectación urbanística" },
+        text: {
+          en: "No planning affectation was found that would limit using this as a home.",
+          es: "No se ha encontrado ninguna afectación urbanística que impida usarla como vivienda.",
+        },
+      },
+      {
+        key: "zoning",
+        tone: "clear",
+        label: { en: "Zoning", es: "Calificación" },
+        text: {
+          en: "Residential, build-ready land — standard for a mid-block flat in consolidated Gràcia.",
+          es: "Suelo residencial y consolidado — lo normal para un piso a media manzana en la Gràcia consolidada.",
+        },
+      },
+      {
+        key: "lez",
+        tone: "info",
+        label: { en: "Low Emission Zone (ZBE)", es: "Zona de Bajas Emisiones (ZBE)" },
+        text: {
+          en: "Like all of central Barcelona, this address is inside the Low Emission Zone. Only relevant if you keep a car without an emissions sticker.",
+          es: "Como toda Barcelona central, esta dirección está dentro de la Zona de Bajas Emisiones. Solo importa si mantienes un coche sin etiqueta ambiental.",
+        },
+      },
+    ],
   },
 
   costs: {
