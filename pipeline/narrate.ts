@@ -7,9 +7,9 @@ import type { Report } from "@/types/report";
 import type { ReportInput } from "@/types/db";
 import { L } from "@/lib/localized";
 
-/* ---------- output schema (strict JSON, bilingual) ---------- */
+/* ---------- output schema (strict JSON, trilingual) ---------- */
 
-const Loc = z.object({ en: z.string(), es: z.string() });
+const Loc = z.object({ en: z.string(), es: z.string(), ca: z.string() });
 
 const NarrativeSchema = z.object({
   verdictHeadline: Loc,
@@ -62,15 +62,16 @@ function buildFacts(report: Report, input: ReportInput) {
   };
 }
 
-const SYSTEM = `You are a property due-diligence analyst writing a bilingual (English + Spanish) buyer dossier for a flat in Barcelona, aimed at local first-time buyers planning to live in the flat (not foreign investors, not short-let / tourist-home operators).
+const SYSTEM = `You are a property due-diligence analyst writing a trilingual (English + Spanish + Catalan) buyer dossier for a flat in Barcelona, aimed at local first-time buyers planning to live in the flat (not foreign investors, not short-let / tourist-home operators).
 
 STRICT RULES — these are non-negotiable:
 - Ground EVERY statement in the FACTS JSON the user provides. Do NOT invent prices, comparables, €/m² figures, scores, legal facts, dates, or citations.
-- If "hasMarketData" is false or "hasAskingPrice" is false, do NOT state any specific market price, €/m² comparison, or fair-value number. Instead say plainly that the price/market analysis is "to verify" / pending comparable data ("por verificar" in Spanish).
+- If "hasMarketData" is false or "hasAskingPrice" is false, do NOT state any specific market price, €/m² comparison, or fair-value number. Instead say plainly that the price/market analysis is "to verify" / pending comparable data ("por verificar" in Spanish, "per verificar" in Catalan).
 - If "hasMarketData" is true, the "comps" array holds nearby ASKING listings (idealista). In priceLede/priceFairValue you MAY compare the subject's asking €/m² to these comps — but ONLY using the numbers given. Always label them ASKING prices from a portal (not closing prices), note that recorded closings typically sit somewhat below asking, and frame the result as orientation for the buyer to confirm, never a definitive valuation.
 - Where a fact is unknown, say it must be verified rather than guessing.
 - Tone: trustworthy proptech — concise, practical, no fluff, honest. Distinguish asking vs closing prices when prices are discussed.
 - Spanish must be natural, native-quality Spanish (es-ES), not a literal translation.
+- Catalan must be natural, native-quality Catalan (ca-ES, Central / Barcelona variant), not a literal translation from Spanish. Use proper Catalan terminology (e.g. "habitatge", "edifici", "cèdula d'habitabilitat", "fons de reserva", "derrama", "ITE") rather than Spanish loanwords.
 - Keep each field tight: headline ≤ 14 words; body paragraphs 2–4 sentences; list items one sentence each.
 - legalItems: the standard get-before-you-offer documents for a Catalonia resale (nota simple, cédula d'habitabilitat, valid ITE, community minutes/actas, pending derrama, updated energy certificate, surface check). 5–7 items.
 - checklist: 5–7 concrete pre-offer actions.

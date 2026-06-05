@@ -16,6 +16,7 @@ export const SEISMIC = {
   detail: {
     en: "PGA ≈ 0.04 g (NCSE-02) — low, standard for Barcelona.",
     es: "PGA ≈ 0,04 g (NCSE-02) — bajo, estándar para Barcelona.",
+    ca: "PGA ≈ 0,04 g (NCSE-02) — baix, estàndard a Barcelona.",
   } satisfies Localized,
 };
 
@@ -25,6 +26,7 @@ export const RADON = {
   detail: {
     en: "Barcelona city is a low-radon area (CTE DB-HS6); upper floors reduce exposure further. Confirm the municipal zone if at ground level.",
     es: "La ciudad de Barcelona es zona de radón bajo (CTE DB-HS6); las plantas altas reducen aún más la exposición. Confirma la zona municipal si es planta baja.",
+    ca: "La ciutat de Barcelona és zona de radó baix (CTE DB-HS6); les plantes altes redueixen encara més l'exposició. Confirma la zona municipal si és planta baixa.",
   } satisfies Localized,
 };
 
@@ -63,6 +65,7 @@ export function crimeContext(districtCode?: number): {
       detail: {
         en: "Barcelona is a generally safe city; reported crime fell across 2025. Check the district's current figures in the Ajuntament open data.",
         es: "Barcelona es en general una ciudad segura; la delincuencia denunciada bajó durante 2025. Consulta las cifras actuales del distrito en los datos abiertos del Ayuntamiento.",
+        ca: "Barcelona és en general una ciutat segura; la delinqüència denunciada va baixar durant el 2025. Consulta les xifres actuals del districte a les dades obertes de l'Ajuntament.",
       },
     };
   }
@@ -73,10 +76,12 @@ export function crimeContext(districtCode?: number): {
       ? {
           en: `${name} is central and lively, with the city's highest tourist-area petty crime — watch for pickpocketing. District-level context, not building-specific; check current Ajuntament figures.`,
           es: `${name} es céntrico y animado, con la mayor delincuencia menor de zona turística de la ciudad — atención a los carteristas. Contexto de distrito, no específico del edificio; consulta las cifras actuales del Ayuntamiento.`,
+          ca: `${name} és cèntric i animat, amb la delinqüència menor de zona turística més alta de la ciutat — atenció als carteristes. Context de districte, no específic de l'edifici; consulta les xifres actuals de l'Ajuntament.`,
         }
       : {
           en: `${name} is a calmer, largely residential district; city-wide reported crime fell across 2025. District-level context, not building-specific — check current Ajuntament figures.`,
           es: `${name} es un distrito más tranquilo y mayormente residencial; la delincuencia denunciada en la ciudad bajó durante 2025. Contexto de distrito, no específico del edificio: consulta las cifras actuales del Ayuntamiento.`,
+          ca: `${name} és un districte més tranquil i majoritàriament residencial; la delinqüència denunciada a la ciutat va baixar durant el 2025. Context de districte, no específic de l'edifici: consulta les xifres actuals de l'Ajuntament.`,
         },
   };
 }

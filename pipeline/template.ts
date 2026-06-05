@@ -16,7 +16,7 @@ import type { CompRow } from "@/types/report";
 import type { ReportInput } from "@/types/db";
 import { scoreOrder, type ScoreKey } from "@/config/scoring";
 
-const EMPTY: Localized = { en: "", es: "" };
+const EMPTY: Localized = { en: "", es: "", ca: "" };
 
 /** A structurally-complete but blank Report the operator fills in / edits. */
 export function emptyReport(id: string, cadastralRef: string): Report {
@@ -54,7 +54,7 @@ export function emptyReport(id: string, cadastralRef: string): Report {
   };
 }
 
-const both = (s: string): Localized => ({ en: s, es: s });
+const both = (s: string): Localized => ({ en: s, es: s, ca: s });
 
 /**
  * Prefill the snapshot + hero meta from Catastro facts. Only the deterministic,
@@ -124,6 +124,7 @@ export function seedFromCatastro(
   r.snapshot.note = {
     en: `The cadastral parcel contains ${parcel.unitCount} units in total — so this is a multi-unit building, not a single home. Confirm the true count on-site (count the mailboxes) and via the building's división horizontal.`,
     es: `La parcela catastral contiene ${parcel.unitCount} unidades en total, así que es un edificio de varias viviendas, no una casa única. Confirma el número real in situ (cuenta los buzones) y mediante la división horizontal del edificio.`,
+    ca: `La parcel·la cadastral conté ${parcel.unitCount} unitats en total — per tant és un edifici de diversos habitatges, no una casa única. Confirma el nombre real in situ (compta les bústies) i mitjançant la divisió horitzontal de l'edifici.`,
   };
 
   return r;
@@ -134,7 +135,7 @@ export function seedFromCatastro(
 function near(p: NearestPlace | undefined): Localized | null {
   if (!p) return null;
   const txt = p.name ? `${p.name} · ~${p.walkMin} min` : `~${p.walkMin} min`;
-  return { en: txt, es: txt };
+  return { en: txt, es: txt, ca: txt };
 }
 
 export function seedAmenities(report: Report, a: AmenityData): Report {
@@ -150,6 +151,7 @@ export function seedAmenities(report: Report, a: AmenityData): Report {
     push("neigh.metro", {
       en: `${names || "Metro"}${mins ? ` · ~${mins} min` : ""} (${a.metro.within800} within 800 m)`,
       es: `${names || "Metro"}${mins ? ` · ~${mins} min` : ""} (${a.metro.within800} a 800 m)`,
+      ca: `${names || "Metro"}${mins ? ` · ~${mins} min` : ""} (${a.metro.within800} a 800 m)`,
     });
   }
   push("neigh.health", near(a.health.nearest));
@@ -160,6 +162,7 @@ export function seedAmenities(report: Report, a: AmenityData): Report {
     push("neigh.schools", {
       en: `${a.schools.within1000} within ~10 min walk`,
       es: `${a.schools.within1000} a ~10 min a pie`,
+      ca: `${a.schools.within1000} a ~10 min a peu`,
     });
   }
   return r;
@@ -180,11 +183,11 @@ export function seedComps(
   if (opts.askingPriceEur) {
     const m2 = opts.builtM2;
     rows.push({
-      reference: { en: "This flat", es: "Este piso" },
+      reference: { en: "This flat", es: "Este piso", ca: "Aquest pis" },
       price: eur(opts.askingPriceEur),
       size: m2 ? `${m2} m²` : undefined,
       pricePerM2: m2 ? Math.round(opts.askingPriceEur / m2).toLocaleString("en-GB") : undefined,
-      note: { en: "Subject property", es: "Inmueble objeto" },
+      note: { en: "Subject property", es: "Inmueble objeto", ca: "Immoble objecte" },
       highlight: true,
     });
   }
@@ -198,6 +201,7 @@ export function seedComps(
       note: {
         en: `${c.rooms ?? "?"} bed · ${c.bathrooms ?? "?"} bath`,
         es: `${c.rooms ?? "?"} hab · ${c.bathrooms ?? "?"} baños`,
+        ca: `${c.rooms ?? "?"} hab · ${c.bathrooms ?? "?"} banys`,
       },
       url: c.url,
     });
@@ -273,6 +277,7 @@ export function seedPriceRefs(report: Report): Report {
       label: {
         en: "Catastro — official reference value (valor de referencia)",
         es: "Catastro — valor de referencia oficial",
+        ca: "Cadastre — valor de referència oficial",
       },
       url: "https://www.sedecatastro.gob.es/Accesos/SECAccvr.aspx",
     },
@@ -281,6 +286,7 @@ export function seedPriceRefs(report: Report): Report {
       label: {
         en: "Ministerio de Vivienda — transaction price statistics",
         es: "Ministerio de Vivienda — estadística de precios de transacción",
+        ca: "Ministerio de Vivienda — estadística de preus de transacció",
       },
       url: "https://www.mivau.gob.es/vivienda/alquila-bien-es-tu-derecho/precios-vivienda",
     },
@@ -289,6 +295,7 @@ export function seedPriceRefs(report: Report): Report {
       label: {
         en: "Col·legi de Registradors — closing-price statistics",
         es: "Col·legi de Registradors — estadística de precios de cierre",
+        ca: "Col·legi de Registradors — estadística de preus de tancament",
       },
       url: "https://www.registradores.org/-/estadistica-registral-inmobiliaria",
     },
@@ -297,6 +304,7 @@ export function seedPriceRefs(report: Report): Report {
       label: {
         en: "idealista — Barcelona published price report (asking)",
         es: "idealista — informe de precios de Barcelona (oferta)",
+        ca: "idealista — informe de preus de Barcelona (oferta)",
       },
       url: "https://www.idealista.com/sala-de-prensa/informes-precio-vivienda/venta/barcelona-provincia/barcelona-capital/",
     },
@@ -305,6 +313,7 @@ export function seedPriceRefs(report: Report): Report {
       label: {
         en: "Fotocasa — Barcelona real-estate index (asking)",
         es: "Fotocasa — índice inmobiliario de Barcelona (oferta)",
+        ca: "Fotocasa — índex immobiliari de Barcelona (oferta)",
       },
       url: "https://www.fotocasa.es/es/indice-inmobiliario__1/",
     },
@@ -313,6 +322,7 @@ export function seedPriceRefs(report: Report): Report {
       label: {
         en: "Find current listings near this address",
         es: "Buscar anuncios actuales cerca de esta dirección",
+        ca: "Cerca anuncis actuals a prop d'aquesta adreça",
       },
       url: `https://www.google.com/search?q=${searchQ}`,
     },
@@ -332,7 +342,7 @@ export function seedEnergy(report: Report, e: EnergyData): Report {
   const year = e.dateRegistered?.slice(0, 4);
   r.hero.meta.push({
     labelKey: "meta.energy",
-    value: { en: `Class ${cls}`, es: `Clase ${cls}` },
+    value: { en: `Class ${cls}`, es: `Clase ${cls}`, ca: `Classe ${cls}` },
   });
 
   const tone: "good" | "ok" | "low" =
@@ -343,6 +353,10 @@ export function seedEnergy(report: Report, e: EnergyData): Report {
   ].filter(Boolean);
   const detailBitsEs = [
     e.primaryEnergyKwh ? `${Math.round(e.primaryEnergyKwh)} kWh/m²·año` : null,
+    year ? `reg. ${year}` : null,
+  ].filter(Boolean);
+  const detailBitsCa = [
+    e.primaryEnergyKwh ? `${Math.round(e.primaryEnergyKwh)} kWh/m²·any` : null,
     year ? `reg. ${year}` : null,
   ].filter(Boolean);
 
@@ -358,6 +372,11 @@ export function seedEnergy(report: Report, e: EnergyData): Report {
       es: `Clase ${cls}${detailBitsEs.length ? ` · ${detailBitsEs.join(" · ")}` : ""}.${
         tone !== "good"
           ? " Facturas más altas; futuras normas de la UE pueden presionar el valor de viviendas con baja calificación."
+          : ""
+      }`,
+      ca: `Classe ${cls}${detailBitsCa.length ? ` · ${detailBitsCa.join(" · ")}` : ""}.${
+        tone !== "good"
+          ? " Factures més altes; les futures normes de la UE poden pressionar el valor dels habitatges amb baixa qualificació."
           : ""
       }`,
     },
@@ -382,15 +401,18 @@ export function seedRisks(
         ? {
             en: "Not in a SNCZI fluvial flood-risk zone.",
             es: "No está en zona de riesgo de inundación fluvial (SNCZI).",
+            ca: "No es troba en zona de risc d'inundació fluvial (SNCZI).",
           }
         : lvl === "medium"
           ? {
               en: "Within the T100 (medium-probability) flood zone — verify with a hydraulic study.",
               es: "Dentro de la zona inundable T100 (probabilidad media) — verifícalo con un estudio hidráulico.",
+              ca: "Dins de la zona inundable T100 (probabilitat mitjana) — verifica-ho amb un estudi hidràulic.",
             }
           : {
               en: "Within the T10 (high-frequency) flood zone — significant flood risk; seek specialist advice.",
               es: "Dentro de la zona inundable T10 (alta frecuencia) — riesgo de inundación significativo; busca asesoramiento especializado.",
+              ca: "Dins de la zona inundable T10 (alta freqüència) — risc d'inundació significatiu; busca assessorament especialitzat.",
             };
     r.risks.push({ labelKey: "risk.flood", tone, detail });
   }
@@ -409,6 +431,7 @@ export function seedRisks(
         detail: {
           en: `${age}-year building — a valid ITE technical inspection is mandatory; confirm it and any pending works.`,
           es: `Edificio de ${age} años — la ITE (inspección técnica) es obligatoria; confírmala y las obras pendientes.`,
+          ca: `Edifici de ${age} anys — la ITE (inspecció tècnica) és obligatòria; confirma-la i les obres pendents.`,
         },
       });
     }
@@ -419,6 +442,7 @@ export function seedRisks(
         detail: {
           en: "Pre-2002 build — possible asbestos in legacy installations; usually low-cost if isolated.",
           es: "Construcción anterior a 2002 — posible amianto en instalaciones antiguas; normalmente de bajo coste si está aislado.",
+          ca: "Construcció anterior al 2002 — possible amiant en instal·lacions antigues; normalment de baix cost si està aïllat.",
         },
       });
     }
@@ -458,10 +482,18 @@ function plainSystems(affs: UrbanismData["affectations"]): Localized {
     infra: "infraestructura pública",
     public: "un uso público",
   };
+  const CA: Record<string, string> = {
+    facility: "un equipament públic",
+    road: "vial o eixamplament de carrer",
+    green: "una zona verda pública",
+    infra: "infraestructura pública",
+    public: "un ús públic",
+  };
   const list = [...cats];
   return {
     en: list.map((c) => EN[c]).join(" and ") || "a public use",
     es: list.map((c) => ES[c]).join(" y ") || "un uso público",
+    ca: list.map((c) => CA[c]).join(" i ") || "un ús públic",
   };
 }
 
@@ -495,28 +527,31 @@ export function seedUrbanism(
   const plain = plainSystems(u.affectations);
   const codes = u.affectations.map((af) => af.clau).join(", ");
   const codeTag = codes
-    ? { en: ` (zoning code ${codes})`, es: ` (código ${codes})` }
-    : { en: "", es: "" };
+    ? { en: ` (zoning code ${codes})`, es: ` (código ${codes})`, ca: ` (codi ${codes})` }
+    : { en: "", es: "", ca: "" };
 
   // 1) Affectation — the headline planning aspect.
   items.push({
     key: "affectation",
     tone: level === "affected" ? "caution" : level === "specific" ? "check" : "clear",
-    label: { en: "Planning affectation", es: "Afectación urbanística" },
+    label: { en: "Planning affectation", es: "Afectación urbanística", ca: "Afectació urbanística" },
     text:
       level === "affected"
         ? {
             en: `${confirmed ? "The city officially flags this property as affected" : "Part of the plot appears reserved for public use"} — part of the plot is reserved for ${plain.en}. This can restrict renovations, cap the resale value, or in extreme cases lead to expropriation. Confirm before offering with an official planning certificate (certificat urbanístic).${codeTag.en}`,
             es: `${confirmed ? "El ayuntamiento marca oficialmente esta propiedad como afectada" : "Parte de la parcela parece reservada para uso público"} — parte de la parcela está reservada para ${plain.es}. Puede limitar reformas, reducir el valor de reventa o, en casos extremos, llevar a expropiación. Confírmalo antes de ofertar con un certificado urbanístico oficial.${codeTag.es}`,
+            ca: `${confirmed ? "L'ajuntament marca oficialment aquesta propietat com a afectada" : "Una part de la parcel·la sembla reservada per a ús públic"} — part de la parcel·la està reservada per a ${plain.ca}. Pot limitar reformes, reduir el valor de revenda o, en casos extrems, comportar expropiació. Confirma-ho abans d'ofertar amb un certificat urbanístic oficial.${codeTag.ca}`,
           }
         : level === "specific"
           ? {
               en: "The city notes specific planning circumstances here (for example a plan being processed, an area under redevelopment, or suspended permits). Check what applies before offering.",
               es: "El ayuntamiento señala circunstancias urbanísticas específicas (por ejemplo un planeamiento en trámite, un ámbito en transformación o licencias suspendidas). Comprueba qué aplica antes de ofertar.",
+              ca: "L'ajuntament assenyala circumstàncies urbanístiques específiques (per exemple un planejament en tràmit, un àmbit en transformació o llicències suspeses). Comprova què s'aplica abans d'ofertar.",
             }
           : {
               en: "No planning affectation was found that would limit using this as a home.",
               es: "No se ha encontrado ninguna afectación urbanística que impida usarla como vivienda.",
+              ca: "No s'ha trobat cap afectació urbanística que impedeixi utilitzar-lo com a habitatge.",
             },
   });
 
@@ -525,10 +560,11 @@ export function seedUrbanism(
     items.push({
       key: "zoning",
       tone: "clear",
-      label: { en: "Zoning", es: "Calificación" },
+      label: { en: "Zoning", es: "Calificación", ca: "Qualificació" },
       text: {
         en: `Residential, build-ready land — standard for a city flat.${u.qualCode ? ` (zoning code ${u.qualCode})` : ""}`,
         es: `Suelo residencial y consolidado — lo normal para un piso urbano.${u.qualCode ? ` (código ${u.qualCode})` : ""}`,
+        ca: `Sòl residencial i consolidat — el que és habitual en un pis urbà.${u.qualCode ? ` (codi ${u.qualCode})` : ""}`,
       },
     });
   }
@@ -540,10 +576,12 @@ export function seedUrbanism(
     label: {
       en: "Low Emission Zone (ZBE)",
       es: "Zona de Bajas Emisiones (ZBE)",
+      ca: "Zona de Baixes Emissions (ZBE)",
     },
     text: {
       en: "Like all of central Barcelona, this address is inside the Low Emission Zone. Only relevant if you keep a car without an emissions sticker.",
       es: "Como toda Barcelona central, esta dirección está dentro de la Zona de Bajas Emisiones. Solo importa si mantienes un coche sin etiqueta ambiental.",
+      ca: "Com tota la Barcelona central, aquesta adreça és dins la Zona de Baixes Emissions. Només importa si tens cotxe sense etiqueta ambiental.",
     },
   });
 
@@ -558,10 +596,12 @@ export function seedUrbanism(
         title: {
           en: confirmed ? "Planning affectation" : "Possible planning affectation",
           es: confirmed ? "Afectación urbanística" : "Posible afectación urbanística",
+          ca: confirmed ? "Afectació urbanística" : "Possible afectació urbanística",
         },
         detail: {
           en: `${confirmed ? "The city flags this property as affected" : "Part of the plot appears reserved for public use"} — part is reserved for ${plain.en}. It can restrict works, cap the value, or lead to expropriation. Confirm with an official planning certificate (certificat urbanístic) before offering.`,
           es: `${confirmed ? "El ayuntamiento marca esta propiedad como afectada" : "Parte de la parcela parece reservada para uso público"} — parte está reservada para ${plain.es}. Puede limitar obras, reducir el valor o llevar a expropiación. Confírmalo con un certificado urbanístico oficial antes de ofertar.`,
+          ca: `${confirmed ? "L'ajuntament marca aquesta propietat com a afectada" : "Una part de la parcel·la sembla reservada per a ús públic"} — una part està reservada per a ${plain.ca}. Pot limitar obres, reduir el valor o comportar expropiació. Confirma-ho amb un certificat urbanístic oficial abans d'ofertar.`,
         },
       },
     ];
@@ -573,10 +613,12 @@ export function seedUrbanism(
         title: {
           en: "Specific planning circumstances",
           es: "Circunstancias urbanísticas específicas",
+          ca: "Circumstàncies urbanístiques específiques",
         },
         detail: {
           en: "The city notes specific circumstances for this property (a plan being processed, an area under redevelopment, or suspended permits). Check what applies before offering.",
           es: "El ayuntamiento señala circunstancias específicas (un planeamiento en trámite, un ámbito en transformación o licencias suspendidas). Comprueba qué aplica antes de ofertar.",
+          ca: "L'ajuntament assenyala circumstàncies específiques (un planejament en tràmit, un àmbit en transformació o llicències suspeses). Comprova què s'aplica abans d'ofertar.",
         },
       },
     ];
@@ -589,18 +631,22 @@ const HERITAGE_LEVEL: Record<HeritageLevel, Localized> = {
   A: {
     en: "a nationally protected landmark — the strictest level (Bé Cultural d'Interès Nacional)",
     es: "un bien protegido de interés nacional — el nivel más estricto (Bé Cultural d'Interès Nacional)",
+    ca: "un bé protegit d'interès nacional — el nivell més estricte (Bé Cultural d'Interès Nacional)",
   },
   B: {
     en: "a locally protected building (Bé Cultural d'Interès Local)",
     es: "un bien protegido de interés local (Bé Cultural d'Interès Local)",
+    ca: "un bé protegit d'interès local (Bé Cultural d'Interès Local)",
   },
   C: {
     en: "a building of urban-planning interest — lighter protection (Bé d'Interès Urbanístic)",
     es: "un bien de interés urbanístico — protección más leve (Bé d'Interès Urbanístic)",
+    ca: "un bé d'interès urbanístic — protecció més lleu (Bé d'Interès Urbanístic)",
   },
   D: {
     en: "a building of documentary interest — the lightest protection (Bé d'Interès Documental)",
     es: "un bien de interés documental — la protección más leve (Bé d'Interès Documental)",
+    ca: "un bé d'interès documental — la protecció més lleu (Bé d'Interès Documental)",
   },
 };
 
@@ -624,10 +670,11 @@ export function seedHeritage(report: Report, h: HeritageData): Report {
     r.urbanism.items.push({
       key: "heritage",
       tone: high ? "caution" : "check",
-      label: { en: "Heritage", es: "Patrimonio" },
+      label: { en: "Heritage", es: "Patrimonio", ca: "Patrimoni" },
       text: {
         en: `This building is heritage-listed — ${name}${lvl.en}${metaClause}. Listing restricts façade and often interior changes; expect special permits and higher, slower renovations. Check the catalog file before offering.`,
         es: `Este edificio está catalogado — ${name}${lvl.es}${metaClause}. La protección limita los cambios en fachada y a menudo en el interior; prevé permisos especiales y reformas más caras y lentas. Consulta la ficha del catálogo antes de ofertar.`,
+        ca: `Aquest edifici està catalogat — ${name}${lvl.ca}${metaClause}. La protecció limita els canvis a la façana i sovint a l'interior; preveu permisos especials i reformes més cares i lentes. Consulta la fitxa del catàleg abans d'ofertar.`,
       },
     });
 
@@ -638,10 +685,12 @@ export function seedHeritage(report: Report, h: HeritageData): Report {
         title: {
           en: high ? "Heritage-protected building" : "Catalogued building",
           es: high ? "Edificio protegido (patrimonio)" : "Edificio catalogado",
+          ca: high ? "Edifici protegit (patrimoni)" : "Edifici catalogat",
         },
         detail: {
           en: `${h.name ? `${h.name}. ` : ""}This building is ${lvl.en}. Heritage protection restricts works (façade/interior), needs special permits, and raises renovation cost and time. Check the catalog file before offering.`,
           es: `${h.name ? `${h.name}. ` : ""}Este edificio es ${lvl.es}. La protección patrimonial limita las obras (fachada/interior), exige permisos especiales y aumenta el coste y el plazo de reforma. Consulta la ficha del catálogo antes de ofertar.`,
+          ca: `${h.name ? `${h.name}. ` : ""}Aquest edifici és ${lvl.ca}. La protecció patrimonial limita les obres (façana/interior), exigeix permisos especials i augmenta el cost i el termini de la reforma. Consulta la fitxa del catàleg abans d'ofertar.`,
         },
       },
     ];
@@ -650,10 +699,11 @@ export function seedHeritage(report: Report, h: HeritageData): Report {
     r.urbanism.items.push({
       key: "heritage",
       tone: "info",
-      label: { en: "Heritage", es: "Patrimonio" },
+      label: { en: "Heritage", es: "Patrimonio", ca: "Patrimoni" },
       text: {
         en: `The building is in a protected conservation area (${ens}). Façade changes are regulated, but there's no individual listing on this building.`,
         es: `El edificio está en un conjunto protegido (${ens}). Los cambios en fachada están regulados, pero no hay catalogación específica de este edificio.`,
+        ca: `L'edifici està dins un conjunt protegit (${ens}). Els canvis a la façana estan regulats, però no hi ha catalogació específica d'aquest edifici.`,
       },
     });
   }
@@ -666,16 +716,19 @@ const SCORE_CAPTION: Record<ScoreKey, (ctx: ScoreCtx) => Localized> = {
   building: ({ year }) => ({
     en: year ? `${year} · ${new Date().getFullYear() - year} yrs` : "—",
     es: year ? `${year} · ${new Date().getFullYear() - year} años` : "—",
+    ca: year ? `${year} · ${new Date().getFullYear() - year} anys` : "—",
   }),
   energy: ({ energyClass }) => ({
     en: energyClass ? `Class ${energyClass}` : "—",
     es: energyClass ? `Clase ${energyClass}` : "—",
+    ca: energyClass ? `Classe ${energyClass}` : "—",
   }),
   transport: ({ amenities }) => {
     const m = amenities?.metro;
     return {
       en: m?.within800 ? `${m.within800} metro within 800 m` : "Limited metro",
       es: m?.within800 ? `${m.within800} metros a 800 m` : "Metro limitado",
+      ca: m?.within800 ? `${m.within800} metros a 800 m` : "Metro limitat",
     };
   },
   location: ({ amenities }) => {
@@ -683,9 +736,10 @@ const SCORE_CAPTION: Record<ScoreKey, (ctx: ScoreCtx) => Localized> = {
     return {
       en: g ? `Green ~${g.walkMin} min` : "Urban",
       es: g ? `Zona verde ~${g.walkMin} min` : "Urbano",
+      ca: g ? `Zona verda ~${g.walkMin} min` : "Urbà",
     };
   },
-  price: () => ({ en: "Awaiting comps", es: "Pendiente de comparables" }),
+  price: () => ({ en: "Awaiting comps", es: "Pendiente de comparables", ca: "Pendent de comparables" }),
 };
 
 interface ScoreCtx {

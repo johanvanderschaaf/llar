@@ -14,6 +14,8 @@ import type { ScoreKey, Band } from "@/config/scoring";
 export interface Localized {
   en: string;
   es: string;
+  /** Catalan. Optional during the trilingual rollout — falls back to `es`. */
+  ca?: string;
 }
 
 export type Tone = "good" | "ok" | "low";
