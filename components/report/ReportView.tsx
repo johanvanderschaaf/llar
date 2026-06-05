@@ -5,8 +5,10 @@ import { bandFor } from "@/config/scoring";
 import { pricing } from "@/config/brand";
 import { L } from "@/lib/localized";
 import { reportPriceEur } from "@/lib/stripe";
+import { brand } from "@/config/brand";
 import { LockedSection } from "./LockedSection";
 import { UnlockButton } from "./UnlockButton";
+import { PrintButton } from "./PrintButton";
 
 /* ---------- small presentational helpers ---------- */
 
@@ -112,6 +114,22 @@ export async function ReportView({
 
   return (
     <div className="wrap">
+      {/* PDF-only brand header */}
+      <div className="print-only print-brand">
+        {brand.wordmark.primary}
+        <b>{brand.wordmark.accent}</b>
+        <span style={{ fontWeight: 500, color: "var(--muted)" }}>
+          · {brand.market}
+        </span>
+      </div>
+
+      {/* Download PDF (full report only) */}
+      {!preview ? (
+        <div className="report-actions">
+          <PrintButton label={t("report.downloadPdf")} />
+        </div>
+      ) : null}
+
       {/* HERO */}
       <header className="hero fx">
         <div className="eyebrow">{t("hero.eyebrow")}</div>

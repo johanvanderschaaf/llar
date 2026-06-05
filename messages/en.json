@@ -59,6 +59,9 @@
     "tagOk": "Check carefully",
     "tagLow": "Proceed with caution"
   },
+  "report": {
+    "downloadPdf": "Download PDF"
+  },
   "landing": {
     "hero": {
       "eyebrow": "Due diligence · Barcelona",

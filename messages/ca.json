@@ -59,6 +59,9 @@
     "tagOk": "Revisa-ho amb cura",
     "tagLow": "Amb cautela"
   },
+  "report": {
+    "downloadPdf": "Descarregar PDF"
+  },
   "landing": {
     "hero": {
       "eyebrow": "Diligència deguda · Barcelona",

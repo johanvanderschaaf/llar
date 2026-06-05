@@ -59,6 +59,9 @@
     "tagOk": "Revísalo con cuidado",
     "tagLow": "Con cautela"
   },
+  "report": {
+    "downloadPdf": "Descargar PDF"
+  },
   "landing": {
     "hero": {
       "eyebrow": "Diligencia debida · Barcelona",
