@@ -434,14 +434,20 @@ export function seedUrbanism(report: Report, u: UrbanismData): Report {
   const r: Report = structuredClone(report);
   const cls = u.classification;
   const q = u.qualification;
-  const code = u.qualCode ? ` (MUC ${u.qualCode})` : "";
+  const code = u.qualCode ? ` (clau ${u.qualCode})` : "";
+
+  // Name the specific systems touching the finca, e.g. "7a — Equipaments
+  // actuals; viari — Xarxa viària", so the buyer sees exactly what's affected.
+  const affList = u.affectations
+    .map((a) => (a.name ? `${a.clau} — ${a.name}` : a.clau))
+    .join("; ");
 
   const affEn = u.possibleAffectation
-    ? "⚠ The qualification corresponds to a system (road / facility / green space), so the parcel may carry an urbanistic affectation — verify this urgently before offering."
-    : "The parcel sits in a buildable zone, with no system affectation detected.";
+    ? `⚠ Part of the finca carries a system qualification (${affList}), which is a possible urbanistic affectation (earmarked for road / facility / green space). Verify this urgently with a certificat urbanístic before offering — an affectation can limit works, reduce value, or expose the property to expropriation.`
+    : "Every part of the finca sits in a buildable zone, with no system affectation detected across the parcel.";
   const affEs = u.possibleAffectation
-    ? "⚠ La calificación corresponde a un sistema (viario / equipamiento / zona verde), por lo que la parcela puede tener una afectación urbanística: verifícalo con urgencia antes de ofertar."
-    : "La parcela está en una zona edificable, sin afectación por sistema detectada.";
+    ? `⚠ Parte de la finca tiene una calificación de sistema (${affList}), lo que supone una posible afectación urbanística (reservada para viario / equipamiento / zona verde). Verifícalo con urgencia con un certificado urbanístico antes de ofertar: una afectación puede limitar obras, reducir el valor o exponer el inmueble a expropiación.`
+    : "Toda la finca está en zona edificable; no se detecta afectación por sistema en ninguna parte de la parcela.";
 
   r.urbanism.body = {
     en: `${cls ? `Land classification: ${cls}. ` : ""}${

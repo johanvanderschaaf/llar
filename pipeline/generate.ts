@@ -132,7 +132,9 @@ export async function generateReport(input: ReportInput): Promise<string> {
     if (geo.status === "ok" && geo.data) {
       [amenities, urbanism, comps, flood] = await Promise.all([
         fetchAmenities(geo.data),
-        fetchUrbanism(geo.data),
+        fetchUrbanism(geo.data, {
+          parcelRef: cat.data?.parcel.parcelRef ?? resolvedRef,
+        }),
         fetchComps(geo.data, {
           minSize: builtM2 ? Math.round(builtM2 * 0.6) : undefined,
           maxSize: builtM2 ? Math.round(builtM2 * 1.6) : undefined,
