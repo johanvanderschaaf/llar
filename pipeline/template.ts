@@ -29,6 +29,7 @@ export function emptyReport(id: string, cadastralRef: string): Report {
       overall: 0,
       tag: { ...EMPTY },
     },
+    alerts: [],
     scores: [],
     snapshot: { facts: [], note: { ...EMPTY } },
     price: {
@@ -457,6 +458,25 @@ export function seedUrbanism(report: Report, u: UrbanismData): Report {
       q ? `Calificación urbanística: ${q}${code}. ` : ""
     }${affEs} Toda Barcelona dentro de las Rondas está en la ZBE (Zona de Bajas Emisiones; solo relevante si mantienes un coche sin etiqueta). Esto es orientativo: confirma el estado definitivo con un certificado urbanístico oficial del Ayuntamiento antes de comprometerte.`,
   };
+
+  // A system qualification on the finca is serious enough to surface at the top
+  // of the report, not just inside the urbanism section.
+  if (u.possibleAffectation && u.affectations.length) {
+    r.alerts = [
+      ...(r.alerts ?? []),
+      {
+        tone: "caution",
+        title: {
+          en: "Possible urbanistic affectation",
+          es: "Posible afectación urbanística",
+        },
+        detail: {
+          en: `Part of the finca is qualified as a system (${affList}) — a possible affectation that can limit works, reduce value, or expose the property to expropriation. Confirm with a certificat urbanístic before offering.`,
+          es: `Parte de la finca está calificada como sistema (${affList}): una posible afectación que puede limitar obras, reducir el valor o exponer el inmueble a expropiación. Confírmalo con un certificado urbanístico antes de ofertar.`,
+        },
+      },
+    ];
+  }
   return r;
 }
 

@@ -216,6 +216,9 @@
     "ok": "Vigilar",
     "low": "Alt"
   },
+  "alerts": {
+    "label": "Requereix verificació"
+  },
   "neigh": {
     "metro": "Metro",
     "health": "Sanitat",

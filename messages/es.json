@@ -216,6 +216,9 @@
     "ok": "Vigilar",
     "low": "Alto"
   },
+  "alerts": {
+    "label": "Requiere verificación"
+  },
   "neigh": {
     "metro": "Metro",
     "health": "Sanidad",

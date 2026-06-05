@@ -173,6 +173,19 @@ export async function ReportView({
         </div>
       </div>
 
+      {/* ALERTS — serious issues surfaced above the fold (e.g. affectation) */}
+      {report.alerts && report.alerts.length > 0 ? (
+        <div className="alerts fx">
+          {report.alerts.map((a, i) => (
+            <div className={`alert ${a.tone}`} key={i}>
+              <div className="alert-cap">{t("alerts.label")}</div>
+              <div className="alert-title">{L(a.title, locale)}</div>
+              <div className="alert-body">{L(a.detail, locale)}</div>
+            </div>
+          ))}
+        </div>
+      ) : null}
+
       {/* PREVIEW — paywall banner (always visible until unlocked) */}
       {preview && reportId ? (
         <div className="unlock-banner fx">

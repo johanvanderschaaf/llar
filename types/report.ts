@@ -73,6 +73,14 @@ export interface Panel {
   body: Localized;
 }
 
+/** A prominent, top-of-report warning. Tone drives the signal colour. */
+export type AlertTone = "caution" | "check";
+export interface ReportAlert {
+  tone: AlertTone;
+  title: Localized;
+  detail: Localized;
+}
+
 export interface Report {
   // --- meta ---
   id: string;
@@ -98,6 +106,13 @@ export interface Report {
     /** Short tag, e.g. "Solid buy — negotiate on the details". */
     tag: Localized;
   };
+
+  /**
+   * Prominent top-of-report warnings shown right under the verdict (and in the
+   * free preview), for issues serious enough that the buyer must see them
+   * before reading on — e.g. an urbanistic affectation on the finca.
+   */
+  alerts?: ReportAlert[];
 
   // --- 01 scores ---
   scores: Score[];

@@ -216,6 +216,9 @@
     "ok": "Watch",
     "low": "High"
   },
+  "alerts": {
+    "label": "Requires verification"
+  },
   "neigh": {
     "metro": "Metro",
     "health": "Healthcare",
