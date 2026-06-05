@@ -152,7 +152,7 @@
     "risks": "Risk & safety",
     "legal": "Legal & documents to request",
     "neighbourhood": "The neighbourhood",
-    "urbanism": "Urbanism & access (ZBE)",
+    "urbanism": "Planning & restrictions",
     "costs": "Costs & taxes",
     "subsidies": "Deductions & grants",
     "negotiation": "Negotiation playbook",
@@ -218,6 +218,12 @@
   },
   "alerts": {
     "label": "Requires verification"
+  },
+  "planTone": {
+    "caution": "Caution",
+    "check": "Worth checking",
+    "clear": "Standard",
+    "info": "Info"
   },
   "neigh": {
     "metro": "Metro",

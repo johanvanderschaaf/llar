@@ -12,6 +12,20 @@ import { PrintButton } from "./PrintButton";
 
 /* ---------- small presentational helpers ---------- */
 
+// Planning-row tone → severity order (caution first) and pill colour class.
+const PLAN_ORDER: Record<string, number> = {
+  caution: 0,
+  check: 1,
+  clear: 2,
+  info: 3,
+};
+const PLAN_PILL: Record<string, string> = {
+  caution: "low",
+  check: "ok",
+  clear: "good",
+  info: "info",
+};
+
 function SectionHead({
   num,
   title,
@@ -409,7 +423,19 @@ export async function ReportView({
       {/* 08 URBANISM */}
       <section className="fx">
         <SectionHead num="08" title={t("sections.urbanism")} />
-        <p className="body">{L(report.urbanism.body, locale)}</p>
+        {[...report.urbanism.items]
+          .sort((a, b) => PLAN_ORDER[a.tone] - PLAN_ORDER[b.tone])
+          .map((it) => (
+            <div className="plan-item" key={it.key}>
+              <span className={`pill ${PLAN_PILL[it.tone]}`}>
+                {t(`planTone.${it.tone}`)}
+              </span>
+              <div className="plan-body">
+                <div className="plan-label">{L(it.label, locale)}</div>
+                <div className="plan-text">{L(it.text, locale)}</div>
+              </div>
+            </div>
+          ))}
       </section>
 
       {/* 09 COSTS */}

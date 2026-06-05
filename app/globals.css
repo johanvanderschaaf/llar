@@ -507,6 +507,40 @@ p.body strong {
 .pill.low::before {
   background: var(--low);
 }
+.pill.info {
+  background: var(--pw-ink-100);
+  color: var(--pw-ink-500);
+}
+.pill.info::before {
+  background: var(--pw-ink-300);
+}
+
+/* planning & restrictions rows (section 08) */
+.plan-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+}
+.plan-item:last-child {
+  border-bottom: none;
+}
+.plan-item .pill {
+  margin-top: 2px;
+  min-width: 104px;
+  justify-content: flex-start;
+}
+.plan-label {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.plan-text {
+  margin-top: 3px;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
 
 /* tables */
 table {
