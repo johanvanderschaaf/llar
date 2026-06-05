@@ -8,6 +8,7 @@ import { SEISMIC, RADON, crimeContext } from "@/config/static-risk";
 import { buildCostFacts, buildSubsidyPanels } from "@/config/costs";
 import { buildBuilding } from "@/config/building";
 import { buildLegal } from "@/config/legal";
+import { buildFooter } from "@/config/footer";
 import type { CompListing } from "@/adapters/idealista";
 import type { CompRow } from "@/types/report";
 import type { ReportInput } from "@/types/db";
@@ -229,6 +230,16 @@ export function seedLegal(report: Report): Report {
   const { intro, items } = buildLegal();
   r.legal.intro = intro;
   r.legal.items = items;
+  return r;
+}
+
+export function seedFooter(report: Report): Report {
+  const r: Report = structuredClone(report);
+  const { sources, disclaimer } = buildFooter({
+    hasComps: r.price.comps.some((c) => !c.highlight),
+  });
+  r.footer.sources = sources;
+  r.footer.disclaimer = disclaimer;
   return r;
 }
 

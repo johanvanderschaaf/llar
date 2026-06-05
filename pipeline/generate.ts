@@ -21,6 +21,7 @@ import {
   seedComps,
   seedCostsTaxes,
   seedEnergy,
+  seedFooter,
   seedFromCatastro,
   seedLegal,
   seedPriceRefs,
@@ -160,6 +161,9 @@ export async function generateReport(input: ReportInput): Promise<string> {
     districtCode: cat.data?.unit.districtCode,
     yearBuilt: cat.data?.unit.yearBuilt,
   });
+
+  // Deterministic "Sources & method" + disclaimer (reflects comps presence).
+  report = seedFooter(report);
 
   // Deterministic scores from what we have (building age, amenities; energy
   // and price land once those adapters/comps exist).

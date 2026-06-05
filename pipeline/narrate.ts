@@ -133,12 +133,6 @@ function mergeNarrative(report: Report, n: Narrative): Report {
 
   r.checklist = n.checklist;
 
-  // Keep a standard bilingual disclaimer if the operator hasn't set one.
-  if (!L(r.footer.disclaimer, "en")) {
-    r.footer.disclaimer = {
-      en: "This dossier is an orientation tool and does not replace a professional technical survey, legal review, or mortgage valuation. Figures marked “estimate” or “to verify” must be confirmed before you commit.",
-      es: "Este dosier es una herramienta de orientación y no sustituye un informe técnico profesional, una revisión legal ni una tasación hipotecaria. Las cifras marcadas como «estimación» o «por verificar» deben confirmarse antes de comprometerte.",
-    };
-  }
+  // Footer (sources & disclaimer) is deterministic — set by seedFooter.
   return r;
 }
