@@ -479,17 +479,10 @@ export const sampleSors35: Report = {
       },
       { labelKey: "costs.valuation", value: "~€300–500" },
       { labelKey: "costs.allIn", value: "~€510,000–520,000" },
-      {
-        labelKey: "costs.before",
-        value: {
-          en: "NIE + Spanish bank account",
-          es: "NIE + cuenta bancaria española",
-        },
-      },
     ],
     footnote: {
-      en: "Catalan ITP brackets were revised in 2025 — confirm the exact current rate with your gestor before budgeting. Non-resident mortgages typically reach ~70% LTV vs ~80% for residents.",
-      es: "Los tramos del ITP catalán se revisaron en 2025: confirma el tipo exacto vigente con tu gestor antes de presupuestar. Las hipotecas para no residentes suelen llegar al ~70% del valor frente al ~80% de los residentes.",
+      en: "Catalan ITP brackets were revised in 2025 — confirm the exact current rate with your gestor before budgeting. Reduced rates may apply (e.g. habitual residence, buyers ≤35, large families).",
+      es: "Los tramos del ITP catalán se revisaron en 2025: confirma el tipo exacto vigente con tu gestor antes de presupuestar. Pueden aplicar tipos reducidos (p. ej. vivienda habitual, compradores ≤35 años, familia numerosa).",
     },
   },
 

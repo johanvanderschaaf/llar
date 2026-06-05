@@ -238,8 +238,7 @@
     "notary": "Notaria + Registre",
     "gestoria": "Gestoria / legal",
     "valuation": "Taxació hipotecària",
-    "allIn": "Estimació total",
-    "before": "Abans de començar"
+    "allIn": "Estimació total"
   },
   "footer": {
     "generated": "Generat el {date}"

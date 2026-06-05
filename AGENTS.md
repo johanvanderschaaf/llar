@@ -8,6 +8,22 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 Read these before editing. They're the rules a fresh chat will silently violate.
 
+## Target audience & ethical stance
+
+This product is for **local first-time buyers** in Barcelona — people buying a
+home to live in. It is deliberately **not** aimed at foreign investors and
+explicitly **not** at the tourist-home / short-let market. When making product
+decisions (copy, features, partnerships, data sources), default to what serves
+a resident buyer; flag anything that would primarily serve investors or
+short-let operators.
+
+Concrete implications:
+- No NIE / non-resident / "moving to Spain" framing in report or marketing copy.
+- No rental-yield or Airbnb-licence features.
+- Costs & taxes reflect Catalan residents (default to resident ITP reductions
+  where they apply); never assume non-resident mortgage limits.
+- Language priority: **CA + ES first**, EN as the international convenience.
+
 ## The pipeline contract
 
 - **Adapters never throw.** They return `AdapterResult<T>` with `status: "ok" | "unavailable" | "error"` and `toVerify: true` on anything but a confident `ok`. Throwing breaks `pipeline/generate.ts` and the buyer sees a generic error banner. See `adapters/types.ts` for `ok()` / `unavailable()` / `failed()` helpers.

@@ -238,8 +238,7 @@
     "notary": "Notaría + Registro",
     "gestoria": "Gestoría / legal",
     "valuation": "Tasación hipotecaria",
-    "allIn": "Estimación total",
-    "before": "Antes de empezar"
+    "allIn": "Estimación total"
   },
   "footer": {
     "generated": "Generado el {date}"

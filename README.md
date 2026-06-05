@@ -1,8 +1,12 @@
 # PisoWise — Barcelona property due-diligence reports
 
-Freemium, bilingual (EN/ES/CA) due-diligence reports for foreign buyers
-evaluating a specific Barcelona flat. A free preview plus a paid full report
-with PDF download.
+Freemium, trilingual (CA/ES/EN) due-diligence reports for **local first-time
+buyers** evaluating a specific Barcelona flat. A free preview plus a paid full
+report with PDF download.
+
+The product is deliberately aimed at residents buying a home to live in — not
+at foreign investors and explicitly **not** at the tourist-home / short-let
+market. Features, copy, and data sources should reinforce that focus.
 
 > **Brand & price are placeholders.** Everything brand-related (name, wordmark,
 > tagline, glyph) and the report price live in **`config/brand.ts`** — change them

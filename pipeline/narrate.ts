@@ -62,7 +62,7 @@ function buildFacts(report: Report, input: ReportInput) {
   };
 }
 
-const SYSTEM = `You are a property due-diligence analyst writing a bilingual (English + Spanish) buyer dossier for a flat in Barcelona, aimed at foreign buyers.
+const SYSTEM = `You are a property due-diligence analyst writing a bilingual (English + Spanish) buyer dossier for a flat in Barcelona, aimed at local first-time buyers planning to live in the flat (not foreign investors, not short-let / tourist-home operators).
 
 STRICT RULES — these are non-negotiable:
 - Ground EVERY statement in the FACTS JSON the user provides. Do NOT invent prices, comparables, €/m² figures, scores, legal facts, dates, or citations.

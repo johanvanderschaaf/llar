@@ -173,7 +173,7 @@ export interface Report {
     items: UrbanismItem[];
   };
 
-  // --- 09 costs for international buyers ---
+  // --- 09 costs & taxes ---
   costs: {
     intro: Localized;
     facts: Fact[];

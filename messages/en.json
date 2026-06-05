@@ -238,8 +238,7 @@
     "notary": "Notary + Land Registry",
     "gestoria": "Gestoría / legal",
     "valuation": "Mortgage valuation",
-    "allIn": "All-in estimate",
-    "before": "Before you start"
+    "allIn": "All-in estimate"
   },
   "footer": {
     "generated": "Generated {date}"
