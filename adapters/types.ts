@@ -15,6 +15,7 @@ export type SourceKey =
   | "amenities"
   | "urbanism"
   | "affectation"
+  | "heritage"
   | "zbe"
   | "tax"
   | "market";

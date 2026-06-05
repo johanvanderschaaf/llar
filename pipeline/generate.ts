@@ -10,6 +10,7 @@ import { geocodeRef } from "@/adapters/geo";
 import { fetchAmenities, type AmenityData } from "@/adapters/amenities";
 import { fetchUrbanism, type UrbanismData } from "@/adapters/urbanism";
 import { fetchAffectation, type AffectationData } from "@/adapters/affectation";
+import { fetchHeritage, type HeritageData } from "@/adapters/heritage";
 import { fetchEnergy, type EnergyData } from "@/adapters/energy";
 import { fetchComps, type CompListing } from "@/adapters/idealista";
 import { fetchFlood, type FloodData } from "@/adapters/flood";
@@ -29,6 +30,7 @@ import {
   seedRisks,
   seedScores,
   seedUrbanism,
+  seedHeritage,
 } from "./template";
 import type { ReportInput } from "@/types/db";
 
@@ -132,11 +134,13 @@ export async function generateReport(input: ReportInput): Promise<string> {
     report = seedEnergy(report, energy.data);
   }
 
-  // Geographic enrichment: coordinates → amenities + urbanism + comps + flood.
+  // Geographic enrichment: coordinates → amenities + urbanism + comps + flood
+  // + heritage.
   let amenities: AdapterResult<AmenityData> | null = null;
   let urbanism: AdapterResult<UrbanismData> | null = null;
   let comps: AdapterResult<CompListing[]> | null = null;
   let flood: AdapterResult<FloodData> | null = null;
+  let heritage: AdapterResult<HeritageData> | null = null;
   // Official affectation (AFH) — needs only the parcel ref, not coordinates.
   let affectation: AdapterResult<AffectationData> | null = null;
   let urbanismSeeded = false;
@@ -150,7 +154,7 @@ export async function generateReport(input: ReportInput): Promise<string> {
     affectation = aff;
     const affData = aff.status === "ok" ? aff.data : undefined;
     if (geo.status === "ok" && geo.data) {
-      [amenities, urbanism, comps, flood] = await Promise.all([
+      [amenities, urbanism, comps, flood, heritage] = await Promise.all([
         fetchAmenities(geo.data),
         fetchUrbanism(geo.data, { parcelRef }),
         fetchComps(geo.data, {
@@ -158,13 +162,19 @@ export async function generateReport(input: ReportInput): Promise<string> {
           maxSize: builtM2 ? Math.round(builtM2 * 1.6) : undefined,
         }),
         fetchFlood(geo.data),
+        fetchHeritage(geo.data),
       ]);
       if (amenities.status === "ok" && amenities.data) {
         report = seedAmenities(report, amenities.data);
       }
-      if (urbanism.status === "ok" && urbanism.data) {
-        report = seedUrbanism(report, urbanism.data, affData);
-        urbanismSeeded = true;
+      // Always seed the urbanism section (with whatever qualification data we
+      // have) before heritage, which appends to its body.
+      const uData =
+        urbanism.status === "ok" && urbanism.data ? urbanism.data : EMPTY_URBANISM;
+      report = seedUrbanism(report, uData, affData);
+      urbanismSeeded = true;
+      if (heritage.status === "ok" && heritage.data) {
+        report = seedHeritage(report, heritage.data);
       }
       if (comps.status === "ok" && comps.data && comps.data.length) {
         report = seedComps(report, {
@@ -174,8 +184,8 @@ export async function generateReport(input: ReportInput): Promise<string> {
         });
       }
     }
-    // If the qualification map was unavailable but the AFH verdict came through,
-    // still surface the affectation alert from the official source alone.
+    // If geocoding failed but the AFH verdict came through, still surface the
+    // affectation alert from the official source alone.
     if (!urbanismSeeded && affData) {
       report = seedUrbanism(report, EMPTY_URBANISM, affData);
     }
@@ -258,6 +268,17 @@ export async function generateReport(input: ReportInput): Promise<string> {
       payload: affectation.data ?? null,
       note: affectation.note ?? null,
       fetched_at: affectation.fetchedAt,
+    });
+  }
+  if (heritage) {
+    sources.push({
+      report_id: id,
+      source: "heritage",
+      status: heritage.status,
+      to_verify: heritage.toVerify,
+      payload: heritage.data ?? null,
+      note: heritage.note ?? null,
+      fetched_at: heritage.fetchedAt,
     });
   }
   sources.push({

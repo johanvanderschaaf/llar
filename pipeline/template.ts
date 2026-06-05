@@ -3,6 +3,7 @@ import type { CatastroData } from "@/adapters/catastro";
 import type { AmenityData, NearestPlace } from "@/adapters/amenities";
 import type { UrbanismData } from "@/adapters/urbanism";
 import type { AffectationData } from "@/adapters/affectation";
+import type { HeritageData, HeritageLevel } from "@/adapters/heritage";
 import type { EnergyData } from "@/adapters/energy";
 import type { FloodData } from "@/adapters/flood";
 import { SEISMIC, RADON, crimeContext } from "@/config/static-risk";
@@ -525,6 +526,72 @@ export function seedUrbanism(
         },
       },
     ];
+  }
+  return r;
+}
+
+const HERITAGE_LEVEL: Record<HeritageLevel, Localized> = {
+  A: {
+    en: "Bé Cultural d'Interès Nacional (BCIN — the strictest level)",
+    es: "Bien Cultural de Interés Nacional (BCIN, el nivel más estricto)",
+  },
+  B: {
+    en: "Bé Cultural d'Interès Local (BCIL)",
+    es: "Bien Cultural de Interés Local (BCIL)",
+  },
+  C: {
+    en: "Bé d'Interès Urbanístic",
+    es: "Bien de Interés Urbanístico",
+  },
+  D: {
+    en: "Bé d'Interès Documental (the lightest level)",
+    es: "Bien de Interés Documental (el nivel más leve)",
+  },
+};
+
+/**
+ * Append architectural-heritage protection to the urbanism section, and raise a
+ * top-of-report alert for a building-specific listing (A/B → caution, C/D →
+ * check). An area-wide ensemble (e.g. the whole Eixample) is reported as context
+ * only, never an alert — almost every Eixample finca is inside one.
+ * Run AFTER seedUrbanism, which authors the section body this appends to.
+ */
+export function seedHeritage(report: Report, h: HeritageData): Report {
+  const r: Report = structuredClone(report);
+
+  if (h.level) {
+    const lvl = HERITAGE_LEVEL[h.level];
+    const name = h.name ? `${h.name} — ` : "";
+    const meta = [h.style, h.epoch].filter(Boolean).join(", ");
+    const metaClause = meta ? ` (${meta})` : "";
+    const sentenceEn = ` Heritage: this building is catalogued — ${name}${lvl.en}${metaClause}. Listing restricts façade and often interior changes; expect special permits, higher renovation costs, and longer timelines.`;
+    const sentenceEs = ` Patrimonio: este edificio está catalogado — ${name}${lvl.es}${metaClause}. La protección limita los cambios en fachada y a menudo en el interior; prevé permisos especiales, mayores costes de reforma y plazos más largos.`;
+    r.urbanism.body = {
+      en: `${r.urbanism.body.en}${sentenceEn}`,
+      es: `${r.urbanism.body.es}${sentenceEs}`,
+    };
+
+    const high = h.level === "A" || h.level === "B";
+    r.alerts = [
+      ...(r.alerts ?? []),
+      {
+        tone: high ? "caution" : "check",
+        title: {
+          en: high ? "Heritage-protected building" : "Catalogued building",
+          es: high ? "Edificio protegido (patrimonio)" : "Edificio catalogado",
+        },
+        detail: {
+          en: `${h.name ? `${h.name}. ` : ""}${lvl.en}. Heritage protection restricts works (façade/interior), needs special permits, and raises renovation cost and time. Check the catalog file before offering.`,
+          es: `${h.name ? `${h.name}. ` : ""}${lvl.es}. La protección patrimonial limita las obras (fachada/interior), exige permisos especiales y aumenta el coste y el plazo de reforma. Consulta la ficha del catálogo antes de ofertar.`,
+        },
+      },
+    ];
+  } else if (h.inEnsemble) {
+    const ens = h.ensembleName ?? "a protected ensemble";
+    r.urbanism.body = {
+      en: `${r.urbanism.body.en} Heritage: the building sits within a protected ensemble (${ens}); façade interventions are regulated, though there is no building-specific listing.`,
+      es: `${r.urbanism.body.es} Patrimonio: el edificio está dentro de un conjunto protegido (${ens}); las intervenciones en fachada están reguladas, aunque no hay una catalogación específica del edificio.`,
+    };
   }
   return r;
 }
