@@ -2,6 +2,7 @@ import type { Report, Localized, Score } from "@/types/report";
 import type { CatastroData } from "@/adapters/catastro";
 import type { AmenityData, NearestPlace } from "@/adapters/amenities";
 import type { UrbanismData } from "@/adapters/urbanism";
+import type { AffectationData } from "@/adapters/affectation";
 import type { EnergyData } from "@/adapters/energy";
 import type { FloodData } from "@/adapters/flood";
 import { SEISMIC, RADON, crimeContext } from "@/config/static-risk";
@@ -431,7 +432,19 @@ export function seedRisks(
 
 /* ---------- urbanistic situation → section 08 ---------- */
 
-export function seedUrbanism(report: Report, u: UrbanismData): Report {
+/**
+ * Seed the urbanism section + top-of-report affectation alert.
+ *
+ * The affectation verdict prefers the official Ajuntament AFH service (`a`):
+ * category A → affected, C/D → specific circumstances, B → clear. When the AFH
+ * service is unavailable, it falls back to the qualification inference in `u`
+ * (a system clau touching the parcel → possible affectation).
+ */
+export function seedUrbanism(
+  report: Report,
+  u: UrbanismData,
+  a?: AffectationData,
+): Report {
   const r: Report = structuredClone(report);
   const cls = u.classification;
   const q = u.qualification;
@@ -440,15 +453,37 @@ export function seedUrbanism(report: Report, u: UrbanismData): Report {
   // Name the specific systems touching the finca, e.g. "7a — Equipaments
   // actuals; viari — Xarxa viària", so the buyer sees exactly what's affected.
   const affList = u.affectations
-    .map((a) => (a.name ? `${a.clau} — ${a.name}` : a.clau))
+    .map((af) => (af.name ? `${af.clau} — ${af.name}` : af.clau))
     .join("; ");
+  const systemsClause = affList
+    ? { en: ` (${affList})`, es: ` (${affList})` }
+    : { en: "", es: "" };
 
-  const affEn = u.possibleAffectation
-    ? `⚠ Part of the finca carries a system qualification (${affList}), which is a possible urbanistic affectation (earmarked for road / facility / green space). Verify this urgently with a certificat urbanístic before offering — an affectation can limit works, reduce value, or expose the property to expropriation.`
-    : "Every part of the finca sits in a buildable zone, with no system affectation detected across the parcel.";
-  const affEs = u.possibleAffectation
-    ? `⚠ Parte de la finca tiene una calificación de sistema (${affList}), lo que supone una posible afectación urbanística (reservada para viario / equipamiento / zona verde). Verifícalo con urgencia con un certificado urbanístico antes de ofertar: una afectación puede limitar obras, reducir el valor o exponer el inmueble a expropiación.`
-    : "Toda la finca está en zona edificable; no se detecta afectación por sistema en ninguna parte de la parcela.";
+  // Unified verdict: AFH category if present, else the qualification inference.
+  const level: "affected" | "specific" | "clear" = a
+    ? a.category === "A"
+      ? "affected"
+      : a.category === "B"
+        ? "clear"
+        : "specific"
+    : u.possibleAffectation
+      ? "affected"
+      : "clear";
+  // AFH gives a confirmed call; the inference is only a "possible" affectation.
+  const confirmed = Boolean(a);
+
+  const affEn =
+    level === "affected"
+      ? `⚠ ${confirmed ? "The Ajuntament flags this finca as carrying an urbanistic affectation" : "Part of the finca carries a system qualification, a possible urbanistic affectation"}${systemsClause.en}. An affectation can limit works, reduce value, or expose the property to expropriation — verify it urgently with a certificat urbanístic before offering.`
+      : level === "specific"
+        ? "⚠ The Ajuntament flags specific urbanistic circumstances for this finca (e.g. a plan in progress, an urban-management area, suspended licences, or a court ruling). Check what applies before offering."
+        : "No urbanistic affectation impeding housing use was found for this finca.";
+  const affEs =
+    level === "affected"
+      ? `⚠ ${confirmed ? "El Ayuntamiento señala que esta finca tiene una afectación urbanística" : "Parte de la finca tiene una calificación de sistema, una posible afectación urbanística"}${systemsClause.es}. Una afectación puede limitar obras, reducir el valor o exponer el inmueble a expropiación: verifícalo con urgencia con un certificado urbanístico antes de ofertar.`
+      : level === "specific"
+        ? "⚠ El Ayuntamiento señala circunstancias urbanísticas específicas para esta finca (p. ej. un planeamiento en trámite, un ámbito de gestión urbanística, licencias suspendidas o una sentencia). Comprueba qué aplica antes de ofertar."
+        : "No se ha encontrado ninguna afectación urbanística que impida el uso como vivienda en esta finca.";
 
   r.urbanism.body = {
     en: `${cls ? `Land classification: ${cls}. ` : ""}${
@@ -459,20 +494,34 @@ export function seedUrbanism(report: Report, u: UrbanismData): Report {
     }${affEs} Toda Barcelona dentro de las Rondas está en la ZBE (Zona de Bajas Emisiones; solo relevante si mantienes un coche sin etiqueta). Esto es orientativo: confirma el estado definitivo con un certificado urbanístico oficial del Ayuntamiento antes de comprometerte.`,
   };
 
-  // A system qualification on the finca is serious enough to surface at the top
-  // of the report, not just inside the urbanism section.
-  if (u.possibleAffectation && u.affectations.length) {
+  // Surface a serious finding at the top of the report, not just in the section.
+  if (level === "affected") {
     r.alerts = [
       ...(r.alerts ?? []),
       {
         tone: "caution",
         title: {
-          en: "Possible urbanistic affectation",
-          es: "Posible afectación urbanística",
+          en: confirmed ? "Urbanistic affectation" : "Possible urbanistic affectation",
+          es: confirmed ? "Afectación urbanística" : "Posible afectación urbanística",
         },
         detail: {
-          en: `Part of the finca is qualified as a system (${affList}) — a possible affectation that can limit works, reduce value, or expose the property to expropriation. Confirm with a certificat urbanístic before offering.`,
-          es: `Parte de la finca está calificada como sistema (${affList}): una posible afectación que puede limitar obras, reducir el valor o exponer el inmueble a expropiación. Confírmalo con un certificado urbanístico antes de ofertar.`,
+          en: `${confirmed ? "The Ajuntament flags this finca as affected" : "Part of the finca is qualified as a system"}${systemsClause.en}. It can limit works, reduce value, or expose the property to expropriation. Confirm with a certificat urbanístic before offering.`,
+          es: `${confirmed ? "El Ayuntamiento señala esta finca como afectada" : "Parte de la finca está calificada como sistema"}${systemsClause.es}. Puede limitar obras, reducir el valor o exponer el inmueble a expropiación. Confírmalo con un certificado urbanístico antes de ofertar.`,
+        },
+      },
+    ];
+  } else if (level === "specific") {
+    r.alerts = [
+      ...(r.alerts ?? []),
+      {
+        tone: "check",
+        title: {
+          en: "Specific urbanistic circumstances",
+          es: "Circunstancias urbanísticas específicas",
+        },
+        detail: {
+          en: "The Ajuntament flags specific circumstances for this finca (a plan in progress, an urban-management area, suspended licences, or a court ruling). Check what applies before offering.",
+          es: "El Ayuntamiento señala circunstancias específicas para esta finca (un planeamiento en trámite, un ámbito de gestión urbanística, licencias suspendidas o una sentencia). Comprueba qué aplica antes de ofertar.",
         },
       },
     ];

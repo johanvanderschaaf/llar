@@ -9,6 +9,7 @@ import type { AdapterResult } from "@/adapters/types";
 import { geocodeRef } from "@/adapters/geo";
 import { fetchAmenities, type AmenityData } from "@/adapters/amenities";
 import { fetchUrbanism, type UrbanismData } from "@/adapters/urbanism";
+import { fetchAffectation, type AffectationData } from "@/adapters/affectation";
 import { fetchEnergy, type EnergyData } from "@/adapters/energy";
 import { fetchComps, type CompListing } from "@/adapters/idealista";
 import { fetchFlood, type FloodData } from "@/adapters/flood";
@@ -30,6 +31,16 @@ import {
   seedUrbanism,
 } from "./template";
 import type { ReportInput } from "@/types/db";
+
+// Minimal urbanism data so the AFH affectation alert can render even when the
+// qualification map (geo-dependent) is unavailable.
+const EMPTY_URBANISM: UrbanismData = {
+  possibleAffectation: false,
+  affectations: [],
+  qualifications: [],
+  method: "bcn-point",
+  mapUrl: "https://ajuntament.barcelona.cat/informaciourbanistica/cerca/ca/",
+};
 
 const CACHE_TTL_MS = 1000 * 60 * 60 * 24 * 30; // 30 days
 // Bump when the parsed CatastroData shape changes, to auto-invalidate old rows.
@@ -126,15 +137,22 @@ export async function generateReport(input: ReportInput): Promise<string> {
   let urbanism: AdapterResult<UrbanismData> | null = null;
   let comps: AdapterResult<CompListing[]> | null = null;
   let flood: AdapterResult<FloodData> | null = null;
+  // Official affectation (AFH) — needs only the parcel ref, not coordinates.
+  let affectation: AdapterResult<AffectationData> | null = null;
+  let urbanismSeeded = false;
   const builtM2 = input.builtM2 ?? cat.data?.unit.builtAreaM2;
   if (cat.status === "ok") {
-    const geo = await geocodeRef(resolvedRef);
+    const parcelRef = cat.data?.parcel.parcelRef ?? resolvedRef;
+    const [geo, aff] = await Promise.all([
+      geocodeRef(resolvedRef),
+      fetchAffectation(parcelRef),
+    ]);
+    affectation = aff;
+    const affData = aff.status === "ok" ? aff.data : undefined;
     if (geo.status === "ok" && geo.data) {
       [amenities, urbanism, comps, flood] = await Promise.all([
         fetchAmenities(geo.data),
-        fetchUrbanism(geo.data, {
-          parcelRef: cat.data?.parcel.parcelRef ?? resolvedRef,
-        }),
+        fetchUrbanism(geo.data, { parcelRef }),
         fetchComps(geo.data, {
           minSize: builtM2 ? Math.round(builtM2 * 0.6) : undefined,
           maxSize: builtM2 ? Math.round(builtM2 * 1.6) : undefined,
@@ -145,7 +163,8 @@ export async function generateReport(input: ReportInput): Promise<string> {
         report = seedAmenities(report, amenities.data);
       }
       if (urbanism.status === "ok" && urbanism.data) {
-        report = seedUrbanism(report, urbanism.data);
+        report = seedUrbanism(report, urbanism.data, affData);
+        urbanismSeeded = true;
       }
       if (comps.status === "ok" && comps.data && comps.data.length) {
         report = seedComps(report, {
@@ -154,6 +173,11 @@ export async function generateReport(input: ReportInput): Promise<string> {
           comps: comps.data,
         });
       }
+    }
+    // If the qualification map was unavailable but the AFH verdict came through,
+    // still surface the affectation alert from the official source alone.
+    if (!urbanismSeeded && affData) {
+      report = seedUrbanism(report, EMPTY_URBANISM, affData);
     }
   }
 
@@ -223,6 +247,17 @@ export async function generateReport(input: ReportInput): Promise<string> {
       payload: urbanism.data ?? null,
       note: urbanism.note ?? null,
       fetched_at: urbanism.fetchedAt,
+    });
+  }
+  if (affectation) {
+    sources.push({
+      report_id: id,
+      source: "affectation",
+      status: affectation.status,
+      to_verify: affectation.toVerify,
+      payload: affectation.data ?? null,
+      note: affectation.note ?? null,
+      fetched_at: affectation.fetchedAt,
     });
   }
   sources.push({

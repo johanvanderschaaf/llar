@@ -14,6 +14,7 @@ export type SourceKey =
   | "crime"
   | "amenities"
   | "urbanism"
+  | "affectation"
   | "zbe"
   | "tax"
   | "market";
