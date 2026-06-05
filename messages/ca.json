@@ -27,7 +27,8 @@
     "email": "Correu (opcional)",
     "emailHint": "Per guardar-te l'informe i avisar-te quan tinguis l'anàlisi completa.",
     "selected": "Seleccionat:",
-    "submit": "Generar vista prèvia →"
+    "submit": "Generar vista prèvia →",
+    "genError": "No hem pogut generar l'informe. Torna-ho a provar d'aquí a un moment."
   },
   "analyzing": {
     "title": "Analitzant el teu pis",

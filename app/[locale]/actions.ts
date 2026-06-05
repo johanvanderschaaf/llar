@@ -41,7 +41,14 @@ export async function startAnalysisAction(formData: FormData) {
     redirect(`/${locale}/start?error=missing`);
   }
 
-  const id = await generateReport(input);
+  let id: string;
+  try {
+    id = await generateReport(input);
+  } catch (e) {
+    // Never show the buyer a raw 500 — bounce back with a retry message.
+    console.error("[startAnalysis] generation failed:", (e as Error)?.message);
+    redirect(`/${locale}/start?error=generation`);
+  }
   redirect(`/${locale}/report/${id}`);
 }
 

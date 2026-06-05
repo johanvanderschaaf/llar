@@ -27,7 +27,8 @@
     "email": "Email (optional)",
     "emailHint": "To save your report and tell you when the full analysis is ready.",
     "selected": "Selected:",
-    "submit": "Generate preview →"
+    "submit": "Generate preview →",
+    "genError": "We couldn't generate the report. Please try again in a moment."
   },
   "analyzing": {
     "title": "Analysing your flat",

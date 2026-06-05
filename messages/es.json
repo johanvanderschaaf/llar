@@ -27,7 +27,8 @@
     "email": "Email (opcional)",
     "emailHint": "Para guardarte el informe y avisarte cuando esté el análisis completo.",
     "selected": "Seleccionado:",
-    "submit": "Generar vista previa →"
+    "submit": "Generar vista previa →",
+    "genError": "No hemos podido generar el informe. Inténtalo de nuevo en un momento."
   },
   "analyzing": {
     "title": "Analizando tu piso",

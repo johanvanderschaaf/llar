@@ -92,7 +92,7 @@ export async function fetchAmenities(
   let lastErr = "";
   for (const endpoint of OVERPASS_ENDPOINTS) {
     try {
-      const res = await fetchWithTimeout(endpoint, 30000, {
+      const res = await fetchWithTimeout(endpoint, 12000, {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
