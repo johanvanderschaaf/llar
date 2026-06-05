@@ -2,8 +2,12 @@
 
 import { redirect } from "next/navigation";
 import { generateReport } from "@/pipeline/generate";
+import { generateNarrative } from "@/pipeline/narrate";
 import { routing } from "@/i18n/routing";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
+import { hasPaidOrder } from "@/lib/orders";
+import { hasAnthropicKey } from "@/lib/anthropic";
 import { getStripe, hasStripe, reportPriceCents, stripeLocale } from "@/lib/stripe";
 import type { ReportInput, ReportRow } from "@/types/db";
 
@@ -39,6 +43,39 @@ export async function startAnalysisAction(formData: FormData) {
 
   const id = await generateReport(input);
   redirect(`/${locale}/report/${id}`);
+}
+
+/**
+ * Generate the AI narrative for an unlocked report (operator or paid), if not
+ * already present. Access-checked server-side. Returns when done so the client
+ * can refresh into the complete report.
+ */
+export async function ensureNarrativeAction(reportId: string): Promise<void> {
+  if (!hasAnthropicKey()) return;
+  const db = createAdminClient();
+  const { data: row } = await db
+    .from("reports")
+    .select("*")
+    .eq("id", reportId)
+    .maybeSingle();
+  if (!row) return;
+  const report = row as ReportRow;
+  if (report.data?.verdict?.headline?.en) return; // already generated
+
+  // Access gate: operator or a paid order.
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const paid = await hasPaidOrder(reportId);
+  if (!user && !paid) return;
+
+  try {
+    const next = await generateNarrative(report.data, report.input);
+    await db.from("reports").update({ data: next }).eq("id", reportId);
+  } catch {
+    // Leave deterministic data if narration fails.
+  }
 }
 
 /**

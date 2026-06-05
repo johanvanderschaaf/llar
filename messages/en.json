@@ -29,6 +29,25 @@
     "selected": "Selected:",
     "submit": "Generate preview →"
   },
+  "analyzing": {
+    "title": "Analysing your flat",
+    "fullTitle": "Preparing your full report",
+    "wait": "This takes a few seconds. Don't close this page.",
+    "steps": [
+      "Cadastre & surface",
+      "Energy certificate (ICAEN)",
+      "Urban planning & affectations",
+      "Natural risks",
+      "Neighbourhood & amenities",
+      "Computing scores"
+    ],
+    "fullSteps": [
+      "Cross-checking the data",
+      "Writing the analysis",
+      "Negotiation playbook",
+      "Finalising the report"
+    ]
+  },
   "preview": {
     "free": "Free preview",
     "note": "Free preview. Unlock the full report and PDF instantly.",

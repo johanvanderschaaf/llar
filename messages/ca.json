@@ -29,6 +29,25 @@
     "selected": "Seleccionat:",
     "submit": "Generar vista prèvia →"
   },
+  "analyzing": {
+    "title": "Analitzant el teu pis",
+    "fullTitle": "Preparant el teu informe complet",
+    "wait": "Això triga uns segons. No tanquis aquesta pàgina.",
+    "steps": [
+      "Cadastre i superfície",
+      "Certificat energètic (ICAEN)",
+      "Urbanisme i afectacions",
+      "Riscos naturals",
+      "Barri i serveis",
+      "Calculant puntuacions"
+    ],
+    "fullSteps": [
+      "Creuant les dades",
+      "Redactant l'anàlisi",
+      "Guia de negociació",
+      "Ultimant l'informe"
+    ]
+  },
   "preview": {
     "free": "Vista prèvia gratuïta",
     "note": "Vista prèvia gratuïta. Desbloqueja l'informe complet i el PDF a l'instant.",

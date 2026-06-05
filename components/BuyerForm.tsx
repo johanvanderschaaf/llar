@@ -3,6 +3,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import { startAnalysisAction } from "@/app/[locale]/actions";
 import { PropertyPicker } from "@/components/PropertyPicker";
+import { AnalyzingScreen } from "@/components/AnalyzingScreen";
 
 export function BuyerForm() {
   const t = useTranslations("form");
@@ -30,6 +31,7 @@ export function BuyerForm() {
       labels={labels}
       withEmail
       extraHidden={{ locale, source: "buyer" }}
+      loadingScreen={<AnalyzingScreen variant="data" />}
     />
   );
 }

@@ -29,6 +29,25 @@
     "selected": "Seleccionado:",
     "submit": "Generar vista previa →"
   },
+  "analyzing": {
+    "title": "Analizando tu piso",
+    "fullTitle": "Preparando tu informe completo",
+    "wait": "Esto tarda unos segundos. No cierres esta página.",
+    "steps": [
+      "Catastro y superficie",
+      "Certificado energético (ICAEN)",
+      "Urbanismo y afectaciones",
+      "Riesgos naturales",
+      "Barrio y servicios",
+      "Calculando puntuaciones"
+    ],
+    "fullSteps": [
+      "Cruzando los datos",
+      "Redactando el análisis",
+      "Guía de negociación",
+      "Ultimando el informe"
+    ]
+  },
   "preview": {
     "free": "Vista previa gratuita",
     "note": "Vista previa gratuita. Desbloquea el informe completo y el PDF al instante.",

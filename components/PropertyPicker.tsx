@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 interface Street {
   tipo: string;
@@ -60,12 +60,15 @@ export function PropertyPicker({
   withEmail = false,
   showExtras = false,
   extraHidden = {},
+  loadingScreen,
 }: {
   action: (formData: FormData) => void | Promise<void>;
   labels: PickerLabels;
   withEmail?: boolean;
   showExtras?: boolean;
   extraHidden?: Record<string, string>;
+  /** Shown full-screen while the form submits + the report generates. */
+  loadingScreen?: ReactNode;
 }) {
   const [query, setQuery] = useState("");
   const [streets, setStreets] = useState<Street[]>([]);
@@ -124,6 +127,11 @@ export function PropertyPicker({
 
   const activeRef = resolved?.ref || manualRef.trim();
   const activeLabel = resolved?.label || manualRef.trim();
+
+  // While submitting, swap the whole form for the loading/progress screen.
+  if (submitting && loadingScreen) {
+    return <>{loadingScreen}</>;
+  }
 
   return (
     <form
