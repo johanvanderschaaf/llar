@@ -1,7 +1,13 @@
 {
-  "asOf": null,
+  "asOf": "Apr 2025 – Mar 2026",
   "source": "Portal Estadístico del Notariado",
   "sourceUrl": "https://penotariado.com/inmobiliario/buscador-precio-vivienda",
-  "note": "Empty by design — see adapters/notariado.ts and data/README-notariado.md for how to populate this file from a penotariado.com monthly export. Until populated the adapter degrades to 'unavailable' and the buyer flow keeps working.",
-  "byCp": {}
+  "note": "Refreshed manually from per-postcode PDF exports — see data/README-notariado.md. Rolling 12-month windows; portal updates monthly.",
+  "byCp": {
+    "08021": {
+      "pricePerM2": 6620,
+      "transactions": 276,
+      "avgSurfaceM2": 163
+    }
+  }
 }

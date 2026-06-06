@@ -36,15 +36,23 @@ present, so include them when the portal exposes them.
 
 ## How to refresh from a Notariado export
 
-1. Sign in at <https://penotariado.com/>.
-2. Filter by **Provincia: Barcelona** and the latest period available
-   (the portal updates monthly).
-3. Export the by-postcode table (CSV or XLSX).
-4. Convert to the schema above. Keep only the Barcelona-city postcodes
-   (`080xx`). Drop rows where the portal blanks values for low transaction
-   counts — `unavailable` is better than misleading.
-5. Update `asOf` (e.g. `"2026-Q1"`) and commit.
+The portal exports one PDF per postcode (no bulk CSV at the CP level — that's
+why this dataset is curated by hand). For each Barcelona-city postcode you
+care about:
 
-If you'd rather paste the raw export and let the adapter handle the mapping,
-open an issue and we'll add a small converter script — not built yet because
-the portal's export shape isn't documented publicly.
+1. Sign in at <https://penotariado.com/> and open *Estadísticas → Mapa*.
+2. Filter **Provincia: Barcelona → Municipio: Barcelona → Código Postal: 080xx**.
+3. Leave **Property type** and **Construction type** as *All*. The Barcelona-
+   city CPs are >99% apartments and >90% second-hand, so the "All" mix is
+   effectively what a buyer is looking at; restricting further produces
+   identical numbers for most CPs and missing data for the rest.
+4. Use the "Share / PDF" button to export the report.
+5. Paste the four numbers into `byCp`:
+   - `pricePerM2` ← *Average price m²* (drop the dot — `6.620 €/m²` → `6620`)
+   - `transactions` ← *Sales*
+   - `avgSurfaceM2` ← *Average surface area*
+6. Update the file-level `asOf` to the *Values from … to …* line on the PDF
+   (rolling 12-month window) and commit.
+
+Drop rows where the portal blanks values for low transaction counts —
+`unavailable` is better than misleading.
