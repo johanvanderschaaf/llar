@@ -12,6 +12,7 @@ import { buildBuilding } from "@/config/building";
 import { buildLegal } from "@/config/legal";
 import { buildFooter } from "@/config/footer";
 import type { CompListing } from "@/adapters/idealista";
+import type { IpvData } from "@/adapters/ine-ipv";
 import type { CompRow } from "@/types/report";
 import type { ReportInput } from "@/types/db";
 import { scoreOrder, type ScoreKey } from "@/config/scoring";
@@ -220,6 +221,58 @@ export function compsMedianPerM2(comps: CompListing[]): number | null {
   if (!vals.length) return null;
   const mid = Math.floor(vals.length / 2);
   return vals.length % 2 ? vals[mid] : Math.round((vals[mid - 1] + vals[mid]) / 2);
+}
+
+/* ---------- INE IPV → market-context panel in section 03 ---------- */
+
+/**
+ * Seed the "market context" panel and price lede from the INE IPV YoY change
+ * for Cataluña. This is plain-language framing for a resident first-time buyer
+ * — *how the market is moving*, not an investment yield. Always paired with the
+ * "verify with current comparables" disclaimer because the index lags the
+ * asking-price reality by a quarter.
+ */
+export function seedMarketContext(report: Report, ipv: IpvData): Report {
+  const r: Report = structuredClone(report);
+  const pct = ipv.yoyPct;
+  const sign = pct > 0 ? "+" : "";
+  const dir =
+    pct > 4
+      ? { en: "rising fast", es: "subiendo con fuerza", ca: "pujant amb força" }
+      : pct > 0.5
+        ? { en: "edging up", es: "subiendo de forma moderada", ca: "pujant moderadament" }
+        : pct < -0.5
+          ? { en: "easing", es: "bajando", ca: "baixant" }
+          : { en: "broadly flat", es: "prácticamente plano", ca: "pràcticament pla" };
+
+  const segLabel = ipv.segment === "secondHand"
+    ? { en: "second-hand homes", es: "viviendas de segunda mano", ca: "habitatges de segona mà" }
+    : { en: "all homes", es: "todas las viviendas", ca: "tots els habitatges" };
+
+  const heading: Localized = {
+    en: "Market context (Catalonia)",
+    es: "Contexto de mercado (Cataluña)",
+    ca: "Context de mercat (Catalunya)",
+  };
+  const body: Localized = {
+    en: `Across Catalonia, prices for ${segLabel.en} are ${dir.en}: ${sign}${pct.toFixed(1)}% year-on-year in ${ipv.quarter} (INE Housing Price Index). This is regional context, not a quote for this address — verify with current comparables before offering.`,
+    es: `En Cataluña, los precios de ${segLabel.es} están ${dir.es}: ${sign}${pct.toFixed(1)}% interanual en ${ipv.quarter} (Índice de Precios de Vivienda, INE). Es contexto regional, no una valoración de esta dirección — contrástalo con comparables actuales antes de ofertar.`,
+    ca: `A Catalunya, els preus dels ${segLabel.ca} estan ${dir.ca}: ${sign}${pct.toFixed(1)}% interanual al ${ipv.quarter} (Índex de Preus de l'Habitatge, INE). És context regional, no una valoració d'aquesta adreça — contrasta-ho amb comparables actuals abans d'ofertar.`,
+  };
+
+  // Insert the market-context panel as the first panel in section 03.
+  r.price.panels = [{ heading, body }, ...r.price.panels];
+
+  // Short lede above the panels, only when not already authored.
+  if (!r.price.lede.en) {
+    r.price.lede = {
+      en: `Catalan housing prices are ${dir.en} (${sign}${pct.toFixed(1)}% YoY, ${ipv.quarter}). The figures below are the regional backdrop — pair them with the specific comparables for this street.`,
+      es: `Los precios de la vivienda en Cataluña están ${dir.es} (${sign}${pct.toFixed(1)}% interanual, ${ipv.quarter}). Las cifras siguientes son el contexto regional — combínalas con los comparables concretos de esta calle.`,
+      ca: `Els preus de l'habitatge a Catalunya estan ${dir.ca} (${sign}${pct.toFixed(1)}% interanual, ${ipv.quarter}). Les xifres següents són el context regional — combina-les amb els comparables concrets d'aquest carrer.`,
+    };
+  }
+
+  return r;
 }
 
 /* ---------- building & condition + legal (deterministic) ---------- */

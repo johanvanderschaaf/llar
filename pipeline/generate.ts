@@ -12,6 +12,7 @@ import { fetchUrbanism, type UrbanismData } from "@/adapters/urbanism";
 import { fetchAffectation, type AffectationData } from "@/adapters/affectation";
 import { fetchHeritage, type HeritageData } from "@/adapters/heritage";
 import { fetchEnergy, type EnergyData } from "@/adapters/energy";
+import { fetchIpv } from "@/adapters/ine-ipv";
 import { fetchComps, type CompListing } from "@/adapters/idealista";
 import { fetchFlood, type FloodData } from "@/adapters/flood";
 import { computeScores } from "@/config/scoring";
@@ -31,6 +32,7 @@ import {
   seedScores,
   seedUrbanism,
   seedHeritage,
+  seedMarketContext,
 } from "./template";
 import type { ReportInput } from "@/types/db";
 
@@ -128,10 +130,14 @@ export async function generateReport(input: ReportInput): Promise<string> {
   report = seedBuilding(report, cat.data?.unit.yearBuilt);
   report = seedLegal(report);
 
-  // Energy certificate (ICAEN) — keyed by cadastral reference.
-  const energy = await fetchEnergy(resolvedRef);
+  // Energy certificate (ICAEN) + INE IPV (Catalan housing market context).
+  // Independent of geocoding so they run in parallel with the cadastral step.
+  const [energy, ipv] = await Promise.all([fetchEnergy(resolvedRef), fetchIpv()]);
   if (energy.status === "ok" && energy.data) {
     report = seedEnergy(report, energy.data);
+  }
+  if (ipv.status === "ok" && ipv.data) {
+    report = seedMarketContext(report, ipv.data);
   }
 
   // Geographic enrichment: coordinates → amenities + urbanism + comps + flood
@@ -289,6 +295,15 @@ export async function generateReport(input: ReportInput): Promise<string> {
     payload: energy.data ?? null,
     note: energy.note ?? null,
     fetched_at: energy.fetchedAt,
+  });
+  sources.push({
+    report_id: id,
+    source: "ipv",
+    status: ipv.status,
+    to_verify: ipv.toVerify,
+    payload: ipv.data ?? null,
+    note: ipv.note ?? null,
+    fetched_at: ipv.fetchedAt,
   });
   if (comps) {
     sources.push({

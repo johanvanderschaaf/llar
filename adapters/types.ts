@@ -18,7 +18,8 @@ export type SourceKey =
   | "heritage"
   | "zbe"
   | "tax"
-  | "market";
+  | "market"
+  | "ipv";
 
 export type AdapterStatus = "ok" | "unavailable" | "error";
 
