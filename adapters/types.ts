@@ -19,7 +19,8 @@ export type SourceKey =
   | "zbe"
   | "tax"
   | "market"
-  | "ipv";
+  | "ipv"
+  | "notariado";
 
 export type AdapterStatus = "ok" | "unavailable" | "error";
 

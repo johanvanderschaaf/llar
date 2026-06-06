@@ -136,7 +136,8 @@
     "size": "Tamaño",
     "built": "Construido",
     "energy": "Energía",
-    "floor": "Planta"
+    "floor": "Planta",
+    "vsMarket": "vs €/m² del código postal"
   },
   "verdict": {
     "label": "La conclusión",

@@ -13,6 +13,7 @@ import { buildLegal } from "@/config/legal";
 import { buildFooter } from "@/config/footer";
 import type { CompListing } from "@/adapters/idealista";
 import type { IpvData } from "@/adapters/ine-ipv";
+import type { NotariadoData } from "@/adapters/notariado";
 import type { CompRow } from "@/types/report";
 import type { ReportInput } from "@/types/db";
 import { scoreOrder, type ScoreKey } from "@/config/scoring";
@@ -232,7 +233,11 @@ export function compsMedianPerM2(comps: CompListing[]): number | null {
  * "verify with current comparables" disclaimer because the index lags the
  * asking-price reality by a quarter.
  */
-export function seedMarketContext(report: Report, ipv: IpvData): Report {
+export function seedMarketContext(
+  report: Report,
+  ipv: IpvData,
+  opts: { notariado?: NotariadoData; askingPriceEur?: number; builtM2?: number } = {},
+): Report {
   const r: Report = structuredClone(report);
   const pct = ipv.yoyPct;
   const sign = pct > 0 ? "+" : "";
@@ -262,6 +267,73 @@ export function seedMarketContext(report: Report, ipv: IpvData): Report {
 
   // Insert the market-context panel as the first panel in section 03.
   r.price.panels = [{ heading, body }, ...r.price.panels];
+
+  // Notariado postcode snapshot — official notarial sale prices for this CP.
+  if (opts.notariado) {
+    const n = opts.notariado;
+    const ppm = Math.round(n.pricePerM2);
+    const ppmStr = ppm.toLocaleString("en-GB");
+    const tx = n.transactions != null ? ` from ${n.transactions} closed sales` : "";
+    const txEs = n.transactions != null ? ` con ${n.transactions} ventas cerradas` : "";
+    const txCa = n.transactions != null ? ` amb ${n.transactions} vendes tancades` : "";
+    const surf = n.avgSurfaceM2
+      ? ` Average flat in the postcode: ${n.avgSurfaceM2} m².`
+      : "";
+    const surfEs = n.avgSurfaceM2
+      ? ` Tamaño medio del piso en el código postal: ${n.avgSurfaceM2} m².`
+      : "";
+    const surfCa = n.avgSurfaceM2
+      ? ` Mida mitjana del pis al codi postal: ${n.avgSurfaceM2} m².`
+      : "";
+
+    // Asking-price comparison when we have both the asking €/m² and Notariado.
+    let cmpEn = "";
+    let cmpEs = "";
+    let cmpCa = "";
+    if (opts.askingPriceEur && opts.builtM2) {
+      const askPerM2 = opts.askingPriceEur / opts.builtM2;
+      const delta = ((askPerM2 - n.pricePerM2) / n.pricePerM2) * 100;
+      const sign = delta > 0 ? "+" : "";
+      const deltaTxt = `${sign}${delta.toFixed(1)}%`;
+      cmpEn = ` This flat's asking €/m² (€${Math.round(askPerM2).toLocaleString("en-GB")}) is ${deltaTxt} vs the postcode average.`;
+      cmpEs = ` El €/m² pedido en este piso (€${Math.round(askPerM2).toLocaleString("en-GB")}) es ${deltaTxt} sobre la media del código postal.`;
+      cmpCa = ` El €/m² demanat per aquest pis (€${Math.round(askPerM2).toLocaleString("en-GB")}) és ${deltaTxt} respecte a la mitjana del codi postal.`;
+    }
+
+    r.price.panels.splice(1, 0, {
+      heading: {
+        en: `Postcode ${n.postalCode} — real sale prices`,
+        es: `Código postal ${n.postalCode} — precios reales de venta`,
+        ca: `Codi postal ${n.postalCode} — preus reals de venda`,
+      },
+      body: {
+        en: `Notarised average €${ppmStr}/m² in ${n.asOf}${tx}.${surf}${cmpEn} Source: Portal Estadístico del Notariado — closing prices, not asking.`,
+        es: `Media notarial €${ppmStr}/m² en ${n.asOf}${txEs}.${surfEs}${cmpEs} Fuente: Portal Estadístico del Notariado — precios de cierre, no de oferta.`,
+        ca: `Mitjana notarial €${ppmStr}/m² al ${n.asOf}${txCa}.${surfCa}${cmpCa} Font: Portal Estadístic del Notariat — preus de tancament, no d'oferta.`,
+      },
+    });
+
+    // Hero "vs market" pill when we can compute the delta.
+    if (opts.askingPriceEur && opts.builtM2) {
+      const delta = ((opts.askingPriceEur / opts.builtM2 - n.pricePerM2) / n.pricePerM2) * 100;
+      const sign = delta > 0 ? "+" : "";
+      r.hero.meta.push({
+        labelKey: "meta.vsMarket",
+        value: { en: `${sign}${delta.toFixed(1)}%`, es: `${sign}${delta.toFixed(1)}%`, ca: `${sign}${delta.toFixed(1)}%` },
+      });
+    }
+
+    // Fair-value keyline grounded in the postcode reference, when we have m².
+    if (opts.builtM2) {
+      const lo = Math.round(n.pricePerM2 * 0.95 * opts.builtM2);
+      const hi = Math.round(n.pricePerM2 * 1.05 * opts.builtM2);
+      r.price.fairValue = {
+        en: `Reference range €${lo.toLocaleString("en-GB")} – €${hi.toLocaleString("en-GB")} (postcode €/m² ±5% × ${opts.builtM2} m²). This is a Notariado-grounded reference, not a formal valuation — always cross-check with specific comparables.`,
+        es: `Rango de referencia €${lo.toLocaleString("en-GB")} – €${hi.toLocaleString("en-GB")} (€/m² del código postal ±5% × ${opts.builtM2} m²). Referencia basada en Notariado, no es una tasación formal — contrástala siempre con comparables concretos.`,
+        ca: `Rang de referència €${lo.toLocaleString("en-GB")} – €${hi.toLocaleString("en-GB")} (€/m² del codi postal ±5% × ${opts.builtM2} m²). Referència basada en Notariat, no és una taxació formal — contrasta-la sempre amb comparables concrets.`,
+      };
+    }
+  }
 
   // Short lede above the panels, only when not already authored.
   if (!r.price.lede.en) {

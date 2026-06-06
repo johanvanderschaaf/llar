@@ -13,6 +13,7 @@ import { fetchAffectation, type AffectationData } from "@/adapters/affectation";
 import { fetchHeritage, type HeritageData } from "@/adapters/heritage";
 import { fetchEnergy, type EnergyData } from "@/adapters/energy";
 import { fetchIpv } from "@/adapters/ine-ipv";
+import { fetchNotariado } from "@/adapters/notariado";
 import { fetchComps, type CompListing } from "@/adapters/idealista";
 import { fetchFlood, type FloodData } from "@/adapters/flood";
 import { computeScores } from "@/config/scoring";
@@ -136,8 +137,13 @@ export async function generateReport(input: ReportInput): Promise<string> {
   if (energy.status === "ok" && energy.data) {
     report = seedEnergy(report, energy.data);
   }
+  const notariado = fetchNotariado(cat.data?.unit.postalCode);
   if (ipv.status === "ok" && ipv.data) {
-    report = seedMarketContext(report, ipv.data);
+    report = seedMarketContext(report, ipv.data, {
+      notariado: notariado.status === "ok" ? notariado.data : undefined,
+      askingPriceEur: input.askingPriceEur,
+      builtM2: input.builtM2 ?? cat.data?.unit.builtAreaM2,
+    });
   }
 
   // Geographic enrichment: coordinates → amenities + urbanism + comps + flood
@@ -304,6 +310,15 @@ export async function generateReport(input: ReportInput): Promise<string> {
     payload: ipv.data ?? null,
     note: ipv.note ?? null,
     fetched_at: ipv.fetchedAt,
+  });
+  sources.push({
+    report_id: id,
+    source: "notariado",
+    status: notariado.status,
+    to_verify: notariado.toVerify,
+    payload: notariado.data ?? null,
+    note: notariado.note ?? null,
+    fetched_at: notariado.fetchedAt,
   });
   if (comps) {
     sources.push({

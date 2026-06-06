@@ -136,7 +136,8 @@
     "size": "Size",
     "built": "Built",
     "energy": "Energy",
-    "floor": "Floor"
+    "floor": "Floor",
+    "vsMarket": "vs postcode €/m²"
   },
   "verdict": {
     "label": "The bottom line",

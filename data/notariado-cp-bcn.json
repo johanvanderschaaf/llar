@@ -1,0 +1,7 @@
+{
+  "asOf": null,
+  "source": "Portal Estadístico del Notariado",
+  "sourceUrl": "https://penotariado.com/inmobiliario/buscador-precio-vivienda",
+  "note": "Empty by design — see adapters/notariado.ts and data/README-notariado.md for how to populate this file from a penotariado.com monthly export. Until populated the adapter degrades to 'unavailable' and the buyer flow keeps working.",
+  "byCp": {}
+}

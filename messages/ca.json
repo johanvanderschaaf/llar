@@ -136,7 +136,8 @@
     "size": "Mida",
     "built": "Construït",
     "energy": "Energia",
-    "floor": "Planta"
+    "floor": "Planta",
+    "vsMarket": "vs €/m² del codi postal"
   },
   "verdict": {
     "label": "La conclusió",
