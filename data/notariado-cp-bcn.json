@@ -8,6 +8,11 @@
       "pricePerM2": 6620,
       "transactions": 276,
       "avgSurfaceM2": 163
+    },
+    "08024": {
+      "pricePerM2": 4733,
+      "transactions": 486,
+      "avgSurfaceM2": 79
     }
   }
 }
