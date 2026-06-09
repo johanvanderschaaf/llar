@@ -33,7 +33,6 @@ import {
   seedScores,
   seedUrbanism,
   seedHeritage,
-  seedIpvContext,
   seedBarriPricing,
 } from "./template";
 import type { ReportInput } from "@/types/db";
@@ -138,9 +137,10 @@ export async function generateReport(input: ReportInput): Promise<string> {
   if (energy.status === "ok" && energy.data) {
     report = seedEnergy(report, energy.data);
   }
-  if (ipv.status === "ok" && ipv.data) {
-    report = seedIpvContext(report, ipv.data);
-  }
+  // IPV trend is recorded for provenance but no longer rendered in section 03 —
+  // a Catalonia-wide YoY index is too coarse to drive a Barcelona buyer's
+  // price decision. seedIpvContext is kept available for future use elsewhere
+  // (e.g. the Verdict section), so we just skip the call here.
 
   // Geographic enrichment: coordinates → amenities + urbanism + comps + flood
   // + heritage.

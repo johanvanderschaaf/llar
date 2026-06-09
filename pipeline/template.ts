@@ -279,14 +279,17 @@ export function seedIpvContext(report: Report, ipv: IpvData): Report {
 /* ---------- Generalitat barri pricing → real-sale-price panel ---------- */
 
 /**
- * Seed the barri-level "real sale prices" panel using Generalitat Habitatge's
- * registered second-hand compraventa data for the specific neighbourhood. Also
- * sets the report's `fairValue` keyline and pushes a hero `vs market` pill
- * when the asking €/m² can be computed. This is the single best signal a
- * resident first-time buyer can ground an offer on.
+ * Seed the entire price section (03) from the Generalitat Habitatge barri
+ * data. Drives, in order of buyer importance:
  *
- * Must be called *after* seedIpvContext so the barri panel inserts right
- * after the regional context panel.
+ *  1. `price.lede`        — a one-sentence verdict (asking €/m² vs barri).
+ *  2. `price.fairValue`   — the realistic ±15% range with positioning guide.
+ *  3. `price.panels[0]`   — the source detail (sales count, period, surface).
+ *  4. `hero.meta` pill    — `vs barri €/m²` delta for the top-of-report strip.
+ *
+ * Catalonia-wide IPV context is intentionally NOT seeded here — it's too
+ * coarse to drive a Barcelona buyer's offer; `seedIpvContext` remains
+ * available for the Verdict section or a footer if we want it elsewhere.
  */
 export function seedBarriPricing(
   report: Report,
@@ -296,48 +299,55 @@ export function seedBarriPricing(
   const r: Report = structuredClone(report);
   const ppm = barri.pricePerM2;
   const ppmStr = ppm.toLocaleString("en-GB");
-  const tx = barri.transactions ? ` from ${barri.transactions} registered sales` : "";
-  const txEs = barri.transactions ? ` con ${barri.transactions} ventas registradas` : "";
-  const txCa = barri.transactions ? ` amb ${barri.transactions} vendes registrades` : "";
-  const surf = barri.avgSurfaceM2
-    ? ` Average flat sold in the barri: ${barri.avgSurfaceM2} m².`
-    : "";
-  const surfEs = barri.avgSurfaceM2
-    ? ` Tamaño medio del piso vendido en el barrio: ${barri.avgSurfaceM2} m².`
-    : "";
-  const surfCa = barri.avgSurfaceM2
-    ? ` Mida mitjana del pis venut al barri: ${barri.avgSurfaceM2} m².`
-    : "";
 
-  // Asking-price comparison vs the barri €/m² closing average.
-  let cmpEn = "";
-  let cmpEs = "";
-  let cmpCa = "";
+  // --- 1. Verdict lede: lead with the asking €/m² vs barri delta ---
   if (opts.askingPriceEur && opts.builtM2) {
     const askPerM2 = opts.askingPriceEur / opts.builtM2;
     const delta = ((askPerM2 - ppm) / ppm) * 100;
-    const sign = delta > 0 ? "+" : "";
-    const deltaTxt = `${sign}${delta.toFixed(1)}%`;
+    const absDelta = Math.abs(delta).toFixed(1);
     const askStr = Math.round(askPerM2).toLocaleString("en-GB");
-    cmpEn = ` This flat's asking €/m² (€${askStr}) is ${deltaTxt} vs the barri closing-price average.`;
-    cmpEs = ` El €/m² pedido en este piso (€${askStr}) es ${deltaTxt} respecto a la media de cierre del barrio.`;
-    cmpCa = ` El €/m² demanat per aquest pis (€${askStr}) és ${deltaTxt} respecte a la mitjana de tancament del barri.`;
+    const dir =
+      delta > 1
+        ? { en: "above", es: "por encima de", ca: "per sobre de" }
+        : delta < -1
+          ? { en: "below", es: "por debajo de", ca: "per sota de" }
+          : { en: "in line with", es: "en línea con", ca: "en línia amb" };
+    r.price.lede = {
+      en: `Asking €${askStr}/m² in ${barri.name} — ${absDelta}% ${dir.en} the barri's €${ppmStr}/m² closing-price average (${barri.asOf}, registered second-hand sales).`,
+      es: `Precio pedido €${askStr}/m² en ${barri.name} — ${absDelta}% ${dir.es} la media de cierre del barrio €${ppmStr}/m² (${barri.asOf}, ventas registradas de segunda mano).`,
+      ca: `Preu demanat €${askStr}/m² a ${barri.name} — ${absDelta}% ${dir.ca} la mitjana de tancament del barri €${ppmStr}/m² (${barri.asOf}, vendes registrades de segona mà).`,
+    };
+  } else {
+    // Asking unknown — verdict-less version centred on the barri figure.
+    r.price.lede = {
+      en: `${barri.name}: €${ppmStr}/m² closing-price average across registered second-hand sales (${barri.asOf}). The range below is what flats this size actually close at — position the asking price within it.`,
+      es: `${barri.name}: €${ppmStr}/m² de media de cierre en ventas registradas de segunda mano (${barri.asOf}). El rango siguiente refleja a qué precio se cierran realmente los pisos de este tamaño — sitúa el precio pedido dentro de él.`,
+      ca: `${barri.name}: €${ppmStr}/m² de mitjana de tancament en vendes registrades de segona mà (${barri.asOf}). El rang següent reflecteix a quin preu es tanquen realment els pisos d'aquesta mida — situa el preu demanat dins d'aquest rang.`,
+    };
   }
 
-  // Insert the barri panel right after the regional context panel (slot 1).
-  const barriPanel = {
-    heading: {
-      en: `${barri.name} — real sale prices`,
-      es: `${barri.name} — precios reales de venta`,
-      ca: `${barri.name} — preus reals de venda`,
+  // --- 3. Supporting evidence panel — single panel, replaces any prior ---
+  const tx = barri.transactions ? `${barri.transactions} registered second-hand sales` : "registered second-hand sales";
+  const txEs = barri.transactions ? `${barri.transactions} ventas registradas de segunda mano` : "ventas registradas de segunda mano";
+  const txCa = barri.transactions ? `${barri.transactions} vendes registrades de segona mà` : "vendes registrades de segona mà";
+  const surf = barri.avgSurfaceM2 ? ` The average flat sold in the barri is ${barri.avgSurfaceM2} m².` : "";
+  const surfEs = barri.avgSurfaceM2 ? ` El tamaño medio del piso vendido en el barrio es ${barri.avgSurfaceM2} m².` : "";
+  const surfCa = barri.avgSurfaceM2 ? ` La mida mitjana del pis venut al barri és ${barri.avgSurfaceM2} m².` : "";
+
+  r.price.panels = [
+    {
+      heading: {
+        en: `Where the €${ppmStr}/m² figure comes from`,
+        es: `De dónde sale el €${ppmStr}/m²`,
+        ca: `D'on surt el €${ppmStr}/m²`,
+      },
+      body: {
+        en: `${barri.asOf}, ${tx}.${surf} The figure is the arithmetic average €/m² built area at closing — not asking. Source: Generalitat de Catalunya — Habitatge (notarial deeds).`,
+        es: `${barri.asOf}, ${txEs}.${surfEs} La cifra es la media aritmética de €/m² construido al cierre — no precio de oferta. Fuente: Generalitat de Catalunya — Habitatge (escrituras notariales).`,
+        ca: `${barri.asOf}, ${txCa}.${surfCa} La xifra és la mitjana aritmètica de €/m² construït al tancament — no preu d'oferta. Font: Generalitat de Catalunya — Habitatge (escriptures notarials).`,
+      },
     },
-    body: {
-      en: `Registered notarial average €${ppmStr}/m² built area, ${barri.asOf}${tx}, second-hand only.${surf}${cmpEn} Source: Generalitat Habitatge — closing prices, not asking.`,
-      es: `Media notarial registrada €${ppmStr}/m² construido, ${barri.asOf}${txEs}, solo segunda mano.${surfEs}${cmpEs} Fuente: Generalitat Habitatge — precios de cierre, no de oferta.`,
-      ca: `Mitjana notarial registrada €${ppmStr}/m² construït, ${barri.asOf}${txCa}, només segona mà.${surfCa}${cmpCa} Font: Generalitat Habitatge — preus de tancament, no d'oferta.`,
-    },
-  };
-  r.price.panels = [r.price.panels[0], barriPanel, ...r.price.panels.slice(1)];
+  ];
 
   // Hero "vs market" pill when we can compute the delta.
   if (opts.askingPriceEur && opts.builtM2) {

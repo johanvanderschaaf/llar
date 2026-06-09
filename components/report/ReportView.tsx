@@ -266,73 +266,71 @@ export async function ReportView({
           title={t("sections.price")}
           note={t("sections.priceNote")}
         />
+        {/* 1. Verdict — single sentence, leads the section. */}
         <p className="lede">{L(report.price.lede, locale)}</p>
-        <div className="grid-2" style={{ marginBottom: 24 }}>
-          {report.price.panels.map((p, i) => (
-            <div className="panel" key={i}>
-              <h3 className="serif">{L(p.heading, locale)}</h3>
-              <p>{L(p.body, locale)}</p>
-            </div>
-          ))}
+
+        {/* 2. Fair-value range — the buyer's working band, promoted right under the verdict. */}
+        <div className="keyline" style={{ marginTop: 12 }}>
+          {L(report.price.fairValue, locale)}
         </div>
 
-        <h3 className="serif" style={{ fontSize: 17, margin: "6px 0 2px" }}>
-          {t("price.benchHeading")}
-        </h3>
-        <table>
-          <thead>
-            <tr>
-              <th>{t("price.table.reference")}</th>
-              <th className="num">{t("price.table.price")}</th>
-              <th className="num">{t("price.table.size")}</th>
-              <th className="num">{t("price.table.perM2")}</th>
-              <th>{t("price.table.note")}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {report.price.comps.map((c, i) => (
-              <tr key={i} className={c.highlight ? "highlight" : undefined}>
-                <td>
-                  {c.url ? (
-                    <a
-                      href={c.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{ color: "var(--accent-deep)", fontWeight: 600 }}
-                    >
-                      {L(c.reference, locale)} ↗
-                    </a>
-                  ) : (
-                    L(c.reference, locale)
-                  )}
-                </td>
-                <td className="num">{c.price ?? "—"}</td>
-                <td className="num">{c.size ?? "—"}</td>
-                <td className="num">{c.pricePerM2 ?? "—"}</td>
-                <td>{L(c.note, locale)}</td>
-              </tr>
+        {/* 3. Supporting evidence panels (barri detail). */}
+        {report.price.panels.length > 0 ? (
+          <div className="grid-2" style={{ marginTop: 24, marginBottom: 24 }}>
+            {report.price.panels.map((p, i) => (
+              <div className="panel" key={i}>
+                <h3 className="serif">{L(p.heading, locale)}</h3>
+                <p>{L(p.body, locale)}</p>
+              </div>
             ))}
-          </tbody>
-        </table>
+          </div>
+        ) : null}
 
-        <div className="keyline">{L(report.price.fairValue, locale)}</div>
+        {/* 4. Comps table — only when comps exist (Idealista returned listings). */}
+        {report.price.comps.length > 0 ? (
+          <>
+            <h3 className="serif" style={{ fontSize: 17, margin: "6px 0 2px" }}>
+              {t("price.benchHeading")}
+            </h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>{t("price.table.reference")}</th>
+                  <th className="num">{t("price.table.price")}</th>
+                  <th className="num">{t("price.table.size")}</th>
+                  <th className="num">{t("price.table.perM2")}</th>
+                  <th>{t("price.table.note")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {report.price.comps.map((c, i) => (
+                  <tr key={i} className={c.highlight ? "highlight" : undefined}>
+                    <td>
+                      {c.url ? (
+                        <a
+                          href={c.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ color: "var(--accent-deep)", fontWeight: 600 }}
+                        >
+                          {L(c.reference, locale)} ↗
+                        </a>
+                      ) : (
+                        L(c.reference, locale)
+                      )}
+                    </td>
+                    <td className="num">{c.price ?? "—"}</td>
+                    <td className="num">{c.size ?? "—"}</td>
+                    <td className="num">{c.pricePerM2 ?? "—"}</td>
+                    <td>{L(c.note, locale)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
+        ) : null}
 
-        <h3 className="serif" style={{ fontSize: 17, margin: "22px 0 6px" }}>
-          {t("price.ladderHeading")}
-        </h3>
-        <div className="ladder">
-          {report.price.ladder.map((r) => (
-            <div
-              className={`rung${r.kind === "target" ? " target" : ""}`}
-              key={r.kind}
-            >
-              <div className="lab">{t(`price.ladder.${r.kind}`)}</div>
-              <div className="amt">{r.amount}</div>
-              <div className="pm">{L(r.rationale, locale)}</div>
-            </div>
-          ))}
-        </div>
-
+        {/* 5. Verify yourself — reference sources at the bottom. */}
         {report.price.references && report.price.references.length > 0 ? (
           <>
             <h3 className="serif" style={{ fontSize: 17, margin: "22px 0 2px" }}>
