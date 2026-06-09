@@ -141,7 +141,9 @@ export interface Report {
     lede: Localized;
     panels: Panel[]; // market context + this-flat-vs-market
     comps: CompRow[];
-    fairValue: Localized; // keyline
+    fairValue: Localized; // keyline (explanatory text)
+    /** Numeric €€ bookends of the fair-value range, rendered as big numbers above the keyline. */
+    range?: { lo: number; hi: number };
     ladder: OfferRung[];
     /** Source links so the buyer can compare the price themselves. */
     references?: PriceRef[];

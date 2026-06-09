@@ -182,6 +182,7 @@
   },
   "price": {
     "benchHeading": "Referències i evidència comparable",
+    "rangeHeading": "Rang raonable per a aquesta mida en aquest barri",
     "ladderHeading": "Escala d'oferta suggerida",
     "referencesHeading": "Comprova el preu tu mateix — fonts de referència",
     "referencesNote": "No assignem un valor en nom teu. Fes servir aquestes fonts oficials i publicades per comparar el preu de sortida amb el mercat i decidir per tu mateix.",

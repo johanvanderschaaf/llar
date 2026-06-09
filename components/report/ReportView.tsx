@@ -269,10 +269,44 @@ export async function ReportView({
         {/* 1. Verdict — single sentence, leads the section. */}
         <p className="lede">{L(report.price.lede, locale)}</p>
 
-        {/* 2. Fair-value range — the buyer's working band, promoted right under the verdict. */}
-        <div className="keyline" style={{ marginTop: 12 }}>
-          {L(report.price.fairValue, locale)}
-        </div>
+        {/* 2. Fair price range — labelled block with the numeric bookends as
+            the focal point, plus the floor/condition framing underneath. */}
+        {report.price.range ? (
+          <div className="panel" style={{ marginTop: 16, padding: "18px 22px" }}>
+            <div
+              className="serif"
+              style={{
+                fontSize: 13,
+                letterSpacing: 1,
+                textTransform: "uppercase",
+                color: "var(--muted)",
+                marginBottom: 6,
+              }}
+            >
+              {t("price.rangeHeading")}
+            </div>
+            <div
+              className="num"
+              style={{
+                fontSize: 30,
+                fontWeight: 700,
+                lineHeight: 1.1,
+                color: "var(--ink)",
+              }}
+            >
+              €{report.price.range.lo.toLocaleString("en-GB")}
+              <span style={{ color: "var(--muted)", margin: "0 10px", fontWeight: 400 }}>–</span>
+              €{report.price.range.hi.toLocaleString("en-GB")}
+            </div>
+            <p style={{ fontSize: 14, color: "var(--muted)", marginTop: 10, marginBottom: 0 }}>
+              {L(report.price.fairValue, locale)}
+            </p>
+          </div>
+        ) : (
+          <div className="keyline" style={{ marginTop: 12 }}>
+            {L(report.price.fairValue, locale)}
+          </div>
+        )}
 
         {/* 3. Supporting evidence panels (barri detail). */}
         {report.price.panels.length > 0 ? (
@@ -327,38 +361,6 @@ export async function ReportView({
                 ))}
               </tbody>
             </table>
-          </>
-        ) : null}
-
-        {/* 5. Verify yourself — reference sources at the bottom. */}
-        {report.price.references && report.price.references.length > 0 ? (
-          <>
-            <h3 className="serif" style={{ fontSize: 17, margin: "22px 0 2px" }}>
-              {t("price.referencesHeading")}
-            </h3>
-            <p
-              className="body"
-              style={{ fontSize: 14, color: "var(--muted)", marginBottom: 10 }}
-            >
-              {t("price.referencesNote")}
-            </p>
-            <ul className="check" style={{ gap: 8 }}>
-              {report.price.references.map((ref, i) => (
-                <li key={i} style={{ paddingLeft: 22 }}>
-                  <a
-                    href={ref.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ color: "var(--accent-deep)", fontWeight: 600 }}
-                  >
-                    {L(ref.label, locale)}
-                  </a>{" "}
-                  <span style={{ fontSize: 12, color: "var(--muted)" }}>
-                    · {t(`price.refKind.${ref.kind}`)}
-                  </span>
-                </li>
-              ))}
-            </ul>
           </>
         ) : null}
       </section>

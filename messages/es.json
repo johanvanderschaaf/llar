@@ -182,6 +182,7 @@
   },
   "price": {
     "benchHeading": "Referencias y evidencia comparable",
+    "rangeHeading": "Rango razonable para este tamaño en este barrio",
     "ladderHeading": "Escalera de oferta sugerida",
     "referencesHeading": "Comprueba el precio tú mismo — fuentes de referencia",
     "referencesNote": "No asignamos un valor en tu nombre. Usa estas fuentes oficiales y publicadas para comparar el precio de oferta con el mercado y decidir por ti mismo.",

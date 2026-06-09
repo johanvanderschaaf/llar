@@ -182,6 +182,7 @@
   },
   "price": {
     "benchHeading": "Benchmarks & comparable evidence",
+    "rangeHeading": "Fair price range for this size in this barri",
     "ladderHeading": "Suggested offer ladder",
     "referencesHeading": "Check the price yourself — reference sources",
     "referencesNote": "We don't assign a value on your behalf. Use these official and published sources to compare the asking price against the market and decide for yourself.",

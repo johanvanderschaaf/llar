@@ -370,6 +370,7 @@ export function seedBarriPricing(
     const hi = Math.round(ppm * 1.15 * opts.builtM2);
     const loStr = lo.toLocaleString("en-GB");
     const hiStr = hi.toLocaleString("en-GB");
+    r.price.range = { lo, hi };
     r.price.fairValue = {
       en: `Most flats this size in ${barri.name} close between €${loStr} and €${hiStr} (barri €/m² ±15% × ${opts.builtM2} m²). The lower end is older / unreformed / low floor; the upper end is reformed / high floor / outdoor space. Position the offer relative to this flat's specific features, then verify with concrete comparables.`,
       es: `La mayoría de los pisos de este tamaño en ${barri.name} se cierran entre €${loStr} y €${hiStr} (€/m² del barrio ±15% × ${opts.builtM2} m²). El extremo inferior corresponde a pisos antiguos / sin reformar / planta baja; el superior, a reformados / planta alta / con espacio exterior. Sitúa la oferta según las características concretas de este piso y contrástala con comparables.`,
