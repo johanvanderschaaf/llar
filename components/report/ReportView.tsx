@@ -320,7 +320,40 @@ export async function ReportView({
           </div>
         ) : null}
 
-        {/* 4. Comps table — only when comps exist (Idealista returned listings). */}
+        {/* 4. Live listings — pre-filtered deep links to portals. We don't
+            ingest portal data; the buyer clicks out to a live view. */}
+        {report.price.liveSearches && report.price.liveSearches.length > 0 ? (
+          <div style={{ marginTop: 6 }}>
+            <h3 className="serif" style={{ fontSize: 17, margin: "6px 0 2px" }}>
+              {t("price.liveHeading")}
+            </h3>
+            <p
+              className="body"
+              style={{ fontSize: 14, color: "var(--muted)", marginBottom: 12 }}
+            >
+              {t("price.liveNote")}
+            </p>
+            <ul className="check" style={{ gap: 10 }}>
+              {report.price.liveSearches.map((s, i) => (
+                <li key={i} style={{ paddingLeft: 22 }}>
+                  <a
+                    href={s.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: "var(--accent-deep)", fontWeight: 600 }}
+                  >
+                    {s.portal} ↗
+                  </a>{" "}
+                  <span style={{ fontSize: 13, color: "var(--muted)" }}>
+                    · {L(s.label, locale)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+
+        {/* 5. Comps table — only when comps exist (operator/idealista returned). */}
         {report.price.comps.length > 0 ? (
           <>
             <h3 className="serif" style={{ fontSize: 17, margin: "6px 0 2px" }}>

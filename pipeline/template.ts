@@ -14,6 +14,7 @@ import { buildFooter } from "@/config/footer";
 import type { CompListing } from "@/adapters/idealista";
 import type { IpvData } from "@/adapters/ine-ipv";
 import type { GencatBarriData } from "@/adapters/gencat-barri";
+import { buildLiveSearches } from "@/adapters/live-listings";
 import type { CompRow } from "@/types/report";
 import type { ReportInput } from "@/types/db";
 import { scoreOrder, type ScoreKey } from "@/config/scoring";
@@ -348,6 +349,14 @@ export function seedBarriPricing(
       },
     },
   ];
+
+  // --- 4. Live listings deep links (no data ingested, buyer clicks out) ---
+  r.price.liveSearches = buildLiveSearches({
+    districtCode: barri.districtCode,
+    barriName: barri.name,
+    builtM2: opts.builtM2,
+    askingPriceEur: opts.askingPriceEur,
+  });
 
   // Hero "vs market" pill when we can compute the delta.
   if (opts.askingPriceEur && opts.builtM2) {

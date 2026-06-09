@@ -183,6 +183,8 @@
   "price": {
     "benchHeading": "Referencias y evidencia comparable",
     "rangeHeading": "Rango razonable para este tamaño en este barrio",
+    "liveHeading": "Pisos similares, en directo",
+    "liveNote": "El inventario de los portales cambia a diario, así que en vez de incrustar capturas obsoletas te llevamos a búsquedas prefiltradas por distrito, tamaño y rango de precio. Afina al barrio exacto en el propio portal.",
     "ladderHeading": "Escalera de oferta sugerida",
     "referencesHeading": "Comprueba el precio tú mismo — fuentes de referencia",
     "referencesNote": "No asignamos un valor en tu nombre. Usa estas fuentes oficiales y publicadas para comparar el precio de oferta con el mercado y decidir por ti mismo.",

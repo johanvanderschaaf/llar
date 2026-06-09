@@ -183,6 +183,8 @@
   "price": {
     "benchHeading": "Benchmarks & comparable evidence",
     "rangeHeading": "Fair price range for this size in this barri",
+    "liveHeading": "Similar listings, live",
+    "liveNote": "Portal inventory changes daily, so instead of embedding stale snapshots we point you at pre-filtered searches for this district, size and price band. Refine to the exact barri on the portal.",
     "ladderHeading": "Suggested offer ladder",
     "referencesHeading": "Check the price yourself — reference sources",
     "referencesNote": "We don't assign a value on your behalf. Use these official and published sources to compare the asking price against the market and decide for yourself.",

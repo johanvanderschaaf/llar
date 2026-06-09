@@ -56,6 +56,16 @@ export interface PriceRef {
   kind: "official" | "portal" | "search";
 }
 
+/** A pre-filtered live-listings deep link to a Spanish property portal. */
+export interface LiveSearch {
+  /** Display name of the portal, e.g. "Idealista" / "Fotocasa". */
+  portal: string;
+  /** Absolute https URL to a portal-side search page. */
+  url: string;
+  /** One-line description of what the link filters down to. */
+  label: Localized;
+}
+
 export interface OfferRung {
   /** "open" | "target" | "ceiling" — drives label + highlight styling. */
   kind: "open" | "target" | "ceiling";
@@ -144,6 +154,13 @@ export interface Report {
     fairValue: Localized; // keyline (explanatory text)
     /** Numeric €€ bookends of the fair-value range, rendered as big numbers above the keyline. */
     range?: { lo: number; hi: number };
+    /**
+     * Deep-linked pre-filtered portal searches for live listings in this
+     * barri / district matching the subject's size and price range. We never
+     * ingest portal listings into the report — the buyer clicks out to a
+     * live view. Empty when we don't have enough inputs to deep-link.
+     */
+    liveSearches?: LiveSearch[];
     ladder: OfferRung[];
     /** Source links so the buyer can compare the price themselves. */
     references?: PriceRef[];
