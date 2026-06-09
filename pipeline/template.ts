@@ -350,14 +350,20 @@ export function seedBarriPricing(
     });
   }
 
-  // Fair-value keyline grounded in the barri €/m², when we have m².
+  // Fair-value range grounded in the barri €/m². Width is ±15% — wide enough
+  // to bracket realistic spreads within a single barri (an unreformed planta
+  // baja interior vs. a reformed high floor with balcony are easily ±15–25%
+  // either side of the average), so the range tells the buyer where their
+  // flat plausibly sits, not just where the average is.
   if (opts.builtM2) {
-    const lo = Math.round(ppm * 0.95 * opts.builtM2);
-    const hi = Math.round(ppm * 1.05 * opts.builtM2);
+    const lo = Math.round(ppm * 0.85 * opts.builtM2);
+    const hi = Math.round(ppm * 1.15 * opts.builtM2);
+    const loStr = lo.toLocaleString("en-GB");
+    const hiStr = hi.toLocaleString("en-GB");
     r.price.fairValue = {
-      en: `Reference range €${lo.toLocaleString("en-GB")} – €${hi.toLocaleString("en-GB")} (${barri.name} closing €/m² ±5% × ${opts.builtM2} m²). This is a registered-sales reference, not a formal valuation — always cross-check with specific comparables.`,
-      es: `Rango de referencia €${lo.toLocaleString("en-GB")} – €${hi.toLocaleString("en-GB")} (€/m² de cierre de ${barri.name} ±5% × ${opts.builtM2} m²). Referencia basada en ventas registradas, no es una tasación formal — contrástala siempre con comparables concretos.`,
-      ca: `Rang de referència €${lo.toLocaleString("en-GB")} – €${hi.toLocaleString("en-GB")} (€/m² de tancament de ${barri.name} ±5% × ${opts.builtM2} m²). Referència basada en vendes registrades, no és una taxació formal — contrasta-la sempre amb comparables concrets.`,
+      en: `Most flats this size in ${barri.name} close between €${loStr} and €${hiStr} (barri €/m² ±15% × ${opts.builtM2} m²). The lower end is older / unreformed / low floor; the upper end is reformed / high floor / outdoor space. Position the offer relative to this flat's specific features, then verify with concrete comparables.`,
+      es: `La mayoría de los pisos de este tamaño en ${barri.name} se cierran entre €${loStr} y €${hiStr} (€/m² del barrio ±15% × ${opts.builtM2} m²). El extremo inferior corresponde a pisos antiguos / sin reformar / planta baja; el superior, a reformados / planta alta / con espacio exterior. Sitúa la oferta según las características concretas de este piso y contrástala con comparables.`,
+      ca: `La majoria dels pisos d'aquesta mida a ${barri.name} es tanquen entre €${loStr} i €${hiStr} (€/m² del barri ±15% × ${opts.builtM2} m²). L'extrem inferior correspon a pisos antics / sense reformar / planta baixa; el superior, a reformats / planta alta / amb espai exterior. Situa l'oferta segons les característiques concretes d'aquest pis i contrasta-la amb comparables.`,
     };
   }
 
