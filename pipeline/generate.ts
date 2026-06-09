@@ -13,7 +13,7 @@ import { fetchAffectation, type AffectationData } from "@/adapters/affectation";
 import { fetchHeritage, type HeritageData } from "@/adapters/heritage";
 import { fetchEnergy, type EnergyData } from "@/adapters/energy";
 import { fetchIpv } from "@/adapters/ine-ipv";
-import { fetchNotariado } from "@/adapters/notariado";
+import { fetchGencatBarri, type GencatBarriData } from "@/adapters/gencat-barri";
 import { fetchComps, type CompListing } from "@/adapters/idealista";
 import { fetchFlood, type FloodData } from "@/adapters/flood";
 import { computeScores } from "@/config/scoring";
@@ -33,7 +33,8 @@ import {
   seedScores,
   seedUrbanism,
   seedHeritage,
-  seedMarketContext,
+  seedIpvContext,
+  seedBarriPricing,
 } from "./template";
 import type { ReportInput } from "@/types/db";
 
@@ -137,13 +138,8 @@ export async function generateReport(input: ReportInput): Promise<string> {
   if (energy.status === "ok" && energy.data) {
     report = seedEnergy(report, energy.data);
   }
-  const notariado = fetchNotariado(cat.data?.unit.postalCode);
   if (ipv.status === "ok" && ipv.data) {
-    report = seedMarketContext(report, ipv.data, {
-      notariado: notariado.status === "ok" ? notariado.data : undefined,
-      askingPriceEur: input.askingPriceEur,
-      builtM2: input.builtM2 ?? cat.data?.unit.builtAreaM2,
-    });
+    report = seedIpvContext(report, ipv.data);
   }
 
   // Geographic enrichment: coordinates → amenities + urbanism + comps + flood
@@ -156,6 +152,9 @@ export async function generateReport(input: ReportInput): Promise<string> {
   // Official affectation (AFH) — needs only the parcel ref, not coordinates.
   let affectation: AdapterResult<AffectationData> | null = null;
   let urbanismSeeded = false;
+  // Barri-level closing prices (Generalitat Habitatge) — runs once we have
+  // coordinates from geocoding; degrades to `unavailable` otherwise.
+  let barri: AdapterResult<GencatBarriData> | null = null;
   const builtM2 = input.builtM2 ?? cat.data?.unit.builtAreaM2;
   if (cat.status === "ok") {
     const parcelRef = cat.data?.parcel.parcelRef ?? resolvedRef;
@@ -193,6 +192,14 @@ export async function generateReport(input: ReportInput): Promise<string> {
           askingPriceEur: input.askingPriceEur,
           builtM2,
           comps: comps.data,
+        });
+      }
+      // Barri-level real-sale prices: this is the pricing headline.
+      barri = fetchGencatBarri(geo.data);
+      if (barri.status === "ok" && barri.data) {
+        report = seedBarriPricing(report, barri.data, {
+          askingPriceEur: input.askingPriceEur,
+          builtM2,
         });
       }
     }
@@ -311,15 +318,17 @@ export async function generateReport(input: ReportInput): Promise<string> {
     note: ipv.note ?? null,
     fetched_at: ipv.fetchedAt,
   });
-  sources.push({
-    report_id: id,
-    source: "notariado",
-    status: notariado.status,
-    to_verify: notariado.toVerify,
-    payload: notariado.data ?? null,
-    note: notariado.note ?? null,
-    fetched_at: notariado.fetchedAt,
-  });
+  if (barri) {
+    sources.push({
+      report_id: id,
+      source: "gencat-barri",
+      status: barri.status,
+      to_verify: barri.toVerify,
+      payload: barri.data ?? null,
+      note: barri.note ?? null,
+      fetched_at: barri.fetchedAt,
+    });
+  }
   if (comps) {
     sources.push({
       report_id: id,

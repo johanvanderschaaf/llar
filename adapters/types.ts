@@ -20,7 +20,7 @@ export type SourceKey =
   | "tax"
   | "market"
   | "ipv"
-  | "notariado";
+  | "gencat-barri";
 
 export type AdapterStatus = "ok" | "unavailable" | "error";
 

@@ -1,0 +1,445 @@
+{
+  "asOf": "gener 2025 - desembre 2025",
+  "source": "Generalitat de Catalunya — Habitatge (registered notarial sales, second-hand homes, rolling 12 months)",
+  "sourceUrl": "https://habitatge.gencat.cat/web/.content/home/dades/estadistiques/01_Estadistiques_de_construccio_i_mercat_immobiliari/02_Compravenda_i_preu_de_venda/02_Compravendes_d_habitatges_registrades_i_el_preu_de_venda/2025/BCN_usat_acum1any_2025.xlsx",
+  "byBarri": {
+    "01": {
+      "name": "el Raval",
+      "transactions": 610,
+      "avgSurfaceM2": 62.0,
+      "pricePerM2": 3645
+    },
+    "02": {
+      "name": "el Barri Gòtic",
+      "transactions": 253,
+      "avgSurfaceM2": 91.2,
+      "pricePerM2": 4624
+    },
+    "03": {
+      "name": "la Barceloneta",
+      "transactions": 208,
+      "avgSurfaceM2": 45.3,
+      "pricePerM2": 5686
+    },
+    "04": {
+      "name": "Sant Pere, Santa Caterina i la Ribera",
+      "transactions": 319,
+      "avgSurfaceM2": 70.5,
+      "pricePerM2": 4859
+    },
+    "05": {
+      "name": "el Fort Pienc",
+      "transactions": 211,
+      "avgSurfaceM2": 79.8,
+      "pricePerM2": 5106
+    },
+    "06": {
+      "name": "la Sagrada Família",
+      "transactions": 333,
+      "avgSurfaceM2": 71.9,
+      "pricePerM2": 5130
+    },
+    "07": {
+      "name": "la Dreta de l'Eixample",
+      "transactions": 458,
+      "avgSurfaceM2": 119.7,
+      "pricePerM2": 6831
+    },
+    "08": {
+      "name": "l'Antiga Esquerra de l'Eixample",
+      "transactions": 410,
+      "avgSurfaceM2": 98.8,
+      "pricePerM2": 6205
+    },
+    "09": {
+      "name": "la Nova Esquerra de l'Eixample",
+      "transactions": 373,
+      "avgSurfaceM2": 78.3,
+      "pricePerM2": 5373
+    },
+    "10": {
+      "name": "Sant Antoni",
+      "transactions": 285,
+      "avgSurfaceM2": 81.2,
+      "pricePerM2": 5283
+    },
+    "11": {
+      "name": "el Poble Sec - Parc Montjuïc",
+      "transactions": 490,
+      "avgSurfaceM2": 59.9,
+      "pricePerM2": 4884
+    },
+    "12": {
+      "name": "la Marina del Prat Vermell - Zona Franca",
+      "transactions": 14,
+      "avgSurfaceM2": 78.5,
+      "pricePerM2": 3465
+    },
+    "13": {
+      "name": "la Marina de Port",
+      "transactions": 259,
+      "avgSurfaceM2": 71.2,
+      "pricePerM2": 4356
+    },
+    "14": {
+      "name": "la Font de la Guatlla",
+      "transactions": 72,
+      "avgSurfaceM2": 74.0,
+      "pricePerM2": 4162
+    },
+    "15": {
+      "name": "Hostafrancs",
+      "transactions": 104,
+      "avgSurfaceM2": 74.1,
+      "pricePerM2": 4328
+    },
+    "16": {
+      "name": "la Bordeta",
+      "transactions": 182,
+      "avgSurfaceM2": 71.8,
+      "pricePerM2": 4326
+    },
+    "17": {
+      "name": "Sants - Badal",
+      "transactions": 233,
+      "avgSurfaceM2": 66.2,
+      "pricePerM2": 4320
+    },
+    "18": {
+      "name": "Sants",
+      "transactions": 419,
+      "avgSurfaceM2": 66.7,
+      "pricePerM2": 4598
+    },
+    "19": {
+      "name": "les Corts",
+      "transactions": 342,
+      "avgSurfaceM2": 89.1,
+      "pricePerM2": 5811
+    },
+    "20": {
+      "name": "la Maternitat i Sant Ramon",
+      "transactions": 187,
+      "avgSurfaceM2": 82.3,
+      "pricePerM2": 5009
+    },
+    "21": {
+      "name": "Pedralbes",
+      "transactions": 117,
+      "avgSurfaceM2": 164.3,
+      "pricePerM2": 7491
+    },
+    "22": {
+      "name": "Vallvidrera, el Tibidabo i les Planes",
+      "transactions": 39,
+      "avgSurfaceM2": 151.3,
+      "pricePerM2": 4477
+    },
+    "23": {
+      "name": "Sarrià",
+      "transactions": 180,
+      "avgSurfaceM2": 108.3,
+      "pricePerM2": 6882
+    },
+    "24": {
+      "name": "les Tres Torres",
+      "transactions": 138,
+      "avgSurfaceM2": 148.9,
+      "pricePerM2": 7209
+    },
+    "25": {
+      "name": "Sant Gervasi - la Bonanova",
+      "transactions": 219,
+      "avgSurfaceM2": 126.3,
+      "pricePerM2": 6310
+    },
+    "26": {
+      "name": "Sant Gervasi - Galvany",
+      "transactions": 476,
+      "avgSurfaceM2": 140.7,
+      "pricePerM2": 6629
+    },
+    "27": {
+      "name": "el Putxet i el Farró",
+      "transactions": 251,
+      "avgSurfaceM2": 106.9,
+      "pricePerM2": 5771
+    },
+    "28": {
+      "name": "Vallcarca i els Penitents",
+      "transactions": 97,
+      "avgSurfaceM2": 82.3,
+      "pricePerM2": 4949
+    },
+    "29": {
+      "name": "el Coll",
+      "transactions": 49,
+      "avgSurfaceM2": 72.0,
+      "pricePerM2": 3771
+    },
+    "30": {
+      "name": "la Salut",
+      "transactions": 94,
+      "avgSurfaceM2": 82.3,
+      "pricePerM2": 4616
+    },
+    "31": {
+      "name": "la Vila de Gràcia",
+      "transactions": 487,
+      "avgSurfaceM2": 77.9,
+      "pricePerM2": 5584
+    },
+    "32": {
+      "name": "el Camp d'en Grassot i Gràcia Nova",
+      "transactions": 284,
+      "avgSurfaceM2": 76.2,
+      "pricePerM2": 5415
+    },
+    "33": {
+      "name": "el Baix Guinardó",
+      "transactions": 207,
+      "avgSurfaceM2": 71.6,
+      "pricePerM2": 4496
+    },
+    "34": {
+      "name": "Can Baró",
+      "transactions": 72,
+      "avgSurfaceM2": 72.3,
+      "pricePerM2": 3657
+    },
+    "35": {
+      "name": "el Guinardó",
+      "transactions": 300,
+      "avgSurfaceM2": 72.0,
+      "pricePerM2": 4270
+    },
+    "36": {
+      "name": "la Font d'en Fargues",
+      "transactions": 65,
+      "avgSurfaceM2": 85.7,
+      "pricePerM2": 4800
+    },
+    "37": {
+      "name": "el Carmel",
+      "transactions": 286,
+      "avgSurfaceM2": 61.7,
+      "pricePerM2": 3071
+    },
+    "38": {
+      "name": "la Teixonera",
+      "transactions": 100,
+      "avgSurfaceM2": 60.6,
+      "pricePerM2": 3482
+    },
+    "39": {
+      "name": "Sant Genís dels Agudells",
+      "transactions": 46,
+      "avgSurfaceM2": 78.7,
+      "pricePerM2": 2840
+    },
+    "40": {
+      "name": "Montbau",
+      "transactions": 24,
+      "avgSurfaceM2": 64.8,
+      "pricePerM2": 3621
+    },
+    "41": {
+      "name": "la Vall d'Hebron",
+      "transactions": 19,
+      "avgSurfaceM2": 60.1,
+      "pricePerM2": 5096
+    },
+    "42": {
+      "name": "la Clota",
+      "transactions": 1,
+      "avgSurfaceM2": 112.0,
+      "pricePerM2": null
+    },
+    "43": {
+      "name": "Horta",
+      "transactions": 157,
+      "avgSurfaceM2": 67.3,
+      "pricePerM2": 3965
+    },
+    "44": {
+      "name": "Vilapicina i la Torre Llobeta",
+      "transactions": 180,
+      "avgSurfaceM2": 72.3,
+      "pricePerM2": 3884
+    },
+    "45": {
+      "name": "Porta",
+      "transactions": 192,
+      "avgSurfaceM2": 65.4,
+      "pricePerM2": 3585
+    },
+    "46": {
+      "name": "el Turó de la Peira",
+      "transactions": 196,
+      "avgSurfaceM2": 61.8,
+      "pricePerM2": 2936
+    },
+    "47": {
+      "name": "Can Peguera",
+      "transactions": 1,
+      "avgSurfaceM2": 78.0,
+      "pricePerM2": null
+    },
+    "48": {
+      "name": "la Guineueta",
+      "transactions": 113,
+      "avgSurfaceM2": 74.3,
+      "pricePerM2": 3259
+    },
+    "49": {
+      "name": "Canyelles",
+      "transactions": 48,
+      "avgSurfaceM2": 70.5,
+      "pricePerM2": 3035
+    },
+    "50": {
+      "name": "les Roquetes",
+      "transactions": 234,
+      "avgSurfaceM2": 58.7,
+      "pricePerM2": 2566
+    },
+    "51": {
+      "name": "Verdun",
+      "transactions": 158,
+      "avgSurfaceM2": 56.2,
+      "pricePerM2": 3040
+    },
+    "52": {
+      "name": "la Prosperitat",
+      "transactions": 241,
+      "avgSurfaceM2": 61.1,
+      "pricePerM2": 3163
+    },
+    "53": {
+      "name": "la Trinitat Nova",
+      "transactions": 102,
+      "avgSurfaceM2": 62.2,
+      "pricePerM2": 2476
+    },
+    "54": {
+      "name": "Torre Baró",
+      "transactions": 20,
+      "avgSurfaceM2": 95.5,
+      "pricePerM2": 1920
+    },
+    "55": {
+      "name": "Ciutat Meridiana",
+      "transactions": 198,
+      "avgSurfaceM2": 59.4,
+      "pricePerM2": 1896
+    },
+    "56": {
+      "name": "Vallbona",
+      "transactions": 10,
+      "avgSurfaceM2": 76.9,
+      "pricePerM2": 2631
+    },
+    "57": {
+      "name": "la Trinitat Vella",
+      "transactions": 153,
+      "avgSurfaceM2": 61.1,
+      "pricePerM2": 2279
+    },
+    "58": {
+      "name": "Baró de Viver",
+      "transactions": 23,
+      "avgSurfaceM2": 71.9,
+      "pricePerM2": 0
+    },
+    "59": {
+      "name": "el Bon Pastor",
+      "transactions": 153,
+      "avgSurfaceM2": 67.6,
+      "pricePerM2": 2742
+    },
+    "60": {
+      "name": "Sant Andreu",
+      "transactions": 433,
+      "avgSurfaceM2": 75.8,
+      "pricePerM2": 4120
+    },
+    "61": {
+      "name": "la Sagrera",
+      "transactions": 193,
+      "avgSurfaceM2": 73.1,
+      "pricePerM2": 4202
+    },
+    "62": {
+      "name": "el Congrés i els Indians",
+      "transactions": 121,
+      "avgSurfaceM2": 73.1,
+      "pricePerM2": 3853
+    },
+    "63": {
+      "name": "Navas",
+      "transactions": 142,
+      "avgSurfaceM2": 73.5,
+      "pricePerM2": 4334
+    },
+    "64": {
+      "name": "el Camp de l'Arpa del Clot",
+      "transactions": 273,
+      "avgSurfaceM2": 71.9,
+      "pricePerM2": 4645
+    },
+    "65": {
+      "name": "el Clot",
+      "transactions": 190,
+      "avgSurfaceM2": 72.8,
+      "pricePerM2": 4629
+    },
+    "66": {
+      "name": "el Parc i la Llacuna del Poblenou",
+      "transactions": 112,
+      "avgSurfaceM2": 73.5,
+      "pricePerM2": 5192
+    },
+    "67": {
+      "name": "la Vila Olímpica del Poblenou",
+      "transactions": 67,
+      "avgSurfaceM2": 89.5,
+      "pricePerM2": 5970
+    },
+    "68": {
+      "name": "el Poblenou",
+      "transactions": 285,
+      "avgSurfaceM2": 71.5,
+      "pricePerM2": 5911
+    },
+    "69": {
+      "name": "Diagonal Mar i el Front Marítim del Poblenou",
+      "transactions": 143,
+      "avgSurfaceM2": 97.7,
+      "pricePerM2": 6073
+    },
+    "70": {
+      "name": "el Besòs i el Maresme",
+      "transactions": 293,
+      "avgSurfaceM2": 61.9,
+      "pricePerM2": 2725
+    },
+    "71": {
+      "name": "Provençals del Poblenou",
+      "transactions": 150,
+      "avgSurfaceM2": 78.5,
+      "pricePerM2": 4807
+    },
+    "72": {
+      "name": "Sant Martí de Provençals",
+      "transactions": 212,
+      "avgSurfaceM2": 71.8,
+      "pricePerM2": 3542
+    },
+    "73": {
+      "name": "la Verneda i la Pau",
+      "transactions": 324,
+      "avgSurfaceM2": 71.7,
+      "pricePerM2": 3967
+    }
+  }
+}

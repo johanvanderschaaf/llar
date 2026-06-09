@@ -137,7 +137,7 @@
     "built": "Construido",
     "energy": "Energía",
     "floor": "Planta",
-    "vsMarket": "vs €/m² del código postal"
+    "vsMarket": "vs €/m² del barrio"
   },
   "verdict": {
     "label": "La conclusión",
