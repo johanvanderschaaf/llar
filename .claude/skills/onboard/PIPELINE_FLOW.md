@@ -9,9 +9,9 @@
 2. INSERT into reports (status='in_review')   ← report id is fixed here
 3. seedFromCatastro / seedPriceRefs / seedCostsTaxes / seedBuilding / seedLegal
 4. Promise.all([ fetchEnergy(ref), fetchIpv() ])
-5. seedEnergy if energy.ok
+5. seedEnergy if energy.ok, else seedEnergyMissing ("Not certified")
 6. if cat.ok:
-     Promise.all([ geocodeRef(ref), fetchAffectation(parcelRef) ])
+     Promise.all([ geocodeWithRetry(ref), fetchAffectation(parcelRef) ])
      if geo.ok:
          Promise.all([
            fetchAmenities,
@@ -26,11 +26,12 @@
          else:         seedPricingUnavailable(ipv)  → Section 03 STATE 03
      else:
          seedPricingUnavailable(ipv)  → Section 03 STATE 03
-     if !urbanismSeeded && affData:
-         seedUrbanism(EMPTY_URBANISM, affData)   ← affectation alert without geo
+     if !urbanismSeeded:
+         seedUrbanism(EMPTY_URBANISM, affData)   ← affectation alert without geo;
+                                                   flags "unverified" if affData absent too
 7. seedRisks (flood + static seismic/radon + district crime)
 8. seedFooter
-9. computeScores → seedScores
+9. computeScores (5 pillars + risk modifier) → seedScores   ← see SCORING.md
 10. UPDATE reports SET data
 11. UPSERT into report_sources (one row per attempted source)
 ```
@@ -92,7 +93,8 @@ After all seeders run, `report_sources` is upserted with one row per attempted s
 ## Failure modes
 
 - **Catastro fails** → `throw new Error("Could not create report: …")`. The buyer sees the generic error banner. This is the only adapter whose failure bubbles up.
-- **Geo fails** → no amenities, urbanism, comps, flood, heritage, barri pricing. Section 03 renders State 03. Affectation can still fire (uses parcel ref only) and the urbanism section degrades to "affectation alert only".
+- **Geo fails** → retried once (`geocodeWithRetry`); if still failing: no amenities, urbanism, comps, flood, heritage, barri pricing. Section 03 renders State 03. Affectation can still fire (uses parcel ref only) and the urbanism section degrades to "affectation alert only".
+- **Affectation unavailable** → no score cap (may read too high), but the buyer is told: `seedUrbanism` flags it "unverified" (check-tone row + top alert). See [SCORING.md](./SCORING.md).
 - **Any other adapter fails** → its section degrades to `unavailable` (toVerify=true on the row). The buyer sees a placeholder; the operator dashboard surfaces the issue.
 
 This is why adapters never throw — every `try/catch` in an adapter ultimately calls `failed(source, message)`.

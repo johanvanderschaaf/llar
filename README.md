@@ -24,9 +24,23 @@ Ajuntament de Barcelona sources (see below).
 | Data layer (Supabase + source adapters + operator dashboard) | ✅ live |
 | Buyer flow: address search → unit pick → free preview | ✅ live |
 | Planning & restrictions (affectation + zoning + heritage + ZBE) | ✅ live, sourced from Ajuntament BCN |
+| Scoring (5 pillars + risk override) | ✅ live, deterministic — see `.claude/skills/onboard/SCORING.md` |
 | AI narrative (Anthropic) | 🟡 wired; opt-in per report once unlocked |
 | Stripe checkout + PDF unlock | 🟡 scaffolded; needs production Stripe keys |
 | Landing / SEO / legal polish | 🟡 partial |
+
+## Roadmap (next iterations)
+
+- **Granular A-grade affectation.** Affectation category A currently always caps
+  the score at 30. Use the AFH response's structured fields (which planning
+  system the parcel touches + whether there's a road-widening substitution
+  alignment) to distinguish *expropriation-grade* A (keep the cap) from a
+  *minor* conservation-overlay A (milder penalty). Details in
+  `.claude/skills/onboard/SCORING.md`.
+- **Document upload → richer analysis.** A buyer-facing section to upload
+  building documents (ITE — *inspecció tècnica de l'edifici*, actes de la
+  comunitat, etc.) and fold them into the analysis (e.g. an unfavourable ITE
+  weighs on the building/risk score and raises an alert).
 
 ## Tech
 
@@ -88,7 +102,7 @@ components/report/       ReportView + LockedSection (premium teaser)
 adapters/                external data adapters (one file per source)
 pipeline/                generate.ts, narrate.ts, template.ts (seeders)
 config/brand.ts          brand + price (single rebrand surface)
-config/scoring.ts        score weights + overall computation
+config/scoring.ts        score pillars/weights + risk modifier + overall
 data/sample-sors35.ts    the Sors 35 sample report (EN + ES) — UI fixture
 types/db.ts              ReportInput / ReportRow (the row contract)
 types/report.ts          the structured Report contract

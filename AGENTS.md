@@ -37,6 +37,16 @@ Concrete implications:
 - **`toVerify: true`** marks a field the operator must confirm before publishing. Default to `true` on `unavailable` / `error`; only set `false` on a confident `ok`.
 - **`alerts[]` vs `urbanism.items[]`.** Section 08 ("Planning & restrictions") is a list of plain-language status rows in `urbanism.items` (tone: `caution` / `check` / `clear` / `info`). Anything *serious enough that the buyer must see it above the paywall* goes ALSO in `report.alerts` (tone: `caution` / `check`). Add to both for a serious finding; just `items` for context.
 - **`PREMIUM_SECTIONS`** in `types/report.ts` lists sections gated behind the paywall. Changing the membership changes what the free preview shows — do it deliberately.
+- **The score is 5 weighted pillars × a risk modifier**, not a flat average. Risk (affectation/flood/heritage) can *override* the pillars — affectation A hard-caps the overall at 30. Don't add a risk "pillar"; don't bypass `computeScores`. Full model in `.claude/skills/onboard/SCORING.md`.
+
+## No operator review at MVP — flag to the buyer
+
+The `in_review` status still exists, but reports currently reach the buyer
+without a human gate. So `toVerify`/the dashboard are **not** the safety net:
+anything that needs verifying must be surfaced to the buyer automatically (a
+`check`-tone alert/row), not left for an operator. Examples already wired:
+unverified affectation (AFH down) and "energy not certified". Don't print a
+confident "all clear" for data you couldn't actually confirm.
 
 ## Voice & jargon
 
