@@ -18,7 +18,12 @@ import { buildLiveSearches } from "@/adapters/live-listings";
 import type { Pricing } from "@/types/report";
 import type { CompRow } from "@/types/report";
 import type { ReportInput } from "@/types/db";
-import { scoreOrder, type ScoreKey } from "@/config/scoring";
+import {
+  scoreOrder,
+  type ScoreKey,
+  type RiskOutcome,
+  type RiskSeverity,
+} from "@/config/scoring";
 
 const EMPTY: Localized = { en: "", es: "", ca: "" };
 
@@ -792,6 +797,29 @@ export function seedEnergy(report: Report, e: EnergyData): Report {
   return r;
 }
 
+/**
+ * No ICAEN certificate registered for this unit. Energy drops out of the score
+ * (re-normalised away), but we still state it where energy would appear, so the
+ * buyer knows it's missing rather than assuming it wasn't checked.
+ */
+export function seedEnergyMissing(report: Report): Report {
+  const r: Report = structuredClone(report);
+  r.hero.meta.push({
+    labelKey: "meta.energy",
+    value: { en: "Not certified", es: "Sin certificado", ca: "Sense certificat" },
+  });
+  r.risks.push({
+    labelKey: "risk.energy",
+    tone: "ok",
+    detail: {
+      en: "No energy performance certificate (certificat d'eficiència energètica) is registered for this flat, so it isn't scored on energy. Ask the seller for it — it's legally required to complete a sale.",
+      es: "No hay certificado de eficiencia energética registrado para este piso, así que no se puntúa en energía. Pídeselo al vendedor — es obligatorio para cerrar la compraventa.",
+      ca: "No hi ha cap certificat d'eficiència energètica registrat per a aquest pis, així que no es puntua en energia. Demana'l al venedor — és obligatori per tancar la compravenda.",
+    },
+  });
+  return r;
+}
+
 /* ---------- natural risks + crime → Risk & Safety (section 05) ---------- */
 
 export function seedRisks(
@@ -932,6 +960,10 @@ export function seedUrbanism(
       ? "affected"
       : "clear";
   const confirmed = Boolean(a); // AFH = confirmed; inference = "appears".
+  // "clear" reached without the authoritative AFH source (service down, or only
+  // the qualification fallback ran). With no operator review, the buyer must be
+  // told this is unverified rather than a confirmed all-clear.
+  const unverified = level === "clear" && !a;
   const plain = plainSystems(u.affectations);
   const codes = u.affectations.map((af) => af.clau).join(", ");
   const codeTag = codes
@@ -941,7 +973,12 @@ export function seedUrbanism(
   // 1) Affectation — the headline planning aspect.
   items.push({
     key: "affectation",
-    tone: level === "affected" ? "caution" : level === "specific" ? "check" : "clear",
+    tone:
+      level === "affected"
+        ? "caution"
+        : level === "specific" || unverified
+          ? "check"
+          : "clear",
     label: { en: "Planning affectation", es: "Afectación urbanística", ca: "Afectació urbanística" },
     text:
       level === "affected"
@@ -956,11 +993,17 @@ export function seedUrbanism(
               es: "El ayuntamiento señala circunstancias urbanísticas específicas (por ejemplo un planeamiento en trámite, un ámbito en transformación o licencias suspendidas). Comprueba qué aplica antes de ofertar.",
               ca: "L'ajuntament assenyala circumstàncies urbanístiques específiques (per exemple un planejament en tràmit, un àmbit en transformació o llicències suspeses). Comprova què s'aplica abans d'ofertar.",
             }
-          : {
-              en: "No planning affectation was found that would limit using this as a home.",
-              es: "No se ha encontrado ninguna afectación urbanística que impida usarla como vivienda.",
-              ca: "No s'ha trobat cap afectació urbanística que impedeixi utilitzar-lo com a habitatge.",
-            },
+          : unverified
+            ? {
+                en: "We couldn't confirm this property's official planning-affectation status (the city service was unavailable). This part of the score is provisional — verify with an official planning certificate (certificat urbanístic) before relying on it.",
+                es: "No hemos podido confirmar la afectación urbanística oficial de esta propiedad (el servicio municipal no estaba disponible). Esta parte de la valoración es provisional — verifícalo con un certificado urbanístico oficial antes de confiar en ella.",
+                ca: "No hem pogut confirmar l'afectació urbanística oficial d'aquesta propietat (el servei municipal no estava disponible). Aquesta part de la valoració és provisional — verifica-ho amb un certificat urbanístic oficial abans de confiar-hi.",
+              }
+            : {
+                en: "No planning affectation was found that would limit using this as a home.",
+                es: "No se ha encontrado ninguna afectación urbanística que impida usarla como vivienda.",
+                ca: "No s'ha trobat cap afectació urbanística que impedeixi utilitzar-lo com a habitatge.",
+              },
   });
 
   // 2) Zoning — reassuring context, only when we resolved a qualification.
@@ -1027,6 +1070,23 @@ export function seedUrbanism(
           en: "The city notes specific circumstances for this property (a plan being processed, an area under redevelopment, or suspended permits). Check what applies before offering.",
           es: "El ayuntamiento señala circunstancias específicas (un planeamiento en trámite, un ámbito en transformación o licencias suspendidas). Comprueba qué aplica antes de ofertar.",
           ca: "L'ajuntament assenyala circumstàncies específiques (un planejament en tràmit, un àmbit en transformació o llicències suspeses). Comprova què s'aplica abans d'ofertar.",
+        },
+      },
+    ];
+  } else if (unverified) {
+    r.alerts = [
+      ...(r.alerts ?? []),
+      {
+        tone: "check",
+        title: {
+          en: "Planning affectation not confirmed",
+          es: "Afectación urbanística sin confirmar",
+          ca: "Afectació urbanística sense confirmar",
+        },
+        detail: {
+          en: "We couldn't reach the city's affectation service for this property, so the score doesn't account for a possible planning affectation. Verify with an official planning certificate (certificat urbanístic) before offering.",
+          es: "No hemos podido acceder al servicio municipal de afectaciones para esta propiedad, así que la valoración no tiene en cuenta una posible afectación urbanística. Verifícalo con un certificado urbanístico oficial antes de ofertar.",
+          ca: "No hem pogut accedir al servei municipal d'afectacions per a aquesta propietat, així que la valoració no té en compte una possible afectació urbanística. Verifica-ho amb un certificat urbanístic oficial abans d'ofertar.",
         },
       },
     ];
@@ -1147,13 +1207,65 @@ const SCORE_CAPTION: Record<ScoreKey, (ctx: ScoreCtx) => Localized> = {
       ca: g ? `Zona verda ~${g.walkMin} min` : "Urbà",
     };
   },
-  price: () => ({ en: "Awaiting comps", es: "Pendiente de comparables", ca: "Pendent de comparables" }),
+  price: ({ deltaPct }) => {
+    if (deltaPct == null)
+      return {
+        en: "No barri benchmark",
+        es: "Sin referencia del barrio",
+        ca: "Sense referència del barri",
+      };
+    const pct = Math.round(Math.abs(deltaPct));
+    if (deltaPct < -8)
+      return {
+        en: `~${pct}% below barri`,
+        es: `~${pct}% bajo el barrio`,
+        ca: `~${pct}% sota el barri`,
+      };
+    if (deltaPct > 8)
+      return {
+        en: `~${pct}% above barri`,
+        es: `~${pct}% sobre el barrio`,
+        ca: `~${pct}% sobre el barri`,
+      };
+    return {
+      en: "In line with barri",
+      es: "En línea con el barrio",
+      ca: "En línia amb el barri",
+    };
+  },
 };
 
 interface ScoreCtx {
   year?: number;
   energyClass?: string;
   amenities?: AmenityData;
+  /** Asking €/m² vs barri €/m² (Pricing.deltaPct), for the price caption. */
+  deltaPct?: number;
+}
+
+/**
+ * Verdict tag for a risk that overrode / dragged the overall, so the headline
+ * number and the top-of-report alert agree. Returns null for none/mild — those
+ * don't materially move the score and need no caveat. The detail lives in the
+ * affectation/heritage/flood alerts; this is just the one-line label.
+ */
+function riskTag(severity: RiskSeverity): Localized | null {
+  switch (severity) {
+    case "critical":
+      return {
+        en: "Serious restriction — verify before offering",
+        es: "Restricción grave — verifica antes de ofertar",
+        ca: "Restricció greu — verifica abans d'oferir",
+      };
+    case "serious":
+      return {
+        en: "Notable restriction to check",
+        es: "Restricción relevante a revisar",
+        ca: "Restricció rellevant a revisar",
+      };
+    default:
+      return null;
+  }
 }
 
 export function seedScores(
@@ -1161,6 +1273,7 @@ export function seedScores(
   values: Partial<Record<ScoreKey, number>>,
   overall: number | null,
   ctx: ScoreCtx,
+  risk?: RiskOutcome,
 ): Report {
   const r: Report = structuredClone(report);
   const scores: Score[] = [];
@@ -1171,5 +1284,9 @@ export function seedScores(
   }
   r.scores = scores;
   if (overall != null) r.verdict.overall = overall;
+  if (risk) {
+    const tag = riskTag(risk.severity);
+    if (tag) r.verdict.tag = tag;
+  }
   return r;
 }
