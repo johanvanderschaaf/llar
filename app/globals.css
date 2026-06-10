@@ -40,6 +40,27 @@
   --pw-sh-3: 0 1px 2px rgba(14, 26, 43, 0.06), 0 24px 48px -24px rgba(14, 26, 43, 0.28);
   --pw-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
 
+  /* Spacing scale (4 px base) — from the brand handoff. */
+  --pw-s1: 4px;
+  --pw-s2: 8px;
+  --pw-s3: 12px;
+  --pw-s4: 16px;
+  --pw-s5: 24px;
+  --pw-s6: 32px;
+  --pw-s7: 48px;
+  --pw-s8: 64px;
+
+  /* Radius — from the brand handoff. */
+  --pw-r-sm: 8px;
+  --pw-r-md: 12px;
+  --pw-r-lg: 18px;
+  --pw-r-xl: 24px;
+  --pw-r-pill: 999px;
+
+  /* Font families — needed by components that use the brand tokens directly. */
+  --pw-sans: "Manrope", system-ui, -apple-system, sans-serif;
+  --pw-mono: "Space Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
   /* Legacy names → repointed to PisoWise */
   --paper: var(--pw-field);
   --paper-2: var(--pw-blue-50);

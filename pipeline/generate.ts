@@ -12,6 +12,8 @@ import { fetchUrbanism, type UrbanismData } from "@/adapters/urbanism";
 import { fetchAffectation, type AffectationData } from "@/adapters/affectation";
 import { fetchHeritage, type HeritageData } from "@/adapters/heritage";
 import { fetchEnergy, type EnergyData } from "@/adapters/energy";
+import { fetchIpv } from "@/adapters/ine-ipv";
+import { fetchGencatBarri, type GencatBarriData } from "@/adapters/gencat-barri";
 import { fetchComps, type CompListing } from "@/adapters/idealista";
 import { fetchFlood, type FloodData } from "@/adapters/flood";
 import { computeScores } from "@/config/scoring";
@@ -31,6 +33,8 @@ import {
   seedScores,
   seedUrbanism,
   seedHeritage,
+  seedBarriPricing,
+  seedPricingUnavailable,
 } from "./template";
 import type { ReportInput } from "@/types/db";
 
@@ -128,11 +132,16 @@ export async function generateReport(input: ReportInput): Promise<string> {
   report = seedBuilding(report, cat.data?.unit.yearBuilt);
   report = seedLegal(report);
 
-  // Energy certificate (ICAEN) — keyed by cadastral reference.
-  const energy = await fetchEnergy(resolvedRef);
+  // Energy certificate (ICAEN) + INE IPV (Catalan housing market context).
+  // Independent of geocoding so they run in parallel with the cadastral step.
+  const [energy, ipv] = await Promise.all([fetchEnergy(resolvedRef), fetchIpv()]);
   if (energy.status === "ok" && energy.data) {
     report = seedEnergy(report, energy.data);
   }
+  // IPV trend is recorded for provenance but no longer rendered in section 03 —
+  // a Catalonia-wide YoY index is too coarse to drive a Barcelona buyer's
+  // price decision. seedIpvContext is kept available for future use elsewhere
+  // (e.g. the Verdict section), so we just skip the call here.
 
   // Geographic enrichment: coordinates → amenities + urbanism + comps + flood
   // + heritage.
@@ -144,6 +153,9 @@ export async function generateReport(input: ReportInput): Promise<string> {
   // Official affectation (AFH) — needs only the parcel ref, not coordinates.
   let affectation: AdapterResult<AffectationData> | null = null;
   let urbanismSeeded = false;
+  // Barri-level closing prices (Generalitat Habitatge) — runs once we have
+  // coordinates from geocoding; degrades to `unavailable` otherwise.
+  let barri: AdapterResult<GencatBarriData> | null = null;
   const builtM2 = input.builtM2 ?? cat.data?.unit.builtAreaM2;
   if (cat.status === "ok") {
     const parcelRef = cat.data?.parcel.parcelRef ?? resolvedRef;
@@ -183,6 +195,29 @@ export async function generateReport(input: ReportInput): Promise<string> {
           comps: comps.data,
         });
       }
+      // Barri-level real-sale prices: this is the pricing headline.
+      barri = fetchGencatBarri(geo.data);
+      if (barri.status === "ok" && barri.data) {
+        report = seedBarriPricing(report, barri.data, {
+          askingPriceEur: input.askingPriceEur,
+          builtM2,
+        });
+      } else {
+        // State 03: coords resolved but barri lookup unavailable (outside the
+        // 73 BCN barris, or low-volume barri with no €/m² for the period).
+        report = seedPricingUnavailable(report, {
+          askingPriceEur: input.askingPriceEur,
+          builtM2,
+          ipv: ipv.status === "ok" ? ipv.data : undefined,
+        });
+      }
+    } else {
+      // State 03: no coordinates at all — geocoding failed.
+      report = seedPricingUnavailable(report, {
+        askingPriceEur: input.askingPriceEur,
+        builtM2,
+        ipv: ipv.status === "ok" ? ipv.data : undefined,
+      });
     }
     // If geocoding failed but the AFH verdict came through, still surface the
     // affectation alert from the official source alone.
@@ -290,6 +325,26 @@ export async function generateReport(input: ReportInput): Promise<string> {
     note: energy.note ?? null,
     fetched_at: energy.fetchedAt,
   });
+  sources.push({
+    report_id: id,
+    source: "ipv",
+    status: ipv.status,
+    to_verify: ipv.toVerify,
+    payload: ipv.data ?? null,
+    note: ipv.note ?? null,
+    fetched_at: ipv.fetchedAt,
+  });
+  if (barri) {
+    sources.push({
+      report_id: id,
+      source: "gencat-barri",
+      status: barri.status,
+      to_verify: barri.toVerify,
+      payload: barri.data ?? null,
+      note: barri.note ?? null,
+      fetched_at: barri.fetchedAt,
+    });
+  }
   if (comps) {
     sources.push({
       report_id: id,

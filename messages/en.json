@@ -136,7 +136,8 @@
     "size": "Size",
     "built": "Built",
     "energy": "Energy",
-    "floor": "Floor"
+    "floor": "Floor",
+    "vsMarket": "vs barri €/m²"
   },
   "verdict": {
     "label": "The bottom line",
@@ -181,6 +182,9 @@
   },
   "price": {
     "benchHeading": "Benchmarks & comparable evidence",
+    "rangeHeading": "Fair price range for this size in this barri",
+    "liveHeading": "Similar listings, live",
+    "liveNote": "Portal inventory changes daily, so instead of embedding stale snapshots we point you at pre-filtered searches for this district, size and price band. Refine to the exact barri on the portal.",
     "ladderHeading": "Suggested offer ladder",
     "referencesHeading": "Check the price yourself — reference sources",
     "referencesNote": "We don't assign a value on your behalf. Use these official and published sources to compare the asking price against the market and decide for yourself.",
@@ -200,6 +204,51 @@
       "open": "Open",
       "target": "Target close",
       "ceiling": "Ceiling"
+    },
+    "kicker": "the main event",
+    "pin": {
+      "asking": "Asking",
+      "barriAvg": "Barri average"
+    },
+    "barriAvgLabel": "Barri avg",
+    "rangeLow": "Range low",
+    "rangeHigh": "Range high",
+    "barriClosingAvg": "closing average",
+    "compare": {
+      "askingLabel": "This flat · asking",
+      "barriLabel": "Barri · closing avg"
+    },
+    "delta": {
+      "below": "{n}% below",
+      "above": "{n}% above",
+      "equal": "In line"
+    },
+    "evidence": {
+      "title": "closing prices",
+      "sub": "Registered at the notary — not portal asking prices.",
+      "avgPerM2": "Average €/m² built",
+      "sales": "Registered sales (12 mo)",
+      "avgFlat": "Average flat sold",
+      "period": "Period",
+      "sourceLead": "Source:",
+      "sourceBody": "Generalitat de Catalunya — Habitatge (registered notarial deeds · second-hand)"
+    },
+    "humility": {
+      "lead": "The range brackets a whole barri —",
+      "body": "an unreformed low floor at the bottom, a reformed flat with a balcony at the top. Verify against concrete comparables of similar size, floor and condition before you offer."
+    },
+    "unavailable": {
+      "body": "This address falls outside the 73 Barcelona barris we hold registered closing prices for — or too few flats sold here in the last 12 months to publish an average we'd trust. We won't show you a fair-value range we can't stand behind."
+    },
+    "facts": {
+      "asking": "Asking price",
+      "builtArea": "Built area · Catastro",
+      "askingPerM2": "Asking €/m² built"
+    },
+    "howTo": {
+      "heading": "How to read this",
+      "portals": "Check current asking prices for similar-size flats nearby on a live portal — and remember asking sits consistently above what flats actually close at.",
+      "askAgent": "Ask your agent for recent closed sales on this street or block — the closest thing to a real comparable."
     }
   },
   "risk": {

@@ -18,7 +18,9 @@ export type SourceKey =
   | "heritage"
   | "zbe"
   | "tax"
-  | "market";
+  | "market"
+  | "ipv"
+  | "gencat-barri";
 
 export type AdapterStatus = "ok" | "unavailable" | "error";
 

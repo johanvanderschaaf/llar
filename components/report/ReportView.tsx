@@ -9,6 +9,7 @@ import { brand } from "@/config/brand";
 import { LockedSection } from "./LockedSection";
 import { UnlockButton } from "./UnlockButton";
 import { PrintButton } from "./PrintButton";
+import { PriceSection } from "./PriceSection";
 
 /* ---------- small presentational helpers ---------- */
 
@@ -258,109 +259,71 @@ export async function ReportView({
         </p>
       </section>
 
-      {/* 03 PRICE & VALUE (premium) */}
+      {/* 03 PRICE & VALUE (premium) — new design (Concept A "Number Line").
+          The whole section is driven by the structured `pricing` payload
+          which picks one of three states. We keep the legacy comps table
+          rendered below it for the (rare) case operator/idealista comps
+          are present. */}
       {lock(
       <section className="fx">
-        <SectionHead
-          num="03"
-          title={t("sections.price")}
-          note={t("sections.priceNote")}
-        />
-        <p className="lede">{L(report.price.lede, locale)}</p>
-        <div className="grid-2" style={{ marginBottom: 24 }}>
-          {report.price.panels.map((p, i) => (
-            <div className="panel" key={i}>
-              <h3 className="serif">{L(p.heading, locale)}</h3>
-              <p>{L(p.body, locale)}</p>
-            </div>
-          ))}
-        </div>
-
-        <h3 className="serif" style={{ fontSize: 17, margin: "6px 0 2px" }}>
-          {t("price.benchHeading")}
-        </h3>
-        <table>
-          <thead>
-            <tr>
-              <th>{t("price.table.reference")}</th>
-              <th className="num">{t("price.table.price")}</th>
-              <th className="num">{t("price.table.size")}</th>
-              <th className="num">{t("price.table.perM2")}</th>
-              <th>{t("price.table.note")}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {report.price.comps.map((c, i) => (
-              <tr key={i} className={c.highlight ? "highlight" : undefined}>
-                <td>
-                  {c.url ? (
-                    <a
-                      href={c.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{ color: "var(--accent-deep)", fontWeight: 600 }}
-                    >
-                      {L(c.reference, locale)} ↗
-                    </a>
-                  ) : (
-                    L(c.reference, locale)
-                  )}
-                </td>
-                <td className="num">{c.price ?? "—"}</td>
-                <td className="num">{c.size ?? "—"}</td>
-                <td className="num">{c.pricePerM2 ?? "—"}</td>
-                <td>{L(c.note, locale)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        <div className="keyline">{L(report.price.fairValue, locale)}</div>
-
-        <h3 className="serif" style={{ fontSize: 17, margin: "22px 0 6px" }}>
-          {t("price.ladderHeading")}
-        </h3>
-        <div className="ladder">
-          {report.price.ladder.map((r) => (
-            <div
-              className={`rung${r.kind === "target" ? " target" : ""}`}
-              key={r.kind}
-            >
-              <div className="lab">{t(`price.ladder.${r.kind}`)}</div>
-              <div className="amt">{r.amount}</div>
-              <div className="pm">{L(r.rationale, locale)}</div>
-            </div>
-          ))}
-        </div>
-
-        {report.price.references && report.price.references.length > 0 ? (
+        {report.price.pricing ? (
+          <PriceSection
+            pricing={report.price.pricing}
+            locale={locale}
+            t={t}
+          />
+        ) : (
           <>
-            <h3 className="serif" style={{ fontSize: 17, margin: "22px 0 2px" }}>
-              {t("price.referencesHeading")}
+            <SectionHead
+              num="03"
+              title={t("sections.price")}
+              note={t("sections.priceNote")}
+            />
+            <p className="lede">{L(report.price.lede, locale)}</p>
+          </>
+        )}
+
+        {/* Comps table — only when comps exist (operator/idealista returned). */}
+        {report.price.comps.length > 0 ? (
+          <>
+            <h3 className="serif" style={{ fontSize: 17, margin: "6px 0 2px" }}>
+              {t("price.benchHeading")}
             </h3>
-            <p
-              className="body"
-              style={{ fontSize: 14, color: "var(--muted)", marginBottom: 10 }}
-            >
-              {t("price.referencesNote")}
-            </p>
-            <ul className="check" style={{ gap: 8 }}>
-              {report.price.references.map((ref, i) => (
-                <li key={i} style={{ paddingLeft: 22 }}>
-                  <a
-                    href={ref.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ color: "var(--accent-deep)", fontWeight: 600 }}
-                  >
-                    {L(ref.label, locale)}
-                  </a>{" "}
-                  <span style={{ fontSize: 12, color: "var(--muted)" }}>
-                    · {t(`price.refKind.${ref.kind}`)}
-                  </span>
-                </li>
-              ))}
-            </ul>
+            <table>
+              <thead>
+                <tr>
+                  <th>{t("price.table.reference")}</th>
+                  <th className="num">{t("price.table.price")}</th>
+                  <th className="num">{t("price.table.size")}</th>
+                  <th className="num">{t("price.table.perM2")}</th>
+                  <th>{t("price.table.note")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {report.price.comps.map((c, i) => (
+                  <tr key={i} className={c.highlight ? "highlight" : undefined}>
+                    <td>
+                      {c.url ? (
+                        <a
+                          href={c.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ color: "var(--accent-deep)", fontWeight: 600 }}
+                        >
+                          {L(c.reference, locale)} ↗
+                        </a>
+                      ) : (
+                        L(c.reference, locale)
+                      )}
+                    </td>
+                    <td className="num">{c.price ?? "—"}</td>
+                    <td className="num">{c.size ?? "—"}</td>
+                    <td className="num">{c.pricePerM2 ?? "—"}</td>
+                    <td>{L(c.note, locale)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </>
         ) : null}
       </section>
