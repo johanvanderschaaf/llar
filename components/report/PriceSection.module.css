@@ -396,7 +396,7 @@
 
 /* ============ Evidence panel ============ */
 .evidence {
-  background: var(--pw-field);
+  background: var(--pw-panel);
   border: 1px solid var(--pw-ink-100);
   border-radius: var(--pw-r-lg);
   padding: var(--pw-s5);
