@@ -6,7 +6,7 @@ import type { AffectationData } from "@/adapters/affectation";
 import type { HeritageData, HeritageLevel } from "@/adapters/heritage";
 import type { EnergyData } from "@/adapters/energy";
 import type { FloodData } from "@/adapters/flood";
-import { SEISMIC, RADON, crimeContext } from "@/config/static-risk";
+import { SEISMIC, RADON, crimeContext, BCN_DISTRICTS } from "@/config/static-risk";
 import { buildCostFacts, buildSubsidyPanels } from "@/config/costs";
 import { buildBuilding } from "@/config/building";
 import { buildLegal } from "@/config/legal";
@@ -395,6 +395,22 @@ export function seedBarriPricing(
       ca: `La majoria dels pisos d'aquesta mida a ${barri.name} es tanquen entre €${loStr} i €${hiStr} (€/m² del barri ±15% × ${opts.builtM2} m²). L'extrem inferior correspon a pisos antics / sense reformar / planta baixa; el superior, a reformats / planta alta / amb espai exterior. Situa l'oferta segons les característiques concretes d'aquest pis i contrasta-la amb comparables.`,
     };
   }
+
+  // Surface the resolved barri + district as a single snapshot fact so every
+  // section (and the AI narrative) reads ONE authoritative location. Barri and
+  // district both come from the same Gencat polygon lookup, so they agree.
+  const districtName = barri.districtCode
+    ? BCN_DISTRICTS[Number(barri.districtCode)]
+    : undefined;
+  const locationFact = {
+    labelKey: "snapshot.neighbourhood",
+    value: districtName ? `${barri.name} · ${districtName}` : barri.name,
+  };
+  const addrIdx = r.snapshot.facts.findIndex(
+    (f) => f.labelKey === "snapshot.address",
+  );
+  if (addrIdx >= 0) r.snapshot.facts.splice(addrIdx + 1, 0, locationFact);
+  else r.snapshot.facts.push(locationFact);
 
   return r;
 }

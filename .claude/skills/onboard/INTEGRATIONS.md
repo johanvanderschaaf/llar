@@ -94,6 +94,7 @@ Three clients in `lib/supabase/`, **not interchangeable**:
 - Read at request time via `hasAnthropicKey()` in `lib/`; the whole `pipeline/narrate.ts` step is feature-flagged off if the key is missing.
 - Narrative is opt-in per report (operator triggers in the dashboard once the report is `in_review`).
 - Stored per-language on `report.data.narrative` (CA/ES/EN).
+- **Grounding (don't let it contradict the deterministic sections):** `buildFacts` passes the authoritative location (the `snapshot.neighbourhood` fact = barri · district) and the `barriClosing` benchmark (Gencat closing €/m²). The prompt forbids inferring a neighbourhood from the street address and uses `barriClosing` as the price anchor — so the narrative can't say "Eixample" for a Gràcia flat or "no comparable data" when a barri closing benchmark exists. `comps` (idealista ASKING) is secondary and usually empty. If you add a price/location source, feed it here too.
 
 ## Stripe — Phase 4 paywall
 

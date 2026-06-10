@@ -1,7 +1,13 @@
 import { describe, it, expect } from "vitest";
-import { emptyReport, seedUrbanism, seedEnergyMissing } from "./template";
+import {
+  emptyReport,
+  seedUrbanism,
+  seedEnergyMissing,
+  seedBarriPricing,
+} from "./template";
 import type { UrbanismData } from "@/adapters/urbanism";
 import type { AffectationData } from "@/adapters/affectation";
+import type { GencatBarriData } from "@/adapters/gencat-barri";
 
 const EMPTY_URBANISM = {
   possibleAffectation: false,
@@ -41,6 +47,29 @@ describe("seedUrbanism — affectation flagging (no operator review)", () => {
     const alerts = r.alerts ?? [];
     expect(alerts).toHaveLength(1);
     expect(alerts[0].tone).toBe("caution");
+  });
+});
+
+describe("seedBarriPricing — single authoritative location", () => {
+  const barri = {
+    barriCode: "31",
+    name: "la Vila de Gràcia",
+    districtCode: "06",
+    pricePerM2: 5584,
+    asOf: "gen – des 2025",
+  } as GencatBarriData;
+
+  it("adds a snapshot fact with barri + district from the same lookup", () => {
+    const r = seedBarriPricing(emptyReport("id", "ref"), barri, {
+      askingPriceEur: 500000,
+      builtM2: 90,
+    });
+    const loc = r.snapshot.facts.find(
+      (f) => f.labelKey === "snapshot.neighbourhood",
+    );
+    expect(loc).toBeTruthy();
+    // District derived from the barri's own districtCode → always agrees.
+    expect(loc!.value).toBe("la Vila de Gràcia · Gràcia");
   });
 });
 
