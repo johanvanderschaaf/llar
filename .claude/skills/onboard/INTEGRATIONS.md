@@ -60,6 +60,7 @@ Catastro returns SOAP/XML — adapters parse it with a tiny regex helper, no SOA
 
 - **Adapter:** `adapters/amenities.ts`
 - 500 m radius around the parcel coords. No key. Be mindful of Overpass instance load if extending.
+- Public Overpass mirrors are flaky/rate-limited. The adapter **races all three mirrors with `Promise.any` at an 8s timeout** (fastest healthy one wins) rather than trying them sequentially — a slow Overpass otherwise eats the report's serverless time budget (see [PIPELINE_FLOW.md](./PIPELINE_FLOW.md) → maxDuration).
 
 ## Idealista — Comparable listings
 

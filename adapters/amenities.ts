@@ -88,30 +88,29 @@ export async function fetchAmenities(
     nwr["shop"="supermarket"](around:800,${lat},${lon});
   );out center tags;`;
 
-  let json: { elements: OverpassEl[] } | null = null;
-  let lastErr = "";
-  for (const endpoint of OVERPASS_ENDPOINTS) {
-    try {
-      const res = await fetchWithTimeout(endpoint, 12000, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          "User-Agent": "pisowise/1.0 (property due-diligence)",
-        },
-        body: "data=" + encodeURIComponent(query),
-      });
-      if (!res.ok) {
-        lastErr = `Overpass HTTP ${res.status}`;
-        continue;
-      }
-      json = (await res.json()) as { elements: OverpassEl[] };
-      break;
-    } catch (e) {
-      lastErr = (e as Error).message;
-    }
-  }
-  if (!json) {
-    return failed<AmenityData>("amenities", `Amenities lookup failed: ${lastErr}`);
+  // Race all mirrors at once with a tight per-request timeout: the fastest
+  // healthy instance wins. Querying sequentially (12s × 3 mirrors ≈ 36s) could
+  // overrun the report's serverless time budget; this bounds it to ~8s.
+  const body = "data=" + encodeURIComponent(query);
+  const headers = {
+    "Content-Type": "application/x-www-form-urlencoded",
+    "User-Agent": "pisowise/1.0 (property due-diligence)",
+  };
+  const attempt = async (endpoint: string) => {
+    const res = await fetchWithTimeout(endpoint, 8000, { method: "POST", headers, body });
+    if (!res.ok) throw new Error(`Overpass HTTP ${res.status} @ ${endpoint}`);
+    return (await res.json()) as { elements: OverpassEl[] };
+  };
+
+  let json: { elements: OverpassEl[] };
+  try {
+    json = await Promise.any(OVERPASS_ENDPOINTS.map(attempt));
+  } catch (e) {
+    const note =
+      e instanceof AggregateError
+        ? e.errors.map((x) => (x as Error).message).join("; ")
+        : (e as Error).message;
+    return failed<AmenityData>("amenities", `Amenities lookup failed: ${note}`);
   }
 
   try {
