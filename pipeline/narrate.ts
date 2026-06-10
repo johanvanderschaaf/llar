@@ -59,6 +59,20 @@ function buildFacts(report: Report, input: ReportInput) {
       })),
     hasMarketData: report.price.comps.some((c) => !c.highlight),
     hasAskingPrice: Boolean(input.askingPriceEur),
+    // Authoritative barri-level CLOSING-price benchmark (Generalitat Habitatge,
+    // registered notarial deeds) — the primary price anchor for Section 03. This
+    // is distinct from `comps` (idealista ASKING listings). Present in pricing
+    // states 01/02; absent in state 03.
+    barriClosing: report.price.pricing?.barri
+      ? {
+          barri: report.price.pricing.barri.name,
+          pricePerM2: report.price.pricing.barri.pricePerM2,
+          asOf: report.price.pricing.barri.asOf,
+          transactions: report.price.pricing.barri.transactions ?? null,
+          avgSurfaceM2: report.price.pricing.barri.avgSurfaceM2 ?? null,
+        }
+      : null,
+    hasBarriBenchmark: Boolean(report.price.pricing?.barri),
   };
 }
 
@@ -66,8 +80,10 @@ const SYSTEM = `You are a property due-diligence analyst writing a trilingual (E
 
 STRICT RULES — these are non-negotiable:
 - Ground EVERY statement in the FACTS JSON the user provides. Do NOT invent prices, comparables, €/m² figures, scores, legal facts, dates, or citations.
-- If "hasMarketData" is false or "hasAskingPrice" is false, do NOT state any specific market price, €/m² comparison, or fair-value number. Instead say plainly that the price/market analysis is "to verify" / pending comparable data ("por verificar" in Spanish, "per verificar" in Catalan).
-- If "hasMarketData" is true, the "comps" array holds nearby ASKING listings (idealista). In priceLede/priceFairValue you MAY compare the subject's asking €/m² to these comps — but ONLY using the numbers given. Always label them ASKING prices from a portal (not closing prices), note that recorded closings typically sit somewhat below asking, and frame the result as orientation for the buyer to confirm, never a definitive valuation.
+- LOCATION: refer to the neighbourhood ONLY by the barri and district given in the FACTS (the "neighbourhood" snapshot fact and "barriClosing.barri"). NEVER infer, rename, or guess a barri / district / neighbourhood from the street address or your own knowledge. If the FACTS say the location is "la Vila de Gràcia · Gràcia", do not call it Eixample or anything else.
+- PRICE ANCHOR: when "hasBarriBenchmark" is true, "barriClosing" is the authoritative price reference — the average €/m² that flats in this barri actually CLOSE at (registered notarial deeds, period "barriClosing.asOf"). Use it in priceLede/priceFairValue, clearly labelled as a CLOSING-price average (never call it asking), and compare the subject's asking €/m² to it only when "hasAskingPrice" is true. Frame as orientation, not a definitive valuation.
+- "comps" (only when "hasMarketData" is true) are nearby ASKING listings (idealista) — secondary context only; label them ASKING and note recorded closings sit somewhat below asking.
+- Only if "hasBarriBenchmark", "hasMarketData" AND "hasAskingPrice" are ALL false may you say the price/market analysis is "to verify" / pending data ("por verificar" in Spanish, "per verificar" in Catalan). If "hasBarriBenchmark" is true you DO have a closing-price benchmark — use it, do not say comparable data is missing.
 - Where a fact is unknown, say it must be verified rather than guessing.
 - Tone: trustworthy proptech — concise, practical, no fluff, honest. Distinguish asking vs closing prices when prices are discussed.
 - Spanish must be natural, native-quality Spanish (es-ES), not a literal translation.
