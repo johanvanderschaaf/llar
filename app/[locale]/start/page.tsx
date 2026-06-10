@@ -1,6 +1,13 @@
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { BuyerForm } from "@/components/BuyerForm";
 
+// startAnalysisAction runs generateReport, which fans out to several external
+// sources (Catastro, OSM/Overpass, ICAEN, Ajuntament BCN). Per the Next docs,
+// a Server Action's timeout is governed by the *page's* maxDuration — without
+// this, Vercel's ~10s default kills the action mid-pipeline and the report is
+// saved nearly empty. See .claude/skills/onboard/PIPELINE_FLOW.md.
+export const maxDuration = 60;
+
 export default async function StartPage({
   params,
   searchParams,

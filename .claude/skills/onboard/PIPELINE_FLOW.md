@@ -84,6 +84,16 @@ To invalidate after a parser change:
 const CATASTRO_CACHE_VERSION = "v3";  // was "v2" — bumping invalidates all rows
 ```
 
+## Serverless time budget (don't let it write an empty report)
+
+`generateReport` inserts the row with `data: {}` and only writes the real report
+via the final `UPDATE` (step 10). It runs as a **Server Action**, so its timeout
+is governed by the **page's** `maxDuration` — set to `60` on
+`app/[locale]/start/page.tsx` (buyer) and `app/admin/new/page.tsx` (admin).
+Without it, Vercel's ~10s default kills the action mid-pipeline and the row stays
+`data: {}` ("almost no data"). Keep slow sources bounded (e.g. the Overpass race
+in `adapters/amenities.ts`) so the fan-out never approaches the budget.
+
 ## Provenance
 
 After all seeders run, `report_sources` is upserted with one row per attempted source. The upsert uses `onConflict: "report_id,source"` so re-running on the same report replaces rows rather than duplicating them.

@@ -1,6 +1,11 @@
 import { requireOperator } from "@/lib/auth";
 import { NewReportForm } from "@/components/admin/NewReportForm";
 
+// createReportAction runs generateReport (multi-source pipeline). Server Action
+// timeout follows the page's maxDuration; without it Vercel's ~10s default can
+// kill generation before the report is written. See start/page.tsx.
+export const maxDuration = 60;
+
 export default async function NewReportPage() {
   await requireOperator();
   return (
