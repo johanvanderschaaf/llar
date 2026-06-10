@@ -25,6 +25,7 @@ import {
   seedComps,
   seedCostsTaxes,
   seedEnergy,
+  seedEnergyMissing,
   seedFooter,
   seedFromCatastro,
   seedLegal,
@@ -47,6 +48,22 @@ const EMPTY_URBANISM: UrbanismData = {
   method: "bcn-point",
   mapUrl: "https://ajuntament.barcelona.cat/informaciourbanistica/cerca/ca/",
 };
+
+/**
+ * Geocoding (Catastro CPMRC) is the spine of all geo-dependent adapters
+ * (amenities, urbanism, flood, heritage, barri pricing). It fails transiently
+ * often enough to leave reports with thin scores, so retry once before giving up.
+ */
+async function geocodeWithRetry(
+  ref: string,
+  attempts = 2,
+): Promise<Awaited<ReturnType<typeof geocodeRef>>> {
+  let last = await geocodeRef(ref);
+  for (let i = 1; i < attempts && last.status !== "ok"; i++) {
+    last = await geocodeRef(ref);
+  }
+  return last;
+}
 
 const CACHE_TTL_MS = 1000 * 60 * 60 * 24 * 30; // 30 days
 // Bump when the parsed CatastroData shape changes, to auto-invalidate old rows.
@@ -137,6 +154,10 @@ export async function generateReport(input: ReportInput): Promise<string> {
   const [energy, ipv] = await Promise.all([fetchEnergy(resolvedRef), fetchIpv()]);
   if (energy.status === "ok" && energy.data) {
     report = seedEnergy(report, energy.data);
+  } else {
+    // No ICAEN certificate — state it where energy would appear (it still drops
+    // out of the score via re-normalisation).
+    report = seedEnergyMissing(report);
   }
   // IPV trend is recorded for provenance but no longer rendered in section 03 —
   // a Catalonia-wide YoY index is too coarse to drive a Barcelona buyer's
@@ -160,7 +181,7 @@ export async function generateReport(input: ReportInput): Promise<string> {
   if (cat.status === "ok") {
     const parcelRef = cat.data?.parcel.parcelRef ?? resolvedRef;
     const [geo, aff] = await Promise.all([
-      geocodeRef(resolvedRef),
+      geocodeWithRetry(resolvedRef),
       fetchAffectation(parcelRef),
     ]);
     affectation = aff;
@@ -219,9 +240,11 @@ export async function generateReport(input: ReportInput): Promise<string> {
         ipv: ipv.status === "ok" ? ipv.data : undefined,
       });
     }
-    // If geocoding failed but the AFH verdict came through, still surface the
-    // affectation alert from the official source alone.
-    if (!urbanismSeeded && affData) {
+    // Always seed the urbanism section once. If geo failed but AFH came through,
+    // surface the affectation from the official source alone; if neither
+    // resolved, seedUrbanism flags the affectation as unverified (no operator
+    // review backstops this, so the buyer must be told).
+    if (!urbanismSeeded) {
       report = seedUrbanism(report, EMPTY_URBANISM, affData);
     }
   }
@@ -236,20 +259,32 @@ export async function generateReport(input: ReportInput): Promise<string> {
   // Deterministic "Sources & method" + disclaimer (reflects comps presence).
   report = seedFooter(report);
 
-  // Deterministic scores from what we have (building age, amenities; energy
-  // and price land once those adapters/comps exist).
+  // Deterministic scores: the five quality pillars (building age, amenities,
+  // energy, asking-vs-barri price) plus the risk modifier that can override the
+  // weighted average for a serious affectation/flood/heritage finding.
   const yearBuilt = cat.data?.unit.yearBuilt;
   const energyClass = energy.data?.consumptionClass;
-  const { values, overall } = computeScores({
+  const deltaPct = report.price.pricing?.deltaPct;
+  const risk = {
+    affectation:
+      affectation?.status === "ok" ? affectation.data?.category : undefined,
+    flood: flood?.status === "ok" ? flood.data?.level : undefined,
+    heritageLevel: heritage?.status === "ok" ? heritage.data?.level : undefined,
+  };
+  const { values, overall, risk: riskOutcome } = computeScores({
     yearBuilt,
     energyClass,
     amenities: amenities?.data,
+    deltaPct,
+    risk,
   });
-  report = seedScores(report, values, overall, {
-    year: yearBuilt,
-    energyClass,
-    amenities: amenities?.data,
-  });
+  report = seedScores(
+    report,
+    values,
+    overall,
+    { year: yearBuilt, energyClass, amenities: amenities?.data, deltaPct },
+    riskOutcome,
+  );
 
   await db.from("reports").update({ data: report }).eq("id", id);
 

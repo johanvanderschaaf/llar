@@ -18,11 +18,16 @@ export interface ScoreMeta {
   weight: number;
 }
 
+// Weights for the five quality pillars. Risk is NOT a pillar — it applies as a
+// modifier on the overall (see assessRisk) so a serious finding can override the
+// weighted average entirely. Weights are normalised at runtime, so only their
+// ratios matter; they sum to 0.80 because the remaining 0.20 of buyer concern is
+// expressed through the risk modifier rather than an averaged pillar.
 export const scoreConfig: Record<ScoreKey, ScoreMeta> = {
-  location: { weight: 0.25 },
-  transport: { weight: 0.15 },
-  building: { weight: 0.2 },
-  price: { weight: 0.3 },
+  price: { weight: 0.25 },
+  location: { weight: 0.18 },
+  building: { weight: 0.15 },
+  transport: { weight: 0.12 },
   energy: { weight: 0.1 },
 };
 
@@ -51,12 +56,117 @@ export function computeOverall(scores: Record<ScoreKey, number>): number {
 /* ---------- deterministic score computation ---------- */
 
 import type { AmenityData } from "@/adapters/amenities";
+import type { AffectationCategory } from "@/adapters/affectation";
+import type { FloodLevel } from "@/adapters/flood";
+import type { HeritageLevel } from "@/adapters/heritage";
 
 export interface ScoreInputs {
   yearBuilt?: number;
   /** Energy certificate letter A–G, if known. */
   energyClass?: string;
   amenities?: AmenityData;
+  /** Asking €/m² vs barri €/m², from Pricing.deltaPct. Negative = below market. */
+  deltaPct?: number;
+  /** Inputs for the risk modifier applied to the overall (not a pillar). */
+  risk?: RiskInputs;
+}
+
+/* ---------- risk modifier (overrides the weighted average) ---------- */
+
+/**
+ * Risk inputs, mapped straight from the adapter categories:
+ * - `affectation` — AFH verdict: "A" = the finca HAS an urbanistic affectation
+ *   (expropriation / planning-system exposure), "C"/"D" = worth checking,
+ *   "B" = clear.
+ * - `flood` — ACA/SNCZI fluvial zone: high (T10) / medium (T100) / low (T500).
+ * - `heritageLevel` — building-specific catalogue level A–D (ensembles are
+ *   context, not a building constraint, so they are not passed here).
+ */
+export interface RiskInputs {
+  affectation?: AffectationCategory;
+  flood?: FloodLevel;
+  heritageLevel?: HeritageLevel;
+}
+
+export type RiskSeverity = "critical" | "serious" | "moderate" | "mild" | "none";
+
+export interface RiskOutcome {
+  /** Compounded multiplicative penalty applied to the base, before the cap. */
+  factor: number;
+  /** Hard ceiling on the overall — the override primitive. Infinity if none. */
+  cap: number;
+  /** Most severe active risk, for the verdict tag + colour. */
+  severity: RiskSeverity;
+}
+
+/**
+ * Hard ceiling for a confirmed affectation (category A). A near-perfect flat
+ * with expropriation exposure must still read as a serious caution — even all
+ * green pillars can't lift the overall above this. Tunable single knob.
+ */
+export const CRITICAL_CAP = 30;
+
+const SEVERITY_RANK: Record<RiskSeverity, number> = {
+  none: 0,
+  mild: 1,
+  moderate: 2,
+  serious: 3,
+  critical: 4,
+};
+
+export function assessRisk(r: RiskInputs): RiskOutcome {
+  let factor = 1;
+  let cap = Infinity;
+  let severity: RiskSeverity = "none";
+  const escalate = (s: RiskSeverity) => {
+    if (SEVERITY_RANK[s] > SEVERITY_RANK[severity]) severity = s;
+  };
+
+  // Affectation — category A is the override; C/D are a multiplicative caution.
+  if (r.affectation === "A") {
+    cap = CRITICAL_CAP;
+    escalate("critical");
+  } else if (r.affectation === "C" || r.affectation === "D") {
+    factor *= 0.85;
+    escalate("serious");
+  }
+
+  // Flood — frequency-weighted. T500 ("low") is not penalised: a 1-in-500-year
+  // floodplain covers much of Barcelona and is effectively negligible.
+  if (r.flood === "high") {
+    factor *= 0.8;
+    escalate("serious");
+  } else if (r.flood === "medium") {
+    factor *= 0.9;
+    escalate("moderate");
+  }
+
+  // Heritage — a renovation constraint (cost/permits), so a mild negative that
+  // scales with protection level.
+  if (r.heritageLevel === "A") {
+    factor *= 0.95;
+    escalate("mild");
+  } else if (r.heritageLevel === "B") {
+    factor *= 0.96;
+    escalate("mild");
+  } else if (r.heritageLevel === "C" || r.heritageLevel === "D") {
+    factor *= 0.98;
+    escalate("mild");
+  }
+
+  return { factor, cap, severity };
+}
+
+/**
+ * Price pillar from the asking-vs-barri gap (Pricing.deltaPct, negative =
+ * below market). Absolute bands matching the ±15% fair-range stance.
+ */
+function priceScore(deltaPct: number): number {
+  if (deltaPct < -20) return 90;
+  if (deltaPct < -8) return 82;
+  if (deltaPct <= 8) return 74;
+  if (deltaPct <= 18) return 60;
+  return 44;
 }
 
 /** Pick the first band whose threshold the value is below. */
@@ -65,18 +175,21 @@ function band(value: number, table: [number, number][], fallback: number) {
   return fallback;
 }
 
+// Age is a weak proxy for building quality in Barcelona, where most of the
+// desirable stock (Eixample, Gràcia) predates 1930. New construction earns a
+// real bonus (modern standards, lift, no aluminosi-era risk), but old stock is
+// the norm and stays a solid "ok" rather than being penalised toward the floor.
 function buildingScore(year: number): number {
   const age = new Date().getFullYear() - year;
   return band(
     age,
     [
-      [10, 90],
-      [25, 80],
-      [45, 68],
-      [65, 58],
-      [85, 50],
+      [10, 88],
+      [30, 80],
+      [60, 73],
+      [100, 67],
     ],
-    42,
+    63,
   );
 }
 
@@ -104,10 +217,15 @@ function locationScore(a: AmenityData): number {
   return Math.round((green + sup + mkt + sch + health) / 5);
 }
 
-/** Compute the scores we can derive; omit any we lack data for (e.g. price). */
+/**
+ * Compute the pillars we can derive (omitting any we lack data for), then apply
+ * the risk modifier to the weighted overall. Pillars stay untouched — the risk
+ * outcome is returned separately so the caller can flag the verdict.
+ */
 export function computeScores(inp: ScoreInputs): {
   values: Partial<Record<ScoreKey, number>>;
   overall: number | null;
+  risk: RiskOutcome;
 } {
   const values: Partial<Record<ScoreKey, number>> = {};
   if (inp.yearBuilt) values.building = buildingScore(inp.yearBuilt);
@@ -119,14 +237,20 @@ export function computeScores(inp: ScoreInputs): {
     values.transport = transportScore(inp.amenities);
     values.location = locationScore(inp.amenities);
   }
+  if (inp.deltaPct != null) values.price = priceScore(inp.deltaPct);
+
+  const risk = assessRisk(inp.risk ?? {});
 
   const keys = Object.keys(values) as ScoreKey[];
-  if (keys.length === 0) return { values, overall: null };
+  if (keys.length === 0) return { values, overall: null, risk };
   const totalW = keys.reduce((s, k) => s + scoreConfig[k].weight, 0);
-  const overall = Math.round(
-    keys.reduce((s, k) => s + values[k]! * scoreConfig[k].weight, 0) / totalW,
-  );
-  return { values, overall };
+  const base =
+    keys.reduce((s, k) => s + values[k]! * scoreConfig[k].weight, 0) / totalW;
+  // Apply the risk modifier: compounded factors, then the hard cap (override).
+  let overall = Math.round(base * risk.factor);
+  if (overall > risk.cap) overall = risk.cap;
+  overall = Math.max(0, Math.min(100, overall));
+  return { values, overall, risk };
 }
 
 /** Banding used for ring colour + pills (good / ok / low). */
