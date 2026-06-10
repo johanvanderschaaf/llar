@@ -34,6 +34,7 @@ import {
   seedUrbanism,
   seedHeritage,
   seedBarriPricing,
+  seedPricingUnavailable,
 } from "./template";
 import type { ReportInput } from "@/types/db";
 
@@ -201,7 +202,22 @@ export async function generateReport(input: ReportInput): Promise<string> {
           askingPriceEur: input.askingPriceEur,
           builtM2,
         });
+      } else {
+        // State 03: coords resolved but barri lookup unavailable (outside the
+        // 73 BCN barris, or low-volume barri with no €/m² for the period).
+        report = seedPricingUnavailable(report, {
+          askingPriceEur: input.askingPriceEur,
+          builtM2,
+          ipv: ipv.status === "ok" ? ipv.data : undefined,
+        });
       }
+    } else {
+      // State 03: no coordinates at all — geocoding failed.
+      report = seedPricingUnavailable(report, {
+        askingPriceEur: input.askingPriceEur,
+        builtM2,
+        ipv: ipv.status === "ok" ? ipv.data : undefined,
+      });
     }
     // If geocoding failed but the AFH verdict came through, still surface the
     // affectation alert from the official source alone.

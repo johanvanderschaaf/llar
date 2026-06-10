@@ -15,6 +15,7 @@ import type { CompListing } from "@/adapters/idealista";
 import type { IpvData } from "@/adapters/ine-ipv";
 import type { GencatBarriData } from "@/adapters/gencat-barri";
 import { buildLiveSearches } from "@/adapters/live-listings";
+import type { Pricing } from "@/types/report";
 import type { CompRow } from "@/types/report";
 import type { ReportInput } from "@/types/db";
 import { scoreOrder, type ScoreKey } from "@/config/scoring";
@@ -369,6 +370,9 @@ export function seedBarriPricing(
     });
   }
 
+  // --- Structured payload for the redesigned Section 03 component ---
+  r.price.pricing = buildPricingPayload(barri, opts);
+
   // Fair-value range grounded in the barri €/m². Width is ±15% — wide enough
   // to bracket realistic spreads within a single barri (an unreformed planta
   // baja interior vs. a reformed high floor with balcony are easily ±15–25%
@@ -387,6 +391,242 @@ export function seedBarriPricing(
     };
   }
 
+  return r;
+}
+
+/* ---------- structured Pricing payload (drives the new Section 03) ---------- */
+
+const EUR = (n: number) => `€${Math.round(n).toLocaleString("en-GB")}`;
+
+function clamp01(x: number) {
+  return Math.max(0, Math.min(1, x));
+}
+
+/** Position-within-range narrative, picked from where the asking marker lands. */
+function positionPhrase(pct: number): {
+  en: string;
+  es: string;
+  ca: string;
+} {
+  if (pct < 0)
+    return {
+      en: "below the fair range",
+      es: "por debajo del rango razonable",
+      ca: "per sota del rang raonable",
+    };
+  if (pct > 1)
+    return {
+      en: "above the fair range",
+      es: "por encima del rango razonable",
+      ca: "per sobre del rang raonable",
+    };
+  if (pct < 0.25)
+    return {
+      en: "toward the lower end of a fair range",
+      es: "hacia el extremo bajo de un rango razonable",
+      ca: "cap a l'extrem baix d'un rang raonable",
+    };
+  if (pct > 0.75)
+    return {
+      en: "toward the upper end of a fair range",
+      es: "hacia el extremo alto de un rango razonable",
+      ca: "cap a l'extrem alt d'un rang raonable",
+    };
+  return {
+    en: "right inside a fair range",
+    es: "justo dentro de un rango razonable",
+    ca: "just dins d'un rang raonable",
+  };
+}
+
+function chipForDelta(
+  delta: number,
+): { tone: Pricing["chip"]["tone"]; text: Localized } {
+  // Within ±15% of the barri average is the fair range → "Fairly priced",
+  // regardless of which side. Only label "Below" / "Above" market once the
+  // asking falls outside that range — anything inside is the buyer's fair
+  // working band.
+  if (delta < -15)
+    return {
+      tone: "clear",
+      text: {
+        en: "Below market",
+        es: "Por debajo del mercado",
+        ca: "Per sota del mercat",
+      },
+    };
+  if (delta > 15)
+    return {
+      tone: "check",
+      text: {
+        en: "Above market",
+        es: "Por encima del mercado",
+        ca: "Per sobre del mercat",
+      },
+    };
+  return {
+    tone: "clear",
+    text: { en: "Fairly priced", es: "Precio razonable", ca: "Preu raonable" },
+  };
+}
+
+function deltaPhrase(delta: number): Localized {
+  const sign = delta > 0 ? "+" : ""; // bare for negative — we'll spell it
+  const txt = `${Math.abs(delta).toFixed(0)}%`;
+  if (Math.abs(delta) < 1)
+    return {
+      en: "in line with",
+      es: "en línea con",
+      ca: "en línia amb",
+    };
+  return delta < 0
+    ? { en: `≈${txt} below`, es: `≈${txt} por debajo de`, ca: `≈${txt} per sota de` }
+    : { en: `≈${sign}${txt} above`, es: `≈${sign}${txt} por encima de`, ca: `≈${sign}${txt} per sobre de` };
+}
+
+/** Build the structured payload for State 01 (asking known) or State 02 (unknown). */
+function buildPricingPayload(
+  barri: GencatBarriData,
+  opts: { askingPriceEur?: number; builtM2?: number },
+): Pricing {
+  const ppm = barri.pricePerM2;
+  const builtM2 = opts.builtM2;
+  // Range bookends are inherently fuzzy (±15% × a barri average that's already
+  // an arithmetic mean across ~hundreds of sales) — round to the nearest €1,000
+  // so the buyer reads them as a band, not a precise number. The asking price
+  // and barri-implied value stay precise (they are exact arithmetic).
+  const round1k = (n: number) => Math.round(n / 1000) * 1000;
+  const impliedValue = builtM2 ? Math.round(ppm * builtM2) : 0;
+  const range = builtM2
+    ? { lo: round1k(ppm * 0.85 * builtM2), hi: round1k(ppm * 1.15 * builtM2) }
+    : undefined;
+
+  const barriPayload: NonNullable<Pricing["barri"]> = {
+    name: barri.name,
+    pricePerM2: ppm,
+    avgSurfaceM2: barri.avgSurfaceM2,
+    transactions: barri.transactions,
+    asOf: barri.asOf,
+    impliedValue,
+  };
+
+  // ---------- State 02: asking unknown ----------
+  if (!opts.askingPriceEur || !builtM2) {
+    // Marker = barri average → sits at 50% by construction.
+    const markerPct = 0.5;
+    const verdict: Localized = range
+      ? {
+          en: `For a <span class="num">${builtM2 ?? "—"} m²</span> flat in ${barri.name}, a fair price runs about <span class="num">${EUR(range.lo)}</span> to <span class="num">${EUR(range.hi)}</span> — built on what nearby flats actually closed at.`,
+          es: `Para un piso de <span class="num">${builtM2 ?? "—"} m²</span> en ${barri.name}, un precio razonable ronda entre <span class="num">${EUR(range.lo)}</span> y <span class="num">${EUR(range.hi)}</span> — basado en lo que pisos cercanos cerraron de verdad.`,
+          ca: `Per a un pis de <span class="num">${builtM2 ?? "—"} m²</span> a ${barri.name}, un preu raonable ronda entre <span class="num">${EUR(range.lo)}</span> i <span class="num">${EUR(range.hi)}</span> — basat en el que pisos propers van tancar realment.`,
+        }
+      : {
+          en: `In ${barri.name}, registered second-hand flats closed at an average <span class="num">€${ppm.toLocaleString("en-GB")}/m²</span> built. Apply that to this flat's m² once known.`,
+          es: `En ${barri.name}, los pisos de segunda mano registrados se cerraron a una media de <span class="num">€${ppm.toLocaleString("en-GB")}/m²</span> construido. Aplícalo al m² de este piso cuando se conozca.`,
+          ca: `A ${barri.name}, els pisos de segona mà registrats es van tancar a una mitjana de <span class="num">€${ppm.toLocaleString("en-GB")}/m²</span> construït. Aplica'l al m² d'aquest pis quan es conegui.`,
+        };
+    return {
+      state: "asking-unknown",
+      builtM2,
+      chip: {
+        tone: "neutral",
+        text: {
+          en: "No asking price yet",
+          es: "Aún sin precio de oferta",
+          ca: "Encara sense preu de sortida",
+        },
+      },
+      verdict,
+      barri: barriPayload,
+      range,
+      markerPct: range ? markerPct : undefined,
+      marker: range ? { kind: "barri-avg", value: impliedValue } : undefined,
+    };
+  }
+
+  // ---------- State 01: asking known + barri matched ----------
+  const askPerM2 = opts.askingPriceEur / builtM2;
+  const delta = ((askPerM2 - ppm) / ppm) * 100;
+  const chip = chipForDelta(delta);
+  // markerPct = where the asking price lands on the [lo, hi] axis.
+  const markerPct = range
+    ? clamp01((opts.askingPriceEur - range.lo) / (range.hi - range.lo))
+    : 0.5;
+  const dphrase = deltaPhrase(delta);
+  const positionAfterDash = positionPhrase(markerPct);
+  const verdict: Localized = {
+    en: `Asking <span class="num">${EUR(opts.askingPriceEur)}</span> sits <strong class="pct">${dphrase.en}</strong> the neighbourhood's closing average — ${positionAfterDash.en}.`,
+    es: `Precio pedido <span class="num">${EUR(opts.askingPriceEur)}</span> queda <strong class="pct">${dphrase.es}</strong> la media de cierre del barrio — ${positionAfterDash.es}.`,
+    ca: `Preu demanat <span class="num">${EUR(opts.askingPriceEur)}</span> queda <strong class="pct">${dphrase.ca}</strong> la mitjana de tancament del barri — ${positionAfterDash.ca}.`,
+  };
+
+  return {
+    state: "asking-known",
+    builtM2,
+    asking: { price: opts.askingPriceEur, pricePerM2: Math.round(askPerM2) },
+    chip,
+    verdict,
+    barri: barriPayload,
+    range,
+    deltaPct: delta,
+    markerPct,
+    marker: { kind: "asking", value: opts.askingPriceEur },
+  };
+}
+
+/**
+ * Seed Section 03 in State 03 — barri benchmark unavailable. Called from
+ * the pipeline when `fetchGencatBarri` returns `unavailable` (coords
+ * outside the 73 BCN barris, or a low-volume barri with no €/m² for the
+ * period). No fair range, no barri average, no Δ — never render zeros.
+ */
+export function seedPricingUnavailable(
+  report: Report,
+  opts: {
+    askingPriceEur?: number;
+    builtM2?: number;
+    ipv?: IpvData;
+  } = {},
+): Report {
+  const r: Report = structuredClone(report);
+  const askPerM2 =
+    opts.askingPriceEur && opts.builtM2
+      ? Math.round(opts.askingPriceEur / opts.builtM2)
+      : undefined;
+
+  let ipvFootnote: Localized | undefined;
+  if (opts.ipv) {
+    const pct = opts.ipv.yoyPct;
+    const sign = pct > 0 ? "+" : "";
+    ipvFootnote = {
+      en: `For wider context only — across Catalonia, second-hand home prices moved ${sign}${pct.toFixed(1)}% year-on-year in ${opts.ipv.quarter} (INE Housing Price Index). That's a regional figure, far too coarse to price a single flat — but it's the closest we can offer when the neighbourhood data isn't there.`,
+      es: `Solo como contexto amplio — en Cataluña, los precios de la vivienda de segunda mano variaron un ${sign}${pct.toFixed(1)}% interanual en ${opts.ipv.quarter} (Índice de Precios de Vivienda, INE). Es una cifra regional, demasiado gruesa para valorar un piso concreto — pero es lo más cercano cuando no hay datos del barrio.`,
+      ca: `Només com a context ampli — a Catalunya, els preus de l'habitatge de segona mà van variar un ${sign}${pct.toFixed(1)}% interanual al ${opts.ipv.quarter} (Índex de Preus de l'Habitatge, INE). És una xifra regional, massa gruixuda per valorar un pis concret — però és el més proper quan no hi ha dades del barri.`,
+    };
+  }
+
+  r.price.pricing = {
+    state: "barri-unavailable",
+    builtM2: opts.builtM2,
+    asking:
+      opts.askingPriceEur && askPerM2
+        ? { price: opts.askingPriceEur, pricePerM2: askPerM2 }
+        : undefined,
+    chip: {
+      tone: "check",
+      text: {
+        en: "No barri benchmark",
+        es: "Sin referencia del barrio",
+        ca: "Sense referència del barri",
+      },
+    },
+    verdict: {
+      en: `We can't benchmark this flat against its neighbourhood yet.`,
+      es: `Aún no podemos comparar este piso con su barrio.`,
+      ca: `Encara no podem comparar aquest pis amb el seu barri.`,
+    },
+    ipvFootnote,
+  };
   return r;
 }
 

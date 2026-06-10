@@ -66,6 +66,57 @@ export interface LiveSearch {
   label: Localized;
 }
 
+/** Which of the three Section 03 states to render. */
+export type PricingState = "asking-known" | "asking-unknown" | "barri-unavailable";
+
+/**
+ * Structured data driving the redesigned Section 03 "Price & value".
+ *
+ * Stance (load-bearing):
+ * - never invent a single estimated value / AVM number
+ * - the fair *range* is the answer
+ * - barri figure is always framed as closing prices (not asking)
+ * - every state carries a humility note
+ */
+export interface Pricing {
+  state: PricingState;
+  /** Catastro built area in m². */
+  builtM2?: number;
+  /** Subject flat's asking price + derived €/m². Present only when known. */
+  asking?: { price: number; pricePerM2: number };
+  /** Verdict chip — tone + per-state label. */
+  chip: { tone: "clear" | "neutral" | "check"; text: Localized };
+  /**
+   * Verdict line displayed beneath the chip. May include a `<strong>` span
+   * wrapping the delta phrase ("≈10% below"); the renderer trusts the HTML.
+   */
+  verdict: Localized;
+  /** Barri snapshot — present in states 01 + 02. */
+  barri?: {
+    name: string;
+    pricePerM2: number;
+    avgSurfaceM2?: number;
+    transactions?: number;
+    /** Period label, e.g. "gen – des 2025". */
+    asOf: string;
+    /** barri €/m² × builtM2 — sits at 50% on the number-line by construction. */
+    impliedValue: number;
+  };
+  /** Range bookends, present in states 01 + 02. */
+  range?: { lo: number; hi: number };
+  /** Δ% from asking €/m² vs barri €/m². Negative = below. State 01 only. */
+  deltaPct?: number;
+  /** Marker dot position on the number line [0, 1]. */
+  markerPct?: number;
+  /** What the marker represents. Color follows the kind. */
+  marker?: { kind: "asking" | "barri-avg"; value: number };
+  /**
+   * Catalonia INE IPV YoY footnote — explicitly framed as too coarse to
+   * price one flat. Optional, only used in state 03 ("barri-unavailable").
+   */
+  ipvFootnote?: Localized;
+}
+
 export interface OfferRung {
   /** "open" | "target" | "ceiling" — drives label + highlight styling. */
   kind: "open" | "target" | "ceiling";
@@ -151,16 +202,17 @@ export interface Report {
     lede: Localized;
     panels: Panel[]; // market context + this-flat-vs-market
     comps: CompRow[];
-    fairValue: Localized; // keyline (explanatory text)
-    /** Numeric €€ bookends of the fair-value range, rendered as big numbers above the keyline. */
+    fairValue: Localized; // keyline (explanatory text) — kept for narrative/PDF legacy paths
+    /** Numeric €€ bookends of the fair-value range. Legacy alongside `pricing.range`. */
     range?: { lo: number; hi: number };
-    /**
-     * Deep-linked pre-filtered portal searches for live listings in this
-     * barri / district matching the subject's size and price range. We never
-     * ingest portal listings into the report — the buyer clicks out to a
-     * live view. Empty when we don't have enough inputs to deep-link.
-     */
+    /** Deprecated for section 03 render — kept on the type for the older narrative path. */
     liveSearches?: LiveSearch[];
+    /**
+     * Structured pricing payload that drives the redesigned Section 03.
+     * Computed from the barri lookup + the subject flat's m² + (optional)
+     * asking price. The renderer picks one of three states from `state`.
+     */
+    pricing?: Pricing;
     ladder: OfferRung[];
     /** Source links so the buyer can compare the price themselves. */
     references?: PriceRef[];

@@ -9,6 +9,7 @@ import { brand } from "@/config/brand";
 import { LockedSection } from "./LockedSection";
 import { UnlockButton } from "./UnlockButton";
 import { PrintButton } from "./PrintButton";
+import { PriceSection } from "./PriceSection";
 
 /* ---------- small presentational helpers ---------- */
 
@@ -258,102 +259,31 @@ export async function ReportView({
         </p>
       </section>
 
-      {/* 03 PRICE & VALUE (premium) */}
+      {/* 03 PRICE & VALUE (premium) — new design (Concept A "Number Line").
+          The whole section is driven by the structured `pricing` payload
+          which picks one of three states. We keep the legacy comps table
+          rendered below it for the (rare) case operator/idealista comps
+          are present. */}
       {lock(
       <section className="fx">
-        <SectionHead
-          num="03"
-          title={t("sections.price")}
-          note={t("sections.priceNote")}
-        />
-        {/* 1. Verdict — single sentence, leads the section. */}
-        <p className="lede">{L(report.price.lede, locale)}</p>
-
-        {/* 2. Fair price range — labelled block with the numeric bookends as
-            the focal point, plus the floor/condition framing underneath. */}
-        {report.price.range ? (
-          <div className="panel" style={{ marginTop: 16, padding: "18px 22px" }}>
-            <div
-              className="serif"
-              style={{
-                fontSize: 13,
-                letterSpacing: 1,
-                textTransform: "uppercase",
-                color: "var(--muted)",
-                marginBottom: 6,
-              }}
-            >
-              {t("price.rangeHeading")}
-            </div>
-            <div
-              className="num"
-              style={{
-                fontSize: 30,
-                fontWeight: 700,
-                lineHeight: 1.1,
-                color: "var(--ink)",
-              }}
-            >
-              €{report.price.range.lo.toLocaleString("en-GB")}
-              <span style={{ color: "var(--muted)", margin: "0 10px", fontWeight: 400 }}>–</span>
-              €{report.price.range.hi.toLocaleString("en-GB")}
-            </div>
-            <p style={{ fontSize: 14, color: "var(--muted)", marginTop: 10, marginBottom: 0 }}>
-              {L(report.price.fairValue, locale)}
-            </p>
-          </div>
+        {report.price.pricing ? (
+          <PriceSection
+            pricing={report.price.pricing}
+            locale={locale}
+            t={t}
+          />
         ) : (
-          <div className="keyline" style={{ marginTop: 12 }}>
-            {L(report.price.fairValue, locale)}
-          </div>
+          <>
+            <SectionHead
+              num="03"
+              title={t("sections.price")}
+              note={t("sections.priceNote")}
+            />
+            <p className="lede">{L(report.price.lede, locale)}</p>
+          </>
         )}
 
-        {/* 3. Supporting evidence panels (barri detail). */}
-        {report.price.panels.length > 0 ? (
-          <div className="grid-2" style={{ marginTop: 24, marginBottom: 24 }}>
-            {report.price.panels.map((p, i) => (
-              <div className="panel" key={i}>
-                <h3 className="serif">{L(p.heading, locale)}</h3>
-                <p>{L(p.body, locale)}</p>
-              </div>
-            ))}
-          </div>
-        ) : null}
-
-        {/* 4. Live listings — pre-filtered deep links to portals. We don't
-            ingest portal data; the buyer clicks out to a live view. */}
-        {report.price.liveSearches && report.price.liveSearches.length > 0 ? (
-          <div style={{ marginTop: 6 }}>
-            <h3 className="serif" style={{ fontSize: 17, margin: "6px 0 2px" }}>
-              {t("price.liveHeading")}
-            </h3>
-            <p
-              className="body"
-              style={{ fontSize: 14, color: "var(--muted)", marginBottom: 12 }}
-            >
-              {t("price.liveNote")}
-            </p>
-            <ul className="check" style={{ gap: 10 }}>
-              {report.price.liveSearches.map((s, i) => (
-                <li key={i} style={{ paddingLeft: 22 }}>
-                  <a
-                    href={s.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ color: "var(--accent-deep)", fontWeight: 600 }}
-                  >
-                    {s.portal} ↗
-                  </a>{" "}
-                  <span style={{ fontSize: 13, color: "var(--muted)" }}>
-                    · {L(s.label, locale)}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : null}
-
-        {/* 5. Comps table — only when comps exist (operator/idealista returned). */}
+        {/* Comps table — only when comps exist (operator/idealista returned). */}
         {report.price.comps.length > 0 ? (
           <>
             <h3 className="serif" style={{ fontSize: 17, margin: "6px 0 2px" }}>
