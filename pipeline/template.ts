@@ -104,9 +104,8 @@ export function seedFromCatastro(
       });
     }
   }
-  if (unit.yearBuilt) {
-    r.hero.meta.push({ labelKey: "meta.built", value: String(unit.yearBuilt) });
-  }
+  // Year built is shown in the Property snapshot (snapshot.yearBuilt), so it is
+  // deliberately omitted from the hero meta strip to avoid repeating it.
 
   // Snapshot facts (deterministic, sourced from Catastro).
   const facts = r.snapshot.facts;
@@ -131,9 +130,9 @@ export function seedFromCatastro(
 
   // The signature "how many flats in the building" note.
   r.snapshot.note = {
-    en: `The cadastral parcel contains ${parcel.unitCount} units in total — so this is a multi-unit building, not a single home. Confirm the true count on-site (count the mailboxes) and via the building's división horizontal.`,
+    en: `The cadastral parcel contains ${parcel.unitCount} units in total, so this is a multi-unit building, not a single home. Confirm the true count on-site (count the mailboxes) and via the building's división horizontal.`,
     es: `La parcela catastral contiene ${parcel.unitCount} unidades en total, así que es un edificio de varias viviendas, no una casa única. Confirma el número real in situ (cuenta los buzones) y mediante la división horizontal del edificio.`,
-    ca: `La parcel·la cadastral conté ${parcel.unitCount} unitats en total — per tant és un edifici de diversos habitatges, no una casa única. Confirma el nombre real in situ (compta les bústies) i mitjançant la divisió horitzontal de l'edifici.`,
+    ca: `La parcel·la cadastral conté ${parcel.unitCount} unitats en total, per tant és un edifici de diversos habitatges, no una casa única. Confirma el nombre real in situ (compta les bústies) i mitjançant la divisió horitzontal de l'edifici.`,
   };
 
   return r;
@@ -235,7 +234,7 @@ export function compsMedianPerM2(comps: CompListing[]): number | null {
 
 /**
  * Seed the "market context" panel and price lede from the INE IPV YoY change
- * for Cataluña. Plain-language framing of *how the market is moving* — not an
+ * for Cataluña. Plain-language framing of *how the market is moving*, not an
  * investment yield. Always paired with the "verify with current comparables"
  * disclaimer because the index lags the asking-price reality by a quarter.
  */
@@ -264,9 +263,9 @@ export function seedIpvContext(report: Report, ipv: IpvData): Report {
         ca: "Context de mercat (Catalunya)",
       },
       body: {
-        en: `Across Catalonia, prices for ${segLabel.en} are ${dir.en}: ${sign}${pct.toFixed(1)}% year-on-year in ${ipv.quarter} (INE Housing Price Index). This is regional context, not a quote for this address — verify with current comparables before offering.`,
-        es: `En Cataluña, los precios de ${segLabel.es} están ${dir.es}: ${sign}${pct.toFixed(1)}% interanual en ${ipv.quarter} (Índice de Precios de Vivienda, INE). Es contexto regional, no una valoración de esta dirección — contrástalo con comparables actuales antes de ofertar.`,
-        ca: `A Catalunya, els preus dels ${segLabel.ca} estan ${dir.ca}: ${sign}${pct.toFixed(1)}% interanual al ${ipv.quarter} (Índex de Preus de l'Habitatge, INE). És context regional, no una valoració d'aquesta adreça — contrasta-ho amb comparables actuals abans d'ofertar.`,
+        en: `Across Catalonia, prices for ${segLabel.en} are ${dir.en}: ${sign}${pct.toFixed(1)}% year-on-year in ${ipv.quarter} (INE Housing Price Index). This is regional context, not a quote for this address, verify with current comparables before offering.`,
+        es: `En Cataluña, los precios de ${segLabel.es} están ${dir.es}: ${sign}${pct.toFixed(1)}% interanual en ${ipv.quarter} (Índice de Precios de Vivienda, INE). Es contexto regional, no una valoración de esta dirección, contrástalo con comparables actuales antes de ofertar.`,
+        ca: `A Catalunya, els preus dels ${segLabel.ca} estan ${dir.ca}: ${sign}${pct.toFixed(1)}% interanual al ${ipv.quarter} (Índex de Preus de l'Habitatge, INE). És context regional, no una valoració d'aquesta adreça, contrasta-ho amb comparables actuals abans d'ofertar.`,
       },
     },
     ...r.price.panels,
@@ -274,9 +273,9 @@ export function seedIpvContext(report: Report, ipv: IpvData): Report {
 
   if (!r.price.lede.en) {
     r.price.lede = {
-      en: `Catalan housing prices are ${dir.en} (${sign}${pct.toFixed(1)}% YoY, ${ipv.quarter}). The figures below are the regional backdrop — pair them with the specific comparables for this street.`,
-      es: `Los precios de la vivienda en Cataluña están ${dir.es} (${sign}${pct.toFixed(1)}% interanual, ${ipv.quarter}). Las cifras siguientes son el contexto regional — combínalas con los comparables concretos de esta calle.`,
-      ca: `Els preus de l'habitatge a Catalunya estan ${dir.ca} (${sign}${pct.toFixed(1)}% interanual, ${ipv.quarter}). Les xifres següents són el context regional — combina-les amb els comparables concrets d'aquest carrer.`,
+      en: `Catalan housing prices are ${dir.en} (${sign}${pct.toFixed(1)}% YoY, ${ipv.quarter}). The figures below are the regional backdrop, pair them with the specific comparables for this street.`,
+      es: `Los precios de la vivienda en Cataluña están ${dir.es} (${sign}${pct.toFixed(1)}% interanual, ${ipv.quarter}). Las cifras siguientes son el contexto regional, combínalas con los comparables concretos de esta calle.`,
+      ca: `Els preus de l'habitatge a Catalunya estan ${dir.ca} (${sign}${pct.toFixed(1)}% interanual, ${ipv.quarter}). Les xifres següents són el context regional, combina-les amb els comparables concrets d'aquest carrer.`,
     };
   }
 
@@ -289,12 +288,12 @@ export function seedIpvContext(report: Report, ipv: IpvData): Report {
  * Seed the entire price section (03) from the Generalitat Habitatge barri
  * data. Drives, in order of buyer importance:
  *
- *  1. `price.lede`        — a one-sentence verdict (asking €/m² vs barri).
- *  2. `price.fairValue`   — the realistic ±15% range with positioning guide.
- *  3. `price.panels[0]`   — the source detail (sales count, period, surface).
- *  4. `hero.meta` pill    — `vs barri €/m²` delta for the top-of-report strip.
+ *  1. `price.lede`       , a one-sentence verdict (asking €/m² vs barri).
+ *  2. `price.fairValue`  , the realistic ±15% range with positioning guide.
+ *  3. `price.panels[0]`  , the source detail (sales count, period, surface).
+ *  4. `hero.meta` pill   , `vs barri €/m²` delta for the top-of-report strip.
  *
- * Catalonia-wide IPV context is intentionally NOT seeded here — it's too
+ * Catalonia-wide IPV context is intentionally NOT seeded here, it's too
  * coarse to drive a Barcelona buyer's offer; `seedIpvContext` remains
  * available for the Verdict section or a footer if we want it elsewhere.
  */
@@ -320,20 +319,20 @@ export function seedBarriPricing(
           ? { en: "below", es: "por debajo de", ca: "per sota de" }
           : { en: "in line with", es: "en línea con", ca: "en línia amb" };
     r.price.lede = {
-      en: `Asking €${askStr}/m² in ${barri.name} — ${absDelta}% ${dir.en} the barri's €${ppmStr}/m² closing-price average (${barri.asOf}, registered second-hand sales).`,
-      es: `Precio pedido €${askStr}/m² en ${barri.name} — ${absDelta}% ${dir.es} la media de cierre del barrio €${ppmStr}/m² (${barri.asOf}, ventas registradas de segunda mano).`,
-      ca: `Preu demanat €${askStr}/m² a ${barri.name} — ${absDelta}% ${dir.ca} la mitjana de tancament del barri €${ppmStr}/m² (${barri.asOf}, vendes registrades de segona mà).`,
+      en: `Asking €${askStr}/m² in ${barri.name}, ${absDelta}% ${dir.en} the neighbourhood's €${ppmStr}/m² closing-price average (${barri.asOf}, registered second-hand sales).`,
+      es: `Precio pedido €${askStr}/m² en ${barri.name}, ${absDelta}% ${dir.es} la media de cierre del barrio €${ppmStr}/m² (${barri.asOf}, ventas registradas de segunda mano).`,
+      ca: `Preu demanat €${askStr}/m² a ${barri.name}, ${absDelta}% ${dir.ca} la mitjana de tancament del barri €${ppmStr}/m² (${barri.asOf}, vendes registrades de segona mà).`,
     };
   } else {
-    // Asking unknown — verdict-less version centred on the barri figure.
+    // Asking unknown, verdict-less version centred on the barri figure.
     r.price.lede = {
-      en: `${barri.name}: €${ppmStr}/m² closing-price average across registered second-hand sales (${barri.asOf}). The range below is what flats this size actually close at — position the asking price within it.`,
-      es: `${barri.name}: €${ppmStr}/m² de media de cierre en ventas registradas de segunda mano (${barri.asOf}). El rango siguiente refleja a qué precio se cierran realmente los pisos de este tamaño — sitúa el precio pedido dentro de él.`,
-      ca: `${barri.name}: €${ppmStr}/m² de mitjana de tancament en vendes registrades de segona mà (${barri.asOf}). El rang següent reflecteix a quin preu es tanquen realment els pisos d'aquesta mida — situa el preu demanat dins d'aquest rang.`,
+      en: `${barri.name}: €${ppmStr}/m² closing-price average across registered second-hand sales (${barri.asOf}). The range below is what flats this size actually close at, position the asking price within it.`,
+      es: `${barri.name}: €${ppmStr}/m² de media de cierre en ventas registradas de segunda mano (${barri.asOf}). El rango siguiente refleja a qué precio se cierran realmente los pisos de este tamaño, sitúa el precio pedido dentro de él.`,
+      ca: `${barri.name}: €${ppmStr}/m² de mitjana de tancament en vendes registrades de segona mà (${barri.asOf}). El rang següent reflecteix a quin preu es tanquen realment els pisos d'aquesta mida, situa el preu demanat dins d'aquest rang.`,
     };
   }
 
-  // --- 3. Supporting evidence panel — single panel, replaces any prior ---
+  // --- 3. Supporting evidence panel, single panel, replaces any prior ---
   const tx = barri.transactions ? `${barri.transactions} registered second-hand sales` : "registered second-hand sales";
   const txEs = barri.transactions ? `${barri.transactions} ventas registradas de segunda mano` : "ventas registradas de segunda mano";
   const txCa = barri.transactions ? `${barri.transactions} vendes registrades de segona mà` : "vendes registrades de segona mà";
@@ -349,9 +348,9 @@ export function seedBarriPricing(
         ca: `D'on surt el €${ppmStr}/m²`,
       },
       body: {
-        en: `${barri.asOf}, ${tx}.${surf} The figure is the arithmetic average €/m² built area at closing — not asking. Source: Generalitat de Catalunya — Habitatge (notarial deeds).`,
-        es: `${barri.asOf}, ${txEs}.${surfEs} La cifra es la media aritmética de €/m² construido al cierre — no precio de oferta. Fuente: Generalitat de Catalunya — Habitatge (escrituras notariales).`,
-        ca: `${barri.asOf}, ${txCa}.${surfCa} La xifra és la mitjana aritmètica de €/m² construït al tancament — no preu d'oferta. Font: Generalitat de Catalunya — Habitatge (escriptures notarials).`,
+        en: `${barri.asOf}, ${tx}.${surf} The figure is the arithmetic average €/m² built area at closing, not asking. Source: Generalitat de Catalunya, Habitatge (notarial deeds).`,
+        es: `${barri.asOf}, ${txEs}.${surfEs} La cifra es la media aritmética de €/m² construido al cierre, no precio de oferta. Fuente: Generalitat de Catalunya, Habitatge (escrituras notariales).`,
+        ca: `${barri.asOf}, ${txCa}.${surfCa} La xifra és la mitjana aritmètica de €/m² construït al tancament, no preu d'oferta. Font: Generalitat de Catalunya, Habitatge (escriptures notarials).`,
       },
     },
   ];
@@ -378,7 +377,7 @@ export function seedBarriPricing(
   // --- Structured payload for the redesigned Section 03 component ---
   r.price.pricing = buildPricingPayload(barri, opts);
 
-  // Fair-value range grounded in the barri €/m². Width is ±15% — wide enough
+  // Fair-value range grounded in the barri €/m². Width is ±15%, wide enough
   // to bracket realistic spreads within a single barri (an unreformed planta
   // baja interior vs. a reformed high floor with balcony are easily ±15–25%
   // either side of the average), so the range tells the buyer where their
@@ -390,7 +389,7 @@ export function seedBarriPricing(
     const hiStr = hi.toLocaleString("en-GB");
     r.price.range = { lo, hi };
     r.price.fairValue = {
-      en: `Most flats this size in ${barri.name} close between €${loStr} and €${hiStr} (barri €/m² ±15% × ${opts.builtM2} m²). The lower end is older / unreformed / low floor; the upper end is reformed / high floor / outdoor space. Position the offer relative to this flat's specific features, then verify with concrete comparables.`,
+      en: `Most flats this size in ${barri.name} close between €${loStr} and €${hiStr} (neighbourhood €/m² ±15% × ${opts.builtM2} m²). The lower end is older / unreformed / low floor; the upper end is reformed / high floor / outdoor space. Position the offer relative to this flat's specific features, then verify with concrete comparables.`,
       es: `La mayoría de los pisos de este tamaño en ${barri.name} se cierran entre €${loStr} y €${hiStr} (€/m² del barrio ±15% × ${opts.builtM2} m²). El extremo inferior corresponde a pisos antiguos / sin reformar / planta baja; el superior, a reformados / planta alta / con espacio exterior. Sitúa la oferta según las características concretas de este piso y contrástala con comparables.`,
       ca: `La majoria dels pisos d'aquesta mida a ${barri.name} es tanquen entre €${loStr} i €${hiStr} (€/m² del barri ±15% × ${opts.builtM2} m²). L'extrem inferior correspon a pisos antics / sense reformar / planta baixa; el superior, a reformats / planta alta / amb espai exterior. Situa l'oferta segons les característiques concretes d'aquest pis i contrasta-la amb comparables.`,
     };
@@ -431,68 +430,71 @@ function positionPhrase(pct: number): {
 } {
   if (pct < 0)
     return {
-      en: "below the fair range",
-      es: "por debajo del rango razonable",
-      ca: "per sota del rang raonable",
+      en: "below the neighbourhood range",
+      es: "por debajo del rango del barrio",
+      ca: "per sota del rang del barri",
     };
   if (pct > 1)
     return {
-      en: "above the fair range",
-      es: "por encima del rango razonable",
-      ca: "per sobre del rang raonable",
+      en: "above the neighbourhood range",
+      es: "por encima del rango del barrio",
+      ca: "per sobre del rang del barri",
     };
   if (pct < 0.25)
     return {
-      en: "toward the lower end of a fair range",
-      es: "hacia el extremo bajo de un rango razonable",
-      ca: "cap a l'extrem baix d'un rang raonable",
+      en: "toward the lower end of the neighbourhood range",
+      es: "hacia el extremo bajo del rango del barrio",
+      ca: "cap a l'extrem baix del rang del barri",
     };
   if (pct > 0.75)
     return {
-      en: "toward the upper end of a fair range",
-      es: "hacia el extremo alto de un rango razonable",
-      ca: "cap a l'extrem alt d'un rang raonable",
+      en: "toward the upper end of the neighbourhood range",
+      es: "hacia el extremo alto del rango del barrio",
+      ca: "cap a l'extrem alt del rang del barri",
     };
   return {
-    en: "right inside a fair range",
-    es: "justo dentro de un rango razonable",
-    ca: "just dins d'un rang raonable",
+    en: "in the middle of the neighbourhood range",
+    es: "en el centro del rango del barrio",
+    ca: "al centre del rang del barri",
   };
 }
 
 function chipForDelta(
   delta: number,
 ): { tone: Pricing["chip"]["tone"]; text: Localized } {
-  // Within ±15% of the barri average is the fair range → "Fairly priced",
-  // regardless of which side. Only label "Below" / "Above" market once the
-  // asking falls outside that range — anything inside is the buyer's fair
-  // working band.
+  // Facts only: state where the asking lands relative to the neighbourhood range
+  // (barri average ±15%), not a verdict on whether the price is "fair". Tone
+  // colour stays as a visual cue; the label is factual.
   if (delta < -15)
     return {
       tone: "clear",
       text: {
-        en: "Below market",
-        es: "Por debajo del mercado",
-        ca: "Per sota del mercat",
+        en: "Below the neighbourhood range",
+        es: "Por debajo del rango del barrio",
+        ca: "Per sota del rang del barri",
       },
     };
   if (delta > 15)
     return {
       tone: "check",
       text: {
-        en: "Above market",
-        es: "Por encima del mercado",
-        ca: "Per sobre del mercat",
+        en: "Above the neighbourhood range",
+        es: "Por encima del rango del barrio",
+        ca: "Per sobre del rang del barri",
       },
     };
   return {
     tone: "clear",
-    text: { en: "Fairly priced", es: "Precio razonable", ca: "Preu raonable" },
+    text: {
+      en: "Within the neighbourhood range",
+      es: "Dentro del rango del barrio",
+      ca: "Dins del rang del barri",
+    },
   };
 }
 
 function deltaPhrase(delta: number): Localized {
-  const sign = delta > 0 ? "+" : ""; // bare for negative — we'll spell it
+  const sign = delta > 0 ? "+" : ""; // bare for negative, we'll spell it
   const txt = `${Math.abs(delta).toFixed(0)}%`;
   if (Math.abs(delta) < 1)
     return {
@@ -505,15 +507,20 @@ function deltaPhrase(delta: number): Localized {
     : { en: `≈${sign}${txt} above`, es: `≈${sign}${txt} por encima de`, ca: `≈${sign}${txt} per sobre de` };
 }
 
-/** Build the structured payload for State 01 (asking known) or State 02 (unknown). */
-function buildPricingPayload(
+/**
+ * Build the structured payload for State 01 (asking known) or State 02 (unknown).
+ * Exported so the demo fixture (`data/sample-sors35.ts`) can render the redesigned
+ * Section 03 from the SAME code path as generated reports, keeping preview and
+ * live output identical and always up to date.
+ */
+export function buildPricingPayload(
   barri: GencatBarriData,
   opts: { askingPriceEur?: number; builtM2?: number },
 ): Pricing {
   const ppm = barri.pricePerM2;
   const builtM2 = opts.builtM2;
   // Range bookends are inherently fuzzy (±15% × a barri average that's already
-  // an arithmetic mean across ~hundreds of sales) — round to the nearest €1,000
+  // an arithmetic mean across ~hundreds of sales), round to the nearest €1,000
   // so the buyer reads them as a band, not a precise number. The asking price
   // and barri-implied value stay precise (they are exact arithmetic).
   const round1k = (n: number) => Math.round(n / 1000) * 1000;
@@ -537,9 +544,9 @@ function buildPricingPayload(
     const markerPct = 0.5;
     const verdict: Localized = range
       ? {
-          en: `For a <span class="num">${builtM2 ?? "—"} m²</span> flat in ${barri.name}, a fair price runs about <span class="num">${EUR(range.lo)}</span> to <span class="num">${EUR(range.hi)}</span> — built on what nearby flats actually closed at.`,
-          es: `Para un piso de <span class="num">${builtM2 ?? "—"} m²</span> en ${barri.name}, un precio razonable ronda entre <span class="num">${EUR(range.lo)}</span> y <span class="num">${EUR(range.hi)}</span> — basado en lo que pisos cercanos cerraron de verdad.`,
-          ca: `Per a un pis de <span class="num">${builtM2 ?? "—"} m²</span> a ${barri.name}, un preu raonable ronda entre <span class="num">${EUR(range.lo)}</span> i <span class="num">${EUR(range.hi)}</span> — basat en el que pisos propers van tancar realment.`,
+          en: `Flats around <span class="num">${builtM2 ?? "-"} m²</span> in ${barri.name} closed between <span class="num">${EUR(range.lo)}</span> and <span class="num">${EUR(range.hi)}</span>, based on what nearby flats actually registered at the notary.`,
+          es: `Los pisos de unos <span class="num">${builtM2 ?? "-"} m²</span> en ${barri.name} se cerraron entre <span class="num">${EUR(range.lo)}</span> y <span class="num">${EUR(range.hi)}</span>, según lo que pisos cercanos registraron en notaría.`,
+          ca: `Els pisos d'uns <span class="num">${builtM2 ?? "-"} m²</span> a ${barri.name} es van tancar entre <span class="num">${EUR(range.lo)}</span> i <span class="num">${EUR(range.hi)}</span>, segons el que pisos propers van registrar a notaria.`,
         }
       : {
           en: `In ${barri.name}, registered second-hand flats closed at an average <span class="num">€${ppm.toLocaleString("en-GB")}/m²</span> built. Apply that to this flat's m² once known.`,
@@ -576,9 +583,9 @@ function buildPricingPayload(
   const dphrase = deltaPhrase(delta);
   const positionAfterDash = positionPhrase(markerPct);
   const verdict: Localized = {
-    en: `Asking <span class="num">${EUR(opts.askingPriceEur)}</span> sits <strong class="pct">${dphrase.en}</strong> the neighbourhood's closing average — ${positionAfterDash.en}.`,
-    es: `Precio pedido <span class="num">${EUR(opts.askingPriceEur)}</span> queda <strong class="pct">${dphrase.es}</strong> la media de cierre del barrio — ${positionAfterDash.es}.`,
-    ca: `Preu demanat <span class="num">${EUR(opts.askingPriceEur)}</span> queda <strong class="pct">${dphrase.ca}</strong> la mitjana de tancament del barri — ${positionAfterDash.ca}.`,
+    en: `Asking <span class="num">${EUR(opts.askingPriceEur)}</span> sits <strong class="pct">${dphrase.en}</strong> the neighbourhood's closing average, ${positionAfterDash.en}.`,
+    es: `Precio pedido <span class="num">${EUR(opts.askingPriceEur)}</span> queda <strong class="pct">${dphrase.es}</strong> la media de cierre del barrio, ${positionAfterDash.es}.`,
+    ca: `Preu demanat <span class="num">${EUR(opts.askingPriceEur)}</span> queda <strong class="pct">${dphrase.ca}</strong> la mitjana de tancament del barri, ${positionAfterDash.ca}.`,
   };
 
   return {
@@ -596,10 +603,10 @@ function buildPricingPayload(
 }
 
 /**
- * Seed Section 03 in State 03 — barri benchmark unavailable. Called from
+ * Seed Section 03 in State 03, barri benchmark unavailable. Called from
  * the pipeline when `fetchGencatBarri` returns `unavailable` (coords
  * outside the 73 BCN barris, or a low-volume barri with no €/m² for the
- * period). No fair range, no barri average, no Δ — never render zeros.
+ * period). No fair range, no barri average, no Δ, never render zeros.
  */
 export function seedPricingUnavailable(
   report: Report,
@@ -620,9 +627,9 @@ export function seedPricingUnavailable(
     const pct = opts.ipv.yoyPct;
     const sign = pct > 0 ? "+" : "";
     ipvFootnote = {
-      en: `For wider context only — across Catalonia, second-hand home prices moved ${sign}${pct.toFixed(1)}% year-on-year in ${opts.ipv.quarter} (INE Housing Price Index). That's a regional figure, far too coarse to price a single flat — but it's the closest we can offer when the neighbourhood data isn't there.`,
-      es: `Solo como contexto amplio — en Cataluña, los precios de la vivienda de segunda mano variaron un ${sign}${pct.toFixed(1)}% interanual en ${opts.ipv.quarter} (Índice de Precios de Vivienda, INE). Es una cifra regional, demasiado gruesa para valorar un piso concreto — pero es lo más cercano cuando no hay datos del barrio.`,
-      ca: `Només com a context ampli — a Catalunya, els preus de l'habitatge de segona mà van variar un ${sign}${pct.toFixed(1)}% interanual al ${opts.ipv.quarter} (Índex de Preus de l'Habitatge, INE). És una xifra regional, massa gruixuda per valorar un pis concret — però és el més proper quan no hi ha dades del barri.`,
+      en: `For wider context only, across Catalonia, second-hand home prices moved ${sign}${pct.toFixed(1)}% year-on-year in ${opts.ipv.quarter} (INE Housing Price Index). That's a regional figure, far too coarse to price a single flat, but it's the closest we can offer when the neighbourhood data isn't there.`,
+      es: `Solo como contexto amplio, en Cataluña, los precios de la vivienda de segunda mano variaron un ${sign}${pct.toFixed(1)}% interanual en ${opts.ipv.quarter} (Índice de Precios de Vivienda, INE). Es una cifra regional, demasiado gruesa para valorar un piso concreto, pero es lo más cercano cuando no hay datos del barrio.`,
+      ca: `Només com a context ampli, a Catalunya, els preus de l'habitatge de segona mà van variar un ${sign}${pct.toFixed(1)}% interanual al ${opts.ipv.quarter} (Índex de Preus de l'Habitatge, INE). És una xifra regional, massa gruixuda per valorar un pis concret, però és el més proper quan no hi ha dades del barri.`,
     };
   }
 
@@ -636,7 +643,7 @@ export function seedPricingUnavailable(
     chip: {
       tone: "check",
       text: {
-        en: "No barri benchmark",
+        en: "No neighbourhood benchmark",
         es: "Sin referencia del barrio",
         ca: "Sense referència del barri",
       },
@@ -671,9 +678,7 @@ export function seedLegal(report: Report): Report {
 
 export function seedFooter(report: Report): Report {
   const r: Report = structuredClone(report);
-  const { sources, disclaimer } = buildFooter({
-    hasComps: r.price.comps.some((c) => !c.highlight),
-  });
+  const { sources, disclaimer } = buildFooter();
   r.footer.sources = sources;
   r.footer.disclaimer = disclaimer;
   return r;
@@ -704,45 +709,45 @@ export function seedPriceRefs(report: Report): Report {
     {
       kind: "official",
       label: {
-        en: "Catastro — official reference value (valor de referencia)",
-        es: "Catastro — valor de referencia oficial",
-        ca: "Cadastre — valor de referència oficial",
+        en: "Catastro, official reference value (valor de referencia)",
+        es: "Catastro, valor de referencia oficial",
+        ca: "Cadastre, valor de referència oficial",
       },
       url: "https://www.sedecatastro.gob.es/Accesos/SECAccvr.aspx",
     },
     {
       kind: "official",
       label: {
-        en: "Ministerio de Vivienda — transaction price statistics",
-        es: "Ministerio de Vivienda — estadística de precios de transacción",
-        ca: "Ministerio de Vivienda — estadística de preus de transacció",
+        en: "Ministerio de Vivienda, transaction price statistics",
+        es: "Ministerio de Vivienda, estadística de precios de transacción",
+        ca: "Ministerio de Vivienda, estadística de preus de transacció",
       },
       url: "https://www.mivau.gob.es/vivienda/alquila-bien-es-tu-derecho/precios-vivienda",
     },
     {
       kind: "official",
       label: {
-        en: "Col·legi de Registradors — closing-price statistics",
-        es: "Col·legi de Registradors — estadística de precios de cierre",
-        ca: "Col·legi de Registradors — estadística de preus de tancament",
+        en: "Col·legi de Registradors, closing-price statistics",
+        es: "Col·legi de Registradors, estadística de precios de cierre",
+        ca: "Col·legi de Registradors, estadística de preus de tancament",
       },
       url: "https://www.registradores.org/-/estadistica-registral-inmobiliaria",
     },
     {
       kind: "portal",
       label: {
-        en: "idealista — Barcelona published price report (asking)",
-        es: "idealista — informe de precios de Barcelona (oferta)",
-        ca: "idealista — informe de preus de Barcelona (oferta)",
+        en: "idealista, Barcelona published price report (asking)",
+        es: "idealista, informe de precios de Barcelona (oferta)",
+        ca: "idealista, informe de preus de Barcelona (oferta)",
       },
       url: "https://www.idealista.com/sala-de-prensa/informes-precio-vivienda/venta/barcelona-provincia/barcelona-capital/",
     },
     {
       kind: "portal",
       label: {
-        en: "Fotocasa — Barcelona real-estate index (asking)",
-        es: "Fotocasa — índice inmobiliario de Barcelona (oferta)",
-        ca: "Fotocasa — índex immobiliari de Barcelona (oferta)",
+        en: "Fotocasa, Barcelona real-estate index (asking)",
+        es: "Fotocasa, índice inmobiliario de Barcelona (oferta)",
+        ca: "Fotocasa, índex immobiliari de Barcelona (oferta)",
       },
       url: "https://www.fotocasa.es/es/indice-inmobiliario__1/",
     },
@@ -828,9 +833,9 @@ export function seedEnergyMissing(report: Report): Report {
     labelKey: "risk.energy",
     tone: "ok",
     detail: {
-      en: "No energy performance certificate (certificat d'eficiència energètica) is registered for this flat, so it isn't scored on energy. Ask the seller for it — it's legally required to complete a sale.",
-      es: "No hay certificado de eficiencia energética registrado para este piso, así que no se puntúa en energía. Pídeselo al vendedor — es obligatorio para cerrar la compraventa.",
-      ca: "No hi ha cap certificat d'eficiència energètica registrat per a aquest pis, així que no es puntua en energia. Demana'l al venedor — és obligatori per tancar la compravenda.",
+      en: "No energy performance certificate (certificat d'eficiència energètica) is registered for this flat, so it isn't scored on energy. Ask the seller for it, it's legally required to complete a sale.",
+      es: "No hay certificado de eficiencia energética registrado para este piso, así que no se puntúa en energía. Pídeselo al vendedor, es obligatorio para cerrar la compraventa.",
+      ca: "No hi ha cap certificat d'eficiència energètica registrat per a aquest pis, així que no es puntua en energia. Demana'l al venedor, és obligatori per tancar la compravenda.",
     },
   });
   return r;
@@ -857,14 +862,14 @@ export function seedRisks(
           }
         : lvl === "medium"
           ? {
-              en: "Within the T100 (medium-probability) flood zone — verify with a hydraulic study.",
-              es: "Dentro de la zona inundable T100 (probabilidad media) — verifícalo con un estudio hidráulico.",
-              ca: "Dins de la zona inundable T100 (probabilitat mitjana) — verifica-ho amb un estudi hidràulic.",
+              en: "Within the T100 (medium-probability) flood zone, verify with a hydraulic study.",
+              es: "Dentro de la zona inundable T100 (probabilidad media), verifícalo con un estudio hidráulico.",
+              ca: "Dins de la zona inundable T100 (probabilitat mitjana), verifica-ho amb un estudi hidràulic.",
             }
           : {
-              en: "Within the T10 (high-frequency) flood zone — significant flood risk; seek specialist advice.",
-              es: "Dentro de la zona inundable T10 (alta frecuencia) — riesgo de inundación significativo; busca asesoramiento especializado.",
-              ca: "Dins de la zona inundable T10 (alta freqüència) — risc d'inundació significatiu; busca assessorament especialitzat.",
+              en: "Within the T10 (high-frequency) flood zone, significant flood risk; seek specialist advice.",
+              es: "Dentro de la zona inundable T10 (alta frecuencia), riesgo de inundación significativo; busca asesoramiento especializado.",
+              ca: "Dins de la zona inundable T10 (alta freqüència), risc d'inundació significatiu; busca assessorament especialitzat.",
             };
     r.risks.push({ labelKey: "risk.flood", tone, detail });
   }
@@ -881,9 +886,9 @@ export function seedRisks(
         labelKey: "risk.ite",
         tone: "ok",
         detail: {
-          en: `${age}-year building — a valid ITE technical inspection is mandatory; confirm it and any pending works.`,
-          es: `Edificio de ${age} años — la ITE (inspección técnica) es obligatoria; confírmala y las obras pendientes.`,
-          ca: `Edifici de ${age} anys — la ITE (inspecció tècnica) és obligatòria; confirma-la i les obres pendents.`,
+          en: `${age}-year building, a valid ITE technical inspection is mandatory; confirm it and any pending works.`,
+          es: `Edificio de ${age} años, la ITE (inspección técnica) es obligatoria; confírmala y las obras pendientes.`,
+          ca: `Edifici de ${age} anys, la ITE (inspecció tècnica) és obligatòria; confirma-la i les obres pendents.`,
         },
       });
     }
@@ -892,9 +897,9 @@ export function seedRisks(
         labelKey: "risk.asbestos",
         tone: "ok",
         detail: {
-          en: "Pre-2002 build — possible asbestos in legacy installations; usually low-cost if isolated.",
-          es: "Construcción anterior a 2002 — posible amianto en instalaciones antiguas; normalmente de bajo coste si está aislado.",
-          ca: "Construcció anterior al 2002 — possible amiant en instal·lacions antigues; normalment de baix cost si està aïllat.",
+          en: "Pre-2002 build, possible asbestos in legacy installations; usually low-cost if isolated.",
+          es: "Construcción anterior a 2002, posible amianto en instalaciones antiguas; normalmente de bajo coste si está aislado.",
+          ca: "Construcció anterior al 2002, possible amiant en instal·lacions antigues; normalment de baix cost si està aïllat.",
         },
       });
     }
@@ -986,7 +991,7 @@ export function seedUrbanism(
     ? { en: ` (zoning code ${codes})`, es: ` (código ${codes})`, ca: ` (codi ${codes})` }
     : { en: "", es: "", ca: "" };
 
-  // 1) Affectation — the headline planning aspect.
+  // 1) Affectation, the headline planning aspect.
   items.push({
     key: "affectation",
     tone:
@@ -999,9 +1004,9 @@ export function seedUrbanism(
     text:
       level === "affected"
         ? {
-            en: `${confirmed ? "The city officially flags this property as affected" : "Part of the plot appears reserved for public use"} — part of the plot is reserved for ${plain.en}. This can restrict renovations, cap the resale value, or in extreme cases lead to expropriation. Confirm before offering with an official planning certificate (certificat urbanístic).${codeTag.en}`,
-            es: `${confirmed ? "El ayuntamiento marca oficialmente esta propiedad como afectada" : "Parte de la parcela parece reservada para uso público"} — parte de la parcela está reservada para ${plain.es}. Puede limitar reformas, reducir el valor de reventa o, en casos extremos, llevar a expropiación. Confírmalo antes de ofertar con un certificado urbanístico oficial.${codeTag.es}`,
-            ca: `${confirmed ? "L'ajuntament marca oficialment aquesta propietat com a afectada" : "Una part de la parcel·la sembla reservada per a ús públic"} — part de la parcel·la està reservada per a ${plain.ca}. Pot limitar reformes, reduir el valor de revenda o, en casos extrems, comportar expropiació. Confirma-ho abans d'ofertar amb un certificat urbanístic oficial.${codeTag.ca}`,
+            en: `${confirmed ? "The city officially flags this property as affected" : "Part of the plot appears reserved for public use"}, part of the plot is reserved for ${plain.en}. This can restrict renovations, cap the resale value, or in extreme cases lead to expropriation. Confirm before offering with an official planning certificate (certificat urbanístic).${codeTag.en}`,
+            es: `${confirmed ? "El ayuntamiento marca oficialmente esta propiedad como afectada" : "Parte de la parcela parece reservada para uso público"}, parte de la parcela está reservada para ${plain.es}. Puede limitar reformas, reducir el valor de reventa o, en casos extremos, llevar a expropiación. Confírmalo antes de ofertar con un certificado urbanístico oficial.${codeTag.es}`,
+            ca: `${confirmed ? "L'ajuntament marca oficialment aquesta propietat com a afectada" : "Una part de la parcel·la sembla reservada per a ús públic"}, part de la parcel·la està reservada per a ${plain.ca}. Pot limitar reformes, reduir el valor de revenda o, en casos extrems, comportar expropiació. Confirma-ho abans d'ofertar amb un certificat urbanístic oficial.${codeTag.ca}`,
           }
         : level === "specific"
           ? {
@@ -1011,9 +1016,9 @@ export function seedUrbanism(
             }
           : unverified
             ? {
-                en: "We couldn't confirm this property's official planning-affectation status (the city service was unavailable). This part of the score is provisional — verify with an official planning certificate (certificat urbanístic) before relying on it.",
-                es: "No hemos podido confirmar la afectación urbanística oficial de esta propiedad (el servicio municipal no estaba disponible). Esta parte de la valoración es provisional — verifícalo con un certificado urbanístico oficial antes de confiar en ella.",
-                ca: "No hem pogut confirmar l'afectació urbanística oficial d'aquesta propietat (el servei municipal no estava disponible). Aquesta part de la valoració és provisional — verifica-ho amb un certificat urbanístic oficial abans de confiar-hi.",
+                en: "We couldn't confirm this property's official planning-affectation status (the city service was unavailable). This part of the score is provisional, verify with an official planning certificate (certificat urbanístic) before relying on it.",
+                es: "No hemos podido confirmar la afectación urbanística oficial de esta propiedad (el servicio municipal no estaba disponible). Esta parte de la valoración es provisional, verifícalo con un certificado urbanístico oficial antes de confiar en ella.",
+                ca: "No hem pogut confirmar l'afectació urbanística oficial d'aquesta propietat (el servei municipal no estava disponible). Aquesta part de la valoració és provisional, verifica-ho amb un certificat urbanístic oficial abans de confiar-hi.",
               }
             : {
                 en: "No planning affectation was found that would limit using this as a home.",
@@ -1022,21 +1027,21 @@ export function seedUrbanism(
               },
   });
 
-  // 2) Zoning — reassuring context, only when we resolved a qualification.
+  // 2) Zoning, reassuring context, only when we resolved a qualification.
   if (u.qualCode || u.classification) {
     items.push({
       key: "zoning",
       tone: "clear",
       label: { en: "Zoning", es: "Calificación", ca: "Qualificació" },
       text: {
-        en: `Residential, build-ready land — standard for a city flat.${u.qualCode ? ` (zoning code ${u.qualCode})` : ""}`,
-        es: `Suelo residencial y consolidado — lo normal para un piso urbano.${u.qualCode ? ` (código ${u.qualCode})` : ""}`,
-        ca: `Sòl residencial i consolidat — el que és habitual en un pis urbà.${u.qualCode ? ` (codi ${u.qualCode})` : ""}`,
+        en: `Residential, build-ready land, standard for a city flat.${u.qualCode ? ` (zoning code ${u.qualCode})` : ""}`,
+        es: `Suelo residencial y consolidado, lo normal para un piso urbano.${u.qualCode ? ` (código ${u.qualCode})` : ""}`,
+        ca: `Sòl residencial i consolidat, el que és habitual en un pis urbà.${u.qualCode ? ` (codi ${u.qualCode})` : ""}`,
       },
     });
   }
 
-  // 3) Low Emission Zone — static city-wide context.
+  // 3) Low Emission Zone, static city-wide context.
   items.push({
     key: "lez",
     tone: "info",
@@ -1066,9 +1071,9 @@ export function seedUrbanism(
           ca: confirmed ? "Afectació urbanística" : "Possible afectació urbanística",
         },
         detail: {
-          en: `${confirmed ? "The city flags this property as affected" : "Part of the plot appears reserved for public use"} — part is reserved for ${plain.en}. It can restrict works, cap the value, or lead to expropriation. Confirm with an official planning certificate (certificat urbanístic) before offering.`,
-          es: `${confirmed ? "El ayuntamiento marca esta propiedad como afectada" : "Parte de la parcela parece reservada para uso público"} — parte está reservada para ${plain.es}. Puede limitar obras, reducir el valor o llevar a expropiación. Confírmalo con un certificado urbanístico oficial antes de ofertar.`,
-          ca: `${confirmed ? "L'ajuntament marca aquesta propietat com a afectada" : "Una part de la parcel·la sembla reservada per a ús públic"} — una part està reservada per a ${plain.ca}. Pot limitar obres, reduir el valor o comportar expropiació. Confirma-ho amb un certificat urbanístic oficial abans d'ofertar.`,
+          en: `${confirmed ? "The city flags this property as affected" : "Part of the plot appears reserved for public use"}, part is reserved for ${plain.en}. It can restrict works, cap the value, or lead to expropriation. Confirm with an official planning certificate (certificat urbanístic) before offering.`,
+          es: `${confirmed ? "El ayuntamiento marca esta propiedad como afectada" : "Parte de la parcela parece reservada para uso público"}, parte está reservada para ${plain.es}. Puede limitar obras, reducir el valor o llevar a expropiación. Confírmalo con un certificado urbanístico oficial antes de ofertar.`,
+          ca: `${confirmed ? "L'ajuntament marca aquesta propietat com a afectada" : "Una part de la parcel·la sembla reservada per a ús públic"}, una part està reservada per a ${plain.ca}. Pot limitar obres, reduir el valor o comportar expropiació. Confirma-ho amb un certificat urbanístic oficial abans d'ofertar.`,
         },
       },
     ];
@@ -1113,9 +1118,9 @@ export function seedUrbanism(
 // Plain-language gloss for each catalog level (official Catalan term as a tag).
 const HERITAGE_LEVEL: Record<HeritageLevel, Localized> = {
   A: {
-    en: "a nationally protected landmark — the strictest level (Bé Cultural d'Interès Nacional)",
-    es: "un bien protegido de interés nacional — el nivel más estricto (Bé Cultural d'Interès Nacional)",
-    ca: "un bé protegit d'interès nacional — el nivell més estricte (Bé Cultural d'Interès Nacional)",
+    en: "a nationally protected landmark, the strictest level (Bé Cultural d'Interès Nacional)",
+    es: "un bien protegido de interés nacional, el nivel más estricto (Bé Cultural d'Interès Nacional)",
+    ca: "un bé protegit d'interès nacional, el nivell més estricte (Bé Cultural d'Interès Nacional)",
   },
   B: {
     en: "a locally protected building (Bé Cultural d'Interès Local)",
@@ -1123,14 +1128,14 @@ const HERITAGE_LEVEL: Record<HeritageLevel, Localized> = {
     ca: "un bé protegit d'interès local (Bé Cultural d'Interès Local)",
   },
   C: {
-    en: "a building of urban-planning interest — lighter protection (Bé d'Interès Urbanístic)",
-    es: "un bien de interés urbanístico — protección más leve (Bé d'Interès Urbanístic)",
-    ca: "un bé d'interès urbanístic — protecció més lleu (Bé d'Interès Urbanístic)",
+    en: "a building of urban-planning interest, lighter protection (Bé d'Interès Urbanístic)",
+    es: "un bien de interés urbanístico, protección más leve (Bé d'Interès Urbanístic)",
+    ca: "un bé d'interès urbanístic, protecció més lleu (Bé d'Interès Urbanístic)",
   },
   D: {
-    en: "a building of documentary interest — the lightest protection (Bé d'Interès Documental)",
-    es: "un bien de interés documental — la protección más leve (Bé d'Interès Documental)",
-    ca: "un bé d'interès documental — la protecció més lleu (Bé d'Interès Documental)",
+    en: "a building of documentary interest, the lightest protection (Bé d'Interès Documental)",
+    es: "un bien de interés documental, la protección más leve (Bé d'Interès Documental)",
+    ca: "un bé d'interès documental, la protecció més lleu (Bé d'Interès Documental)",
   },
 };
 
@@ -1138,7 +1143,7 @@ const HERITAGE_LEVEL: Record<HeritageLevel, Localized> = {
  * Add a heritage status row to the urbanism section, and raise a top-of-report
  * alert for a building-specific listing (A/B → caution, C/D → check). An
  * area-wide ensemble (e.g. the whole Eixample) is reported as a neutral context
- * row, never an alert — almost every Eixample finca is inside one.
+ * row, never an alert, almost every Eixample finca is inside one.
  * Run AFTER seedUrbanism, which initialises the items list this appends to.
  */
 export function seedHeritage(report: Report, h: HeritageData): Report {
@@ -1156,9 +1161,9 @@ export function seedHeritage(report: Report, h: HeritageData): Report {
       tone: high ? "caution" : "check",
       label: { en: "Heritage", es: "Patrimonio", ca: "Patrimoni" },
       text: {
-        en: `This building is heritage-listed — ${name}${lvl.en}${metaClause}. Listing restricts façade and often interior changes; expect special permits and higher, slower renovations. Check the catalog file before offering.`,
-        es: `Este edificio está catalogado — ${name}${lvl.es}${metaClause}. La protección limita los cambios en fachada y a menudo en el interior; prevé permisos especiales y reformas más caras y lentas. Consulta la ficha del catálogo antes de ofertar.`,
-        ca: `Aquest edifici està catalogat — ${name}${lvl.ca}${metaClause}. La protecció limita els canvis a la façana i sovint a l'interior; preveu permisos especials i reformes més cares i lentes. Consulta la fitxa del catàleg abans d'ofertar.`,
+        en: `This building is heritage-listed, ${name}${lvl.en}${metaClause}. Listing restricts façade and often interior changes; expect special permits and higher, slower renovations. Check the catalog file before offering.`,
+        es: `Este edificio está catalogado, ${name}${lvl.es}${metaClause}. La protección limita los cambios en fachada y a menudo en el interior; prevé permisos especiales y reformas más caras y lentas. Consulta la ficha del catálogo antes de ofertar.`,
+        ca: `Aquest edifici està catalogat, ${name}${lvl.ca}${metaClause}. La protecció limita els canvis a la façana i sovint a l'interior; preveu permisos especials i reformes més cares i lentes. Consulta la fitxa del catàleg abans d'ofertar.`,
       },
     });
 
@@ -1198,14 +1203,14 @@ export function seedHeritage(report: Report, h: HeritageData): Report {
 
 const SCORE_CAPTION: Record<ScoreKey, (ctx: ScoreCtx) => Localized> = {
   building: ({ year }) => ({
-    en: year ? `${year} · ${new Date().getFullYear() - year} yrs` : "—",
-    es: year ? `${year} · ${new Date().getFullYear() - year} años` : "—",
-    ca: year ? `${year} · ${new Date().getFullYear() - year} anys` : "—",
+    en: year ? `${year} · ${new Date().getFullYear() - year} yrs` : "-",
+    es: year ? `${year} · ${new Date().getFullYear() - year} años` : "-",
+    ca: year ? `${year} · ${new Date().getFullYear() - year} anys` : "-",
   }),
   energy: ({ energyClass }) => ({
-    en: energyClass ? `Class ${energyClass}` : "—",
-    es: energyClass ? `Clase ${energyClass}` : "—",
-    ca: energyClass ? `Classe ${energyClass}` : "—",
+    en: energyClass ? `Class ${energyClass}` : "-",
+    es: energyClass ? `Clase ${energyClass}` : "-",
+    ca: energyClass ? `Classe ${energyClass}` : "-",
   }),
   transport: ({ amenities }) => {
     const m = amenities?.metro;
@@ -1226,25 +1231,25 @@ const SCORE_CAPTION: Record<ScoreKey, (ctx: ScoreCtx) => Localized> = {
   price: ({ deltaPct }) => {
     if (deltaPct == null)
       return {
-        en: "No barri benchmark",
+        en: "No neighbourhood benchmark",
         es: "Sin referencia del barrio",
         ca: "Sense referència del barri",
       };
     const pct = Math.round(Math.abs(deltaPct));
     if (deltaPct < -8)
       return {
-        en: `~${pct}% below barri`,
+        en: `~${pct}% below neighbourhood`,
         es: `~${pct}% bajo el barrio`,
         ca: `~${pct}% sota el barri`,
       };
     if (deltaPct > 8)
       return {
-        en: `~${pct}% above barri`,
+        en: `~${pct}% above neighbourhood`,
         es: `~${pct}% sobre el barrio`,
         ca: `~${pct}% sobre el barri`,
       };
     return {
-      en: "In line with barri",
+      en: "In line with neighbourhood",
       es: "En línea con el barrio",
       ca: "En línia amb el barri",
     };
@@ -1261,7 +1266,7 @@ interface ScoreCtx {
 
 /**
  * Verdict tag for a risk that overrode / dragged the overall, so the headline
- * number and the top-of-report alert agree. Returns null for none/mild — those
+ * number and the top-of-report alert agree. Returns null for none/mild, those
  * don't materially move the score and need no caveat. The detail lives in the
  * affectation/heritage/flood alerts; this is just the one-line label.
  */
@@ -1269,9 +1274,9 @@ function riskTag(severity: RiskSeverity): Localized | null {
   switch (severity) {
     case "critical":
       return {
-        en: "Serious restriction — verify before offering",
-        es: "Restricción grave — verifica antes de ofertar",
-        ca: "Restricció greu — verifica abans d'oferir",
+        en: "Serious restriction, verify before offering",
+        es: "Restricción grave, verifica antes de ofertar",
+        ca: "Restricció greu, verifica abans d'oferir",
       };
     case "serious":
       return {
