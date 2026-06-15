@@ -240,7 +240,10 @@
 .ends {
   display: flex;
   justify-content: space-between;
-  margin-top: 74px;
+  /* Sit the range low/high labels on the same line as the centred barri-avg
+     label below the bar (absolutely positioned at top: 32px relative to the
+     14px-tall track, i.e. ~18px below it). */
+  margin-top: 18px;
 }
 .end {
   display: flex;

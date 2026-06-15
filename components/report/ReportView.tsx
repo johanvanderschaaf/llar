@@ -121,7 +121,9 @@ export async function ReportView({
     ) : (
       children
     );
-  const dateFmt = new Intl.DateTimeFormat(locale === "es" ? "es-ES" : "en-GB", {
+  const dateFmt = new Intl.DateTimeFormat(
+    locale === "es" ? "es-ES" : locale === "ca" ? "ca-ES" : "en-GB",
+    {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -147,7 +149,9 @@ export async function ReportView({
 
       {/* HERO */}
       <header className="hero fx">
-        <div className="eyebrow">{t("hero.eyebrow")}</div>
+        <div className="eyebrow">
+          {t("report.eyebrow")} · {dateFmt}
+        </div>
         <h1 className="serif">
           {report.hero.title}, {L(report.hero.floorLabel, locale)}
         </h1>
@@ -259,11 +263,10 @@ export async function ReportView({
         </p>
       </section>
 
-      {/* 03 PRICE & VALUE (premium) — new design (Concept A "Number Line").
-          The whole section is driven by the structured `pricing` payload
-          which picks one of three states. We keep the legacy comps table
-          rendered below it for the (rare) case operator/idealista comps
-          are present. */}
+      {/* 03 PRICE & VALUE (premium) — "Number Line" design, driven entirely by
+          the structured `pricing` payload (one of three states). The barri
+          closing-price benchmark is the single price anchor; we do not ingest
+          portal listings, so there is no comparables table. */}
       {lock(
       <section className="fx">
         {report.price.pricing ? (
@@ -282,50 +285,6 @@ export async function ReportView({
             <p className="lede">{L(report.price.lede, locale)}</p>
           </>
         )}
-
-        {/* Comps table — only when comps exist (operator/idealista returned). */}
-        {report.price.comps.length > 0 ? (
-          <>
-            <h3 className="serif" style={{ fontSize: 17, margin: "6px 0 2px" }}>
-              {t("price.benchHeading")}
-            </h3>
-            <table>
-              <thead>
-                <tr>
-                  <th>{t("price.table.reference")}</th>
-                  <th className="num">{t("price.table.price")}</th>
-                  <th className="num">{t("price.table.size")}</th>
-                  <th className="num">{t("price.table.perM2")}</th>
-                  <th>{t("price.table.note")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {report.price.comps.map((c, i) => (
-                  <tr key={i} className={c.highlight ? "highlight" : undefined}>
-                    <td>
-                      {c.url ? (
-                        <a
-                          href={c.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={{ color: "var(--accent-deep)", fontWeight: 600 }}
-                        >
-                          {L(c.reference, locale)} ↗
-                        </a>
-                      ) : (
-                        L(c.reference, locale)
-                      )}
-                    </td>
-                    <td className="num">{c.price ?? "—"}</td>
-                    <td className="num">{c.size ?? "—"}</td>
-                    <td className="num">{c.pricePerM2 ?? "—"}</td>
-                    <td>{L(c.note, locale)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </>
-        ) : null}
       </section>
       )}
 

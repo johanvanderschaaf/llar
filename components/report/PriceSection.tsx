@@ -1,6 +1,7 @@
 import type { getTranslations } from "next-intl/server";
 import type { Pricing, Localized } from "@/types/report";
 import { L } from "@/lib/localized";
+import { localizePeriod } from "@/lib/period";
 import styles from "./PriceSection.module.css";
 
 type T = Awaited<ReturnType<typeof getTranslations>>;
@@ -345,7 +346,9 @@ function EvidencePanel({
       ) : null}
       <div className={styles.evidenceRow}>
         <span className="lbl">{t("price.evidence.period")}</span>
-        <span className={`val ${styles.fig}`}>{barri.asOf}</span>
+        <span className={`val ${styles.fig}`}>
+          {localizePeriod(barri.asOf, locale)}
+        </span>
       </div>
       <p className={styles.source}>
         <b>{t("price.evidence.sourceLead")}</b> {t("price.evidence.sourceBody")}

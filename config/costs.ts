@@ -2,7 +2,7 @@ import type { Localized, Fact, Panel } from "@/types/report";
 
 /**
  * Operator-maintained, date-stamped acquisition-cost + tax facts for buying a
- * resale flat in Barcelona (Catalonia). Deterministic — NOT AI-written, since
+ * resale flat in Barcelona (Catalonia). Deterministic, NOT AI-written, since
  * these are financial/legal figures. Review when rates change.
  *
  * IMPORTANT: figures are ESTIMATES/orientation. The Catalan ITP scale was
@@ -116,15 +116,15 @@ export function buildSubsidyPanels(): Panel[] {
     {
       heading: { en: "Still available", es: "Aún disponible", ca: "Encara disponible" },
       body: {
-        en: "IRPF energy deductions — 20% / 40% / 60% income-tax relief for qualifying efficiency works (windows, insulation, heating). Useful if you upgrade the flat later; keep invoices and the energy certificates.",
-        es: "Deducciones de IRPF por eficiencia energética — desgravación del 20% / 40% / 60% por obras que cumplan requisitos (ventanas, aislamiento, calefacción). Útil si mejoras el piso más adelante; guarda facturas y los certificados energéticos.",
-        ca: "Deduccions d'IRPF per eficiència energètica — desgravació del 20% / 40% / 60% per obres que compleixin els requisits (finestres, aïllament, calefacció). Útil si millores el pis més endavant; guarda factures i els certificats energètics.",
+        en: "IRPF energy deductions, 20% / 40% / 60% income-tax relief for qualifying efficiency works (windows, insulation, heating). Useful if you upgrade the flat later; keep invoices and the energy certificates.",
+        es: "Deducciones de IRPF por eficiencia energética, desgravación del 20% / 40% / 60% por obras que cumplan requisitos (ventanas, aislamiento, calefacción). Útil si mejoras el piso más adelante; guarda facturas y los certificados energéticos.",
+        ca: "Deduccions d'IRPF per eficiència energètica, desgravació del 20% / 40% / 60% per obres que compleixin els requisits (finestres, aïllament, calefacció). Útil si millores el pis més endavant; guarda factures i els certificats energètics.",
       },
     },
     {
       heading: { en: "Closing window", es: "Ventana que se cierra", ca: "Finestra que es tanca" },
       body: {
-        en: "Next Generation grants (40–80% of works, up to ~€21k/home) are largely exhausted or waitlisted in Catalonia and must be justified by 30 June 2026 — don't count on them for a future reform.",
+        en: "Next Generation grants (40–80% of works, up to ~€21k/home) are largely exhausted or waitlisted in Catalonia and must be justified by 30 June 2026, don't count on them for a future reform.",
         es: "Las ayudas Next Generation (40–80% de la obra, hasta ~21.000 €/vivienda) están en gran parte agotadas o en lista de espera en Cataluña y deben justificarse antes del 30 de junio de 2026: no cuentes con ellas para una reforma futura.",
         ca: "Els ajuts Next Generation (40–80% de l'obra, fins a ~21.000 €/habitatge) estan en gran part exhaurits o en llista d'espera a Catalunya i s'han de justificar abans del 30 de juny de 2026: no comptis amb ells per a una reforma futura.",
       },
@@ -132,7 +132,7 @@ export function buildSubsidyPanels(): Panel[] {
     {
       heading: { en: "Don't forget", es: "No olvides", ca: "No oblidis" },
       body: {
-        en: "Plusvalía municipal is normally paid by the seller. As the buyer you take on the annual IBI (property tax) and community fees — ask for the current amounts before you offer.",
+        en: "Plusvalía municipal is normally paid by the seller. As the buyer you take on the annual IBI (property tax) and community fees, ask for the current amounts before you offer.",
         es: "La plusvalía municipal la paga normalmente el vendedor. Como comprador asumes el IBI anual y los gastos de comunidad: pide los importes actuales antes de ofertar.",
         ca: "La plusvàlua municipal normalment la paga el venedor. Com a comprador assumeixes l'IBI anual i les despeses de comunitat: demana els imports actuals abans d'ofertar.",
       },

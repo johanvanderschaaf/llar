@@ -2,23 +2,13 @@ import type { Localized } from "@/types/report";
 
 /**
  * Deterministic "Sources & method" + disclaimer for the report footer. Lists
- * the actual official/open sources the pipeline draws on — never AI-written, so
+ * the actual official/open sources the pipeline draws on, never AI-written, so
  * the provenance statement is always accurate and consistent.
  */
-export function buildFooter(opts: { hasComps?: boolean } = {}): {
+export function buildFooter(): {
   sources: Localized;
   disclaimer: Localized;
 } {
-  const compsEn = opts.hasComps
-    ? " idealista official API (comparable on-sale listings);"
-    : "";
-  const compsEs = opts.hasComps
-    ? " API oficial de idealista (anuncios comparables en venta);"
-    : "";
-  const compsCa = opts.hasComps
-    ? " API oficial d'idealista (anuncis comparables en venda);"
-    : "";
-
   return {
     sources: {
       en:
@@ -28,10 +18,9 @@ export function buildFooter(opts: { hasComps?: boolean } = {}): {
         "Mapa Urbanístic de Catalunya / Generalitat (planning qualification and classification); " +
         "MITECO–SNCZI (fluvial flood zones); IGN / NCSE-02 (seismic hazard); CTE DB-HS6 (radon); " +
         "Ajuntament de Barcelona open data (district crime context, ZBE); " +
-        "OpenStreetMap (neighbourhood amenities);" +
-        compsEn +
-        " official price indices and the Catastro reference value for price comparison. " +
-        "Price figures are orientation only and labelled as such; asking prices are distinguished from closings. " +
+        "OpenStreetMap (neighbourhood amenities); " +
+        "Generalitat de Catalunya, Habitatge (registered notarial closing prices by neighbourhood, the single price benchmark). " +
+        "Price figures are orientation only, not portal asking prices. " +
         "Scores are an independent, documented editorial assessment.",
       es:
         "Fuentes y método. Recopilado automáticamente a partir de datos oficiales y abiertos: " +
@@ -40,10 +29,9 @@ export function buildFooter(opts: { hasComps?: boolean } = {}): {
         "Mapa Urbanístic de Catalunya / Generalitat (calificación y clasificación urbanística); " +
         "MITECO–SNCZI (zonas inundables fluviales); IGN / NCSE-02 (peligrosidad sísmica); CTE DB-HS6 (radón); " +
         "datos abiertos del Ajuntament de Barcelona (contexto de delincuencia por distrito, ZBE); " +
-        "OpenStreetMap (servicios del barrio);" +
-        compsEs +
-        " índices de precios oficiales y el valor de referencia del Catastro para la comparación de precio. " +
-        "Las cifras de precio son orientativas y se indican como tales; se distinguen precios de oferta y de cierre. " +
+        "OpenStreetMap (servicios del barrio); " +
+        "Generalitat de Catalunya, Habitatge (precios de cierre notariales registrados por barrio, la referencia de precio única). " +
+        "Las cifras de precio son orientativas, no precios de oferta de portales. " +
         "Las puntuaciones son una valoración editorial independiente.",
       ca:
         "Fonts i mètode. Recopilat automàticament a partir de dades oficials i obertes: " +
@@ -52,10 +40,9 @@ export function buildFooter(opts: { hasComps?: boolean } = {}): {
         "Mapa Urbanístic de Catalunya / Generalitat (qualificació i classificació urbanística); " +
         "MITECO–SNCZI (zones inundables fluvials); IGN / NCSE-02 (perillositat sísmica); CTE DB-HS6 (radó); " +
         "dades obertes de l'Ajuntament de Barcelona (context de delinqüència per districte, ZBE); " +
-        "OpenStreetMap (serveis del barri);" +
-        compsCa +
-        " índexs de preus oficials i el valor de referència del Cadastre per a la comparació de preu. " +
-        "Les xifres de preu són orientatives i s'indiquen com a tals; es distingeixen preus d'oferta i de tancament. " +
+        "OpenStreetMap (serveis del barri); " +
+        "Generalitat de Catalunya, Habitatge (preus de tancament notarials registrats per barri, la referència de preu única). " +
+        "Les xifres de preu són orientatives, no preus d'oferta de portals. " +
         "Les puntuacions són una valoració editorial independent.",
     },
     disclaimer: {
