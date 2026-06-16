@@ -76,6 +76,13 @@ scoped under a `.lp` root in `app/globals.css`. Keep landing styles under `.lp`
 (the design uses generic names like `.nav`, `.band`, `.story` that would collide
 otherwise), and edit landing copy in the `landing` namespace of `messages/*.json`.
 
+The language switcher (`components/LocaleSwitcher.tsx`) is a branded dropdown
+(`.langdd*` styles, spec'd in `design_handoff_homepage_language_toggle`) shared
+by the marketing nav and the interior-page `TopBar`. Items navigate via the
+next-intl router (not local state). On phones the nav drops to a mark-only logo
+(`≤430px`) so the logo + dropdown + CTA fit without overflow — verify across all
+three locales (CA/ES labels run longer than EN and overflow first).
+
 Two traps when overriding shared styles under `.lp`:
 - **Global element/class rules bleed in.** A bare `h2`, `.eyebrow`, etc. still
   applies inside `.lp`, so a `.lp` override must explicitly reset what it
@@ -83,10 +90,23 @@ Two traps when overriding shared styles under `.lp`:
   `.lp .partner h2` must set `color:#fff` or the global `h2` colour hides it on
   the dark band).
 - **The CSS pipeline (Lightning CSS) can silently drop a redundant-looking
-  override.** A bare `.lp .locale-switch` overriding the global `.locale-switch`
-  was dropped from the compiled output entirely. Scope through a parent
-  (`.lp .nav .locale-switch`) or otherwise change the selector so it survives —
-  and verify it landed (check the rule in the built CSS, not just the source).
+  override.** A `.lp .nav .pw-wordmark` rule was dropped from the compiled
+  output entirely because the same selector already existed in another
+  `@media` block. Give the override a distinct selector (e.g. scope it through
+  a parent like `.lp .nav .pw-lockup .pw-wordmark`) so it survives — and verify
+  it landed in the **built** CSS, not just the source.
+
+## Local dev gotcha — stale styles survive a server restart
+
+The Turbopack dev server (`npm run dev`) caches in `.next`, and that cache can
+go stale: edits to `app/globals.css` (and occasionally components) keep serving
+the **old** compiled CSS even after stopping and restarting the server. Symptoms:
+a rule you just wrote isn't in the page, `getComputedStyle` shows old values, the
+served `_next/static/chunks/*.css` doesn't match the source. Don't burn time
+re-editing the rule or debugging specificity — **`rm -rf .next` and restart**.
+Running `npm run build` (production) into the same `.next` makes this worse, so
+clear the cache after a build if you go back to dev. `next build` itself is
+reliable; trust it (and the built CSS) over the dev server when verifying.
 
 ## Operational facts
 

@@ -42,11 +42,11 @@ Ajuntament de Barcelona sources (see below).
   building documents (ITE — *inspecció tècnica de l'edifici*, actes de la
   comunitat, etc.) and fold them into the analysis (e.g. an unfavourable ITE
   weighs on the building/risk score and raises an alert).
-- **Homepage mobile nav + hero photo.** The redesigned homepage replicates the
-  handoff prototype's behaviour: the centre nav links hide ≤1000px (no
-  hamburger menu is designed yet) and the hero's right-hand visual is a reserved
-  placeholder, hidden until a real Barcelona photo exists. Both need a spec/asset
-  before a mobile-first launch.
+- **Homepage mobile nav menu + hero photo.** The header no longer overflows on
+  phones (compact branded language dropdown + mark-only logo ≤430px), but the
+  centre nav links still simply hide ≤1000px — a proper mobile menu (hamburger)
+  isn't designed yet. The hero's right-hand visual is also a reserved
+  placeholder, hidden until a real Barcelona photo exists.
 
 ## Tech
 
