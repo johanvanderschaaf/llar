@@ -61,7 +61,8 @@
     "tagLow": "Con cautela"
   },
   "report": {
-    "downloadPdf": "Descargar PDF"
+    "downloadPdf": "Descargar PDF",
+    "eyebrow": "Informe independiente para el comprador"
   },
   "landing": {
     "nav": {
@@ -272,7 +273,7 @@
     "costs": "Costes e impuestos",
     "subsidies": "Deducciones y ayudas",
     "negotiation": "Guía de negociación",
-    "checklist": "Antes de ofertar — lista de comprobación"
+    "checklist": "Antes de ofertar, lista de comprobación"
   },
   "scoreNames": {
     "location": "Ubicación y estilo de vida",
@@ -297,11 +298,11 @@
   },
   "price": {
     "benchHeading": "Referencias y evidencia comparable",
-    "rangeHeading": "Rango razonable para este tamaño en este barrio",
+    "rangeHeading": "Rango de precios para este tamaño en este barrio",
     "liveHeading": "Pisos similares, en directo",
     "liveNote": "El inventario de los portales cambia a diario, así que en vez de incrustar capturas obsoletas te llevamos a búsquedas prefiltradas por distrito, tamaño y rango de precio. Afina al barrio exacto en el propio portal.",
     "ladderHeading": "Escalera de oferta sugerida",
-    "referencesHeading": "Comprueba el precio tú mismo — fuentes de referencia",
+    "referencesHeading": "Comprueba el precio tú mismo, fuentes de referencia",
     "referencesNote": "No asignamos un valor en tu nombre. Usa estas fuentes oficiales y publicadas para comparar el precio de oferta con el mercado y decidir por ti mismo.",
     "refKind": {
       "official": "oficial",
@@ -331,7 +332,7 @@
     "barriClosingAvg": "media de cierre",
     "compare": {
       "askingLabel": "Este piso · pedido",
-      "barriLabel": "Barrio · media de cierre"
+      "barriLabel": "Media del barrio"
     },
     "delta": {
       "below": "{n}% por debajo",
@@ -339,21 +340,21 @@
       "equal": "En línea"
     },
     "evidence": {
-      "title": "precios de cierre",
-      "sub": "Registrados en notaría — no precios de oferta de los portales.",
+      "title": "referencia de precio",
+      "sub": "Registrados en notaría, no precios de oferta de los portales.",
       "avgPerM2": "Media €/m² construido",
       "sales": "Ventas registradas (12 m)",
       "avgFlat": "Tamaño medio del piso vendido",
       "period": "Periodo",
       "sourceLead": "Fuente:",
-      "sourceBody": "Generalitat de Catalunya — Habitatge (escrituras notariales registradas · segunda mano)"
+      "sourceBody": "Generalitat de Catalunya, Habitatge (escrituras notariales registradas · segunda mano)"
     },
     "humility": {
-      "lead": "El rango abarca todo el barrio —",
+      "lead": "El rango abarca todo el barrio:",
       "body": "una planta baja sin reformar en el extremo bajo; un piso reformado con balcón en el alto. Contrasta con comparables concretos de tamaño, planta y estado similares antes de ofertar."
     },
     "unavailable": {
-      "body": "Esta dirección queda fuera de los 73 barrios de Barcelona para los que tenemos precios de cierre registrados — o se han vendido demasiado pocos pisos aquí en los últimos 12 meses para publicar una media de la que nos fiemos. No te enseñaremos un rango razonable que no podamos defender."
+      "body": "Esta dirección queda fuera de los 73 barrios de Barcelona para los que tenemos precios de cierre registrados, o se han vendido demasiado pocos pisos aquí en los últimos 12 meses para publicar una media de la que nos fiemos. No te enseñaremos un rango de precios que no podamos defender."
     },
     "facts": {
       "asking": "Precio pedido",
@@ -362,8 +363,8 @@
     },
     "howTo": {
       "heading": "Cómo leer esto",
-      "portals": "Mira los precios de oferta actuales de pisos cercanos de tamaño parecido en un portal — y recuerda que la oferta queda sistemáticamente por encima del precio al que de verdad cierran.",
-      "askAgent": "Pídele a tu agente ventas cerradas recientes en esta calle o manzana — lo más cercano a un comparable real."
+      "portals": "Mira los precios de oferta actuales de pisos cercanos de tamaño parecido en un portal, y recuerda que la oferta queda sistemáticamente por encima del precio al que de verdad cierran.",
+      "askAgent": "Pídele a tu agente ventas cerradas recientes en esta calle o manzana, lo más cercano a un comparable real."
     }
   },
   "risk": {

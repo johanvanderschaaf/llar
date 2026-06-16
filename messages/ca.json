@@ -61,7 +61,8 @@
     "tagLow": "Amb cautela"
   },
   "report": {
-    "downloadPdf": "Descarregar PDF"
+    "downloadPdf": "Descarregar PDF",
+    "eyebrow": "Informe independent per al comprador"
   },
   "landing": {
     "nav": {
@@ -272,7 +273,7 @@
     "costs": "Costos i impostos",
     "subsidies": "Deduccions i ajuts",
     "negotiation": "Guia de negociació",
-    "checklist": "Abans d'ofertar — llista de comprovació"
+    "checklist": "Abans d'ofertar, llista de comprovació"
   },
   "scoreNames": {
     "location": "Ubicació i estil de vida",
@@ -297,11 +298,11 @@
   },
   "price": {
     "benchHeading": "Referències i evidència comparable",
-    "rangeHeading": "Rang raonable per a aquesta mida en aquest barri",
+    "rangeHeading": "Rang de preus per a aquesta mida en aquest barri",
     "liveHeading": "Pisos similars, en directe",
     "liveNote": "L'inventari dels portals canvia cada dia, per això en lloc d'incrustar captures antigues t'enviem a cerques prefiltrades per districte, mida i rang de preu. Afina al barri exacte al portal mateix.",
     "ladderHeading": "Escala d'oferta suggerida",
-    "referencesHeading": "Comprova el preu tu mateix — fonts de referència",
+    "referencesHeading": "Comprova el preu tu mateix, fonts de referència",
     "referencesNote": "No assignem un valor en nom teu. Fes servir aquestes fonts oficials i publicades per comparar el preu de sortida amb el mercat i decidir per tu mateix.",
     "refKind": {
       "official": "oficial",
@@ -331,7 +332,7 @@
     "barriClosingAvg": "mitjana de tancament",
     "compare": {
       "askingLabel": "Aquest pis · demanat",
-      "barriLabel": "Barri · mitjana de tancament"
+      "barriLabel": "Mitjana del barri"
     },
     "delta": {
       "below": "{n}% per sota",
@@ -339,21 +340,21 @@
       "equal": "En línia"
     },
     "evidence": {
-      "title": "preus de tancament",
-      "sub": "Registrats al notari — no preus d'oferta dels portals.",
+      "title": "referència de preu",
+      "sub": "Registrats al notari, no preus d'oferta dels portals.",
       "avgPerM2": "Mitjana €/m² construït",
       "sales": "Vendes registrades (12 m)",
       "avgFlat": "Mida mitjana del pis venut",
       "period": "Període",
       "sourceLead": "Font:",
-      "sourceBody": "Generalitat de Catalunya — Habitatge (escriptures notarials registrades · segona mà)"
+      "sourceBody": "Generalitat de Catalunya, Habitatge (escriptures notarials registrades · segona mà)"
     },
     "humility": {
-      "lead": "El rang abasta tot el barri —",
+      "lead": "El rang abasta tot el barri:",
       "body": "una planta baixa sense reformar a l'extrem baix; un pis reformat amb balcó a l'alt. Contrasta amb comparables concrets de mida, planta i estat similars abans d'ofertar."
     },
     "unavailable": {
-      "body": "Aquesta adreça queda fora dels 73 barris de Barcelona dels quals tenim preus de tancament registrats — o s'han venut massa pocs pisos aquí en els últims 12 mesos per publicar una mitjana de què ens fiem. No et mostrarem un rang raonable que no puguem defensar."
+      "body": "Aquesta adreça queda fora dels 73 barris de Barcelona dels quals tenim preus de tancament registrats, o s'han venut massa pocs pisos aquí en els últims 12 mesos per publicar una mitjana de què ens fiem. No et mostrarem un rang de preus que no puguem defensar."
     },
     "facts": {
       "asking": "Preu demanat",
@@ -362,8 +363,8 @@
     },
     "howTo": {
       "heading": "Com llegir això",
-      "portals": "Mira els preus d'oferta actuals de pisos propers d'una mida semblant en un portal — i recorda que l'oferta queda sistemàticament per sobre del preu al qual realment tanquen.",
-      "askAgent": "Demana al teu agent vendes tancades recents en aquest carrer o illa — el més proper a un comparable real."
+      "portals": "Mira els preus d'oferta actuals de pisos propers d'una mida semblant en un portal, i recorda que l'oferta queda sistemàticament per sobre del preu al qual realment tanquen.",
+      "askAgent": "Demana al teu agent vendes tancades recents en aquest carrer o illa, el més proper a un comparable real."
     }
   },
   "risk": {
