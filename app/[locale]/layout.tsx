@@ -5,7 +5,6 @@ import { setRequestLocale } from "next-intl/server";
 import { Manrope, Space_Mono } from "next/font/google";
 import { routing } from "@/i18n/routing";
 import { brand } from "@/config/brand";
-import { TopBar } from "@/components/TopBar";
 import "../globals.css";
 
 const manrope = Manrope({
@@ -46,10 +45,9 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} className={`${manrope.variable} ${spaceMono.variable}`}>
       <body>
-        <NextIntlClientProvider>
-          <TopBar />
-          {children}
-        </NextIntlClientProvider>
+        {/* Chrome is per-page: the marketing home renders its own sticky
+            LandingNav; interior pages (start, report) render <TopBar/>. */}
+        <NextIntlClientProvider>{children}</NextIntlClientProvider>
       </body>
     </html>
   );

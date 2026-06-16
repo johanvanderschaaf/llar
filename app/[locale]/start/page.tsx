@@ -1,5 +1,6 @@
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { BuyerForm } from "@/components/BuyerForm";
+import { TopBar } from "@/components/TopBar";
 
 // startAnalysisAction runs generateReport, which fans out to several external
 // sources (Catastro, OSM/Overpass, ICAEN, Ajuntament BCN). Per the Next docs,
@@ -21,7 +22,9 @@ export default async function StartPage({
   const t = await getTranslations("form");
 
   return (
-    <div className="wrap" style={{ maxWidth: 620, padding: "56px 28px 80px" }}>
+    <>
+      <TopBar />
+      <div className="wrap" style={{ maxWidth: 620, padding: "56px 28px 80px" }}>
       <h1 className="serif" style={{ fontSize: "clamp(30px,5vw,40px)", marginBottom: 12 }}>
         {t("title")}
       </h1>
@@ -51,6 +54,7 @@ export default async function StartPage({
         </div>
       ) : null}
       <BuyerForm />
-    </div>
+      </div>
+    </>
   );
 }

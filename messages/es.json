@@ -65,124 +65,182 @@
     "eyebrow": "Informe independiente para el comprador"
   },
   "landing": {
+    "nav": {
+      "find": "Qué encontramos",
+      "report": "El informe",
+      "how": "Cómo funciona",
+      "pricing": "Precios",
+      "faq": "FAQ"
+    },
+    "cta": {
+      "check": "Analiza mi piso",
+      "sample": "Ver un informe de ejemplo",
+      "partner": "Colabora con nosotros"
+    },
     "hero": {
-      "eyebrow": "Diligencia debida · Barcelona",
-      "title": "Comprueba cualquier piso de Barcelona antes de comprar.",
-      "sub": "Reunimos los datos oficiales de un piso —Catastro, energía, urbanismo, riesgos naturales, barrio— y te los explicamos con claridad. Para que decidas con información, no con corazonadas.",
-      "ctaPrimary": "Analizar mi piso",
-      "ctaSecondary": "Ver un informe de ejemplo"
+      "eyebrow": "Due diligence para compradores de Barcelona",
+      "h1": "Conoce lo que compras de verdad, <em>antes de firmar.</em>",
+      "titlePlain": "Conoce lo que compras de verdad, antes de firmar.",
+      "sub": "Reunimos los datos oficiales de un piso y te los explicamos en lenguaje claro, así decides con hechos, no con corazonadas."
     },
     "trust": {
-      "title": "Solo fuentes oficiales y abiertas",
-      "note": "Nada de scraping de portales. Datos verificables y con fecha."
+      "label": "Solo fuentes oficiales y abiertas",
+      "note": "Sin rastrear portales. Datos verificables y fechados.",
+      "caption": "Reservado · Barcelona"
     },
-    "what": {
-      "title": "Qué incluye el informe",
+    "proof": {
+      "eyebrow": "Qué destapamos",
+      "h2": "Qué puede destapar un informe.",
+      "note": "El tipo de cosa que los compradores no ven hasta el notario, o que nunca llegan a descubrir.",
       "items": [
         {
-          "title": "5 puntuaciones",
-          "desc": "Ubicación, transporte, edificio, precio y energía, de un vistazo."
+          "tag": "Urbanismo",
+          "h3": "Una afectación sobre la finca",
+          "p": "Un piso puede estar en una finca que la ciudad ha reservado: algún día podría expropiar una parte. Leemos el dictamen oficial de afectación del Ayuntamiento y te explicamos qué significa para ti."
         },
         {
-          "title": "Precio y valor",
-          "desc": "El €/m² del piso y fuentes oficiales para compararlo. Distinguimos oferta y cierre."
+          "tag": "Protección patrimonial",
+          "h3": "Un edificio protegido",
+          "p": "Una catalogación patrimonial (BCIN / BCIL) limita qué puedes cambiar: la fachada, la distribución, a veces las ventanas. Te lo avisamos antes de que descuadre tu presupuesto de reforma."
         },
         {
-          "title": "Riesgos naturales",
-          "desc": "Inundación (SNCZI), sísmico y radón, según la ubicación exacta."
+          "tag": "Realidad del precio",
+          "h3": "Muy por encima del precio real",
+          "p": "Los precios de salida suelen estar por encima de lo que se vende en realidad. Te mostramos la horquilla de precios de cierre recientes del barrio para que veas la diferencia y la uses para negociar."
+        }
+      ]
+    },
+    "report": {
+      "eyebrow": "El informe",
+      "h2": "Qué incluye el informe.",
+      "note": "Ocho lecturas de un mismo piso, con el trabajo de urbanismo y riesgos que la mayoría de comprobaciones se saltan.",
+      "scores": {
+        "h4": "5 puntuaciones, un veredicto",
+        "p": "Todo el piso resumido en cinco puntuaciones claras y una lectura final con confianza.",
+        "chips": [
+          "Precio",
+          "Riesgo",
+          "Edificio",
+          "Legal",
+          "Energía"
+        ]
+      },
+      "cards": [
+        {
+          "h4": "Urbanismo",
+          "p": "Afectaciones, claves urbanísticas y qué planea la ciudad para la manzana."
         },
         {
-          "title": "Edificio y estado",
-          "desc": "Año, antigüedad, ITE y qué revisar antes de ofertar."
+          "h4": "Riesgos naturales",
+          "p": "Exposición a inundaciones y sismos, leída de los mapas oficiales de riesgo (SNCZI)."
         },
         {
-          "title": "Legal y documentos",
-          "desc": "Nota simple, cédula, actas, derramas: qué pedir y por qué."
+          "h4": "Precio y valor",
+          "p": "La horquilla de precios de cierre del barrio, nunca una cifra inventada."
         },
         {
-          "title": "Barrio y servicios",
-          "desc": "Metro, sanidad, zonas verdes, mercados y colegios cercanos."
+          "h4": "Edificio y estado",
+          "p": "Antigüedad, estado de la ITE y notas estructurales de la finca."
         },
         {
-          "title": "Urbanismo",
-          "desc": "Calificación urbanística y posibles afectaciones (Mapa Urbanístic)."
+          "h4": "Legal y documentos",
+          "p": "Cédula de habitabilidad, cargas y la documentación que te pedirán firmar."
         },
         {
-          "title": "Energía",
-          "desc": "Certificado registrado (ICAEN): clase, consumo y emisiones."
+          "h4": "Barrio",
+          "p": "Cómo es realmente el barrio: servicios, transporte, vida diaria."
+        },
+        {
+          "h4": "Energía",
+          "p": "La calificación certificada (ICAEN) y qué significa para tus facturas."
         }
       ]
     },
     "how": {
-      "title": "Cómo funciona",
+      "eyebrow": "Cómo funciona",
+      "h2": "Tres pasos. Sin ser experto.",
       "steps": [
         {
-          "title": "Introduce el piso",
-          "desc": "Dirección o referencia catastral. Te ayudamos a encontrarlo."
+          "n": "PASO 01",
+          "h4": "Introduce el piso",
+          "p": "Dirección o referencia catastral. Te ayudamos a encontrarla."
         },
         {
-          "title": "Reunimos los datos",
-          "desc": "Cruzamos fuentes oficiales y lo redactamos con claridad, revisado antes de publicar."
+          "n": "PASO 02",
+          "h4": "Reunimos los datos",
+          "p": "Contrastamos las fuentes oficiales y las redactamos en lenguaje claro."
         },
         {
-          "title": "Recibe tu informe",
-          "desc": "Vista previa gratis; informe completo y PDF cuando quieras."
+          "n": "PASO 03",
+          "h4": "Recibe tu informe",
+          "p": "Vista previa gratis; informe completo y PDF cuando quieras."
         }
       ]
     },
-    "why": {
-      "title": "Por qué {brand}",
-      "items": [
-        {
-          "title": "Independiente",
-          "desc": "No vendemos pisos ni cobramos a vendedores. Trabajamos para el comprador."
-        },
-        {
-          "title": "Fuentes oficiales",
-          "desc": "Catastro, ICAEN, urbanismo, y riesgos del Estado y del Ayuntamiento."
-        },
-        {
-          "title": "Honesto con el precio",
-          "desc": "Te damos referencias para que valores tú; no inventamos una cifra."
-        },
-        {
-          "title": "En tu idioma",
-          "desc": "Castellano, català y English."
-        }
-      ]
+    "indep": {
+      "lead": "Para quien compra una vivienda para vivir.",
+      "body": "Ni inversores. Ni pisos turísticos. Trabajamos solo para el comprador. <strong>No vendemos pisos y nunca cobramos de los vendedores.</strong> Por eso podemos decirte qué falla en un piso, no solo lo que luce bien."
+    },
+    "ph": {
+      "lead": "Nunca nos inventamos un precio.",
+      "body": "Sin valoraciones inventadas ni estimaciones de caja negra. Te damos las referencias oficiales de €/m² y la horquilla de precios de cierre recientes del barrio, y dejamos que lo juzgues tú. <strong>Vale más ser honesto que parecer preciso.</strong>",
+      "range": {
+        "low": "Mínimo",
+        "mid": "Horquilla del barrio",
+        "high": "Máximo",
+        "cap": "Una horquilla real de ventas registradas, no una cifra mágica."
+      }
+    },
+    "partner": {
+      "eyebrow": "Para profesionales",
+      "h2": "¿Trabajas con compradores de vivienda?",
+      "p": "Agentes del comprador, agentes hipotecarios, abogados y gestorías usan PisoWise para dar a sus clientes una claridad fiable. Informes con marca compartida, derivaciones y acceso por API disponibles."
     },
     "pricing": {
-      "title": "Un precio, sin sorpresas",
+      "eyebrow": "Precios",
+      "h2": "Un solo precio, sin sorpresas.",
       "desc": "Vista previa gratis. Informe completo y PDF descargable por {price}.",
-      "cta": "Analizar mi piso",
       "note": "Pago único. Sin suscripción."
     },
     "faq": {
-      "title": "Preguntas frecuentes",
+      "eyebrow": "Preguntas frecuentes",
+      "h2": "Preguntas, resueltas.",
       "items": [
         {
           "q": "¿De dónde salen los datos?",
-          "a": "De fuentes oficiales y abiertas: Catastro, ICAEN, Mapa Urbanístic de Catalunya, SNCZI y datos abiertos del Ayuntamiento. No hacemos scraping de portales."
+          "a": "Solo fuentes oficiales y abiertas: el <strong>Catastro</strong>, el registro de energía (ICAEN), el Mapa Urbanístic, el sistema nacional de riesgo de inundación (SNCZI), el Ayuntamiento de Barcelona y los precios de cierre registrados de la Generalitat. Sin rastrear portales. Cada cifra es verificable y fechada."
+        },
+        {
+          "q": "¿Cómo de fiable es?",
+          "a": "Contamos lo que dicen los registros oficiales y fechamos cada cifra. Cuando los datos están incompletos o una referencia no es fiable, lo decimos claramente en vez de rellenar el hueco con una suposición. Es una <strong>herramienta de orientación</strong>: te muestra qué comprobar, no una tasación certificada."
+        },
+        {
+          "q": "¿Puedo usarlo para negociar?",
+          "a": "Sí. La sección de precio muestra la <strong>horquilla de precios de cierre</strong> recientes del barrio junto al precio de salida, así ves la diferencia y llevas a la mesa cifras registradas, no opiniones."
         },
         {
           "q": "¿Sustituye a un arquitecto o abogado?",
-          "a": "No. Es una herramienta de orientación; no reemplaza una inspección técnica, revisión legal ni tasación. Cada informe lo indica."
+          "a": "<strong>No.</strong> Es una herramienta de orientación que te indica qué vale la pena mirar de cerca y qué preguntas hacer. No sustituye una inspección técnica, una revisión legal ni una tasación formal. Te ayuda a decidir dónde vale la pena pagarlas."
+        },
+        {
+          "q": "¿Y mis datos?",
+          "a": "Solo necesitamos la dirección o la referencia catastral del piso para hacer el informe. No vendemos tus datos y nunca cobramos de los vendedores, así que nada del informe lo dirige nadie más que tú."
         },
         {
           "q": "¿Cuánto cuesta?",
-          "a": "La vista previa es gratis. El informe completo con PDF cuesta {price}, pago único."
+          "a": "La vista previa es gratis. El informe completo y el PDF descargable son <strong>{price}</strong>. Un pago único, sin suscripción."
         },
         {
           "q": "¿Solo Barcelona?",
-          "a": "De momento, sí. Empezamos por la ciudad de Barcelona."
+          "a": "De momento, sí. Cubrimos los barrios de Barcelona en profundidad en lugar de todo el país por encima, y te avisaremos si una dirección queda fuera de la zona donde podemos garantizar una referencia de barrio."
         }
       ]
     },
     "footer": {
       "privacy": "Privacidad",
-      "terms": "Términos",
-      "disclaimer": "Herramienta de orientación. No sustituye una inspección técnica, revisión legal ni tasación.",
-      "rights": "© {year} {brand}"
+      "terms": "Condiciones",
+      "pros": "Para profesionales",
+      "disc": "Una herramienta de orientación, no un sustituto de una inspección técnica, una revisión legal o una tasación."
     }
   },
   "hero": {

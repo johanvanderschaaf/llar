@@ -65,124 +65,182 @@
     "eyebrow": "Informe independent per al comprador"
   },
   "landing": {
+    "nav": {
+      "find": "Què trobem",
+      "report": "L'informe",
+      "how": "Com funciona",
+      "pricing": "Preus",
+      "faq": "FAQ"
+    },
+    "cta": {
+      "check": "Analitza el meu pis",
+      "sample": "Veure un informe d'exemple",
+      "partner": "Col·labora amb nosaltres"
+    },
     "hero": {
-      "eyebrow": "Diligència deguda · Barcelona",
-      "title": "Comprova qualsevol pis de Barcelona abans de comprar.",
-      "sub": "Reunim les dades oficials d'un pis —Cadastre, energia, urbanisme, riscos naturals, barri— i te les expliquem amb claredat. Perquè decideixis amb informació, no amb intuïcions.",
-      "ctaPrimary": "Analitzar el meu pis",
-      "ctaSecondary": "Veure un informe d'exemple"
+      "eyebrow": "Due diligence per a compradors de Barcelona",
+      "h1": "Sàpigues què compres de veritat, <em>abans de signar.</em>",
+      "titlePlain": "Sàpigues què compres de veritat, abans de signar.",
+      "sub": "Reunim les dades oficials d'un pis i te les expliquem en llenguatge clar, així decideixes amb fets, no amb intuïcions."
     },
     "trust": {
-      "title": "Només fonts oficials i obertes",
-      "note": "Res de scraping de portals. Dades verificables i datades."
+      "label": "Només fonts oficials i obertes",
+      "note": "Sense rastrejar portals. Dades verificables i datades.",
+      "caption": "Reservat · Barcelona"
     },
-    "what": {
-      "title": "Què inclou l'informe",
+    "proof": {
+      "eyebrow": "Què destapem",
+      "h2": "Què pot destapar un informe.",
+      "note": "El tipus de cosa que els compradors no veuen fins al notari, o que mai arriben a descobrir.",
       "items": [
         {
-          "title": "5 puntuacions",
-          "desc": "Ubicació, transport, edifici, preu i energia, d'un cop d'ull."
+          "tag": "Urbanisme",
+          "h3": "Una afectació sobre la finca",
+          "p": "Un pis pot estar en una finca que la ciutat ha reservat: algun dia en podria expropiar una part. Llegim el dictamen oficial d'afectació de l'Ajuntament i t'expliquem què significa per a tu."
         },
         {
-          "title": "Preu i valor",
-          "desc": "El €/m² del pis i fonts oficials per comparar-lo. Distingim sortida i tancament."
+          "tag": "Protecció patrimonial",
+          "h3": "Un edifici protegit",
+          "p": "Una catalogació patrimonial (BCIN / BCIL) limita què pots canviar: la façana, la distribució, de vegades les finestres. T'ho advertim abans que et trastoqui el pressupost de reforma."
         },
         {
-          "title": "Riscos naturals",
-          "desc": "Inundació (SNCZI), sísmic i radó, segons la ubicació exacta."
+          "tag": "Realitat del preu",
+          "h3": "Molt per sobre del preu real",
+          "p": "Els preus de sortida solen estar per sobre del que es ven realment. Et mostrem la forquilla de preus de tancament recents del barri perquè vegis la diferència i la facis servir per negociar."
+        }
+      ]
+    },
+    "report": {
+      "eyebrow": "L'informe",
+      "h2": "Què inclou l'informe.",
+      "note": "Vuit lectures d'un mateix pis, amb la feina d'urbanisme i riscos que la majoria de comprovacions es salten.",
+      "scores": {
+        "h4": "5 puntuacions, un veredicte",
+        "p": "Tot el pis resumit en cinc puntuacions clares i una lectura final amb confiança.",
+        "chips": [
+          "Preu",
+          "Risc",
+          "Edifici",
+          "Legal",
+          "Energia"
+        ]
+      },
+      "cards": [
+        {
+          "h4": "Urbanisme",
+          "p": "Afectacions, claus urbanístiques i què planeja la ciutat per a l'illa."
         },
         {
-          "title": "Edifici i estat",
-          "desc": "Any, antiguitat, ITE i què revisar abans d'ofertar."
+          "h4": "Riscos naturals",
+          "p": "Exposició a inundacions i sismes, llegida dels mapes oficials de risc (SNCZI)."
         },
         {
-          "title": "Legal i documents",
-          "desc": "Nota simple, cèdula, actes, derrames: què demanar i per què."
+          "h4": "Preu i valor",
+          "p": "La forquilla de preus de tancament del barri, mai una xifra inventada."
         },
         {
-          "title": "Barri i serveis",
-          "desc": "Metro, sanitat, zones verdes, mercats i escoles a prop."
+          "h4": "Edifici i estat",
+          "p": "Antiguitat, estat de la ITE i notes estructurals de la finca."
         },
         {
-          "title": "Urbanisme",
-          "desc": "Qualificació urbanística i possibles afectacions (Mapa Urbanístic)."
+          "h4": "Legal i documents",
+          "p": "Cèdula d'habitabilitat, càrregues i la documentació que et demanaran signar."
         },
         {
-          "title": "Energia",
-          "desc": "Certificat registrat (ICAEN): classe, consum i emissions."
+          "h4": "Barri",
+          "p": "Com és realment el barri: serveis, transport, vida diària."
+        },
+        {
+          "h4": "Energia",
+          "p": "La qualificació certificada (ICAEN) i què significa per a les teves factures."
         }
       ]
     },
     "how": {
-      "title": "Com funciona",
+      "eyebrow": "Com funciona",
+      "h2": "Tres passos. Sense ser-ne expert.",
       "steps": [
         {
-          "title": "Introdueix el pis",
-          "desc": "Adreça o referència cadastral. T'ajudem a trobar-lo."
+          "n": "PAS 01",
+          "h4": "Introdueix el pis",
+          "p": "Adreça o referència cadastral. T'ajudem a trobar-la."
         },
         {
-          "title": "Reunim les dades",
-          "desc": "Creuem fonts oficials i ho redactem amb claredat, revisat abans de publicar."
+          "n": "PAS 02",
+          "h4": "Reunim les dades",
+          "p": "Contrastem les fonts oficials i les redactem en llenguatge clar."
         },
         {
-          "title": "Rep el teu informe",
-          "desc": "Vista prèvia gratuïta; informe complet i PDF quan vulguis."
+          "n": "PAS 03",
+          "h4": "Rep el teu informe",
+          "p": "Vista prèvia gratuïta; informe complet i PDF quan vulguis."
         }
       ]
     },
-    "why": {
-      "title": "Per què {brand}",
-      "items": [
-        {
-          "title": "Independent",
-          "desc": "No venem pisos ni cobrem als venedors. Treballem per al comprador."
-        },
-        {
-          "title": "Fonts oficials",
-          "desc": "Cadastre, ICAEN, urbanisme, i riscos de l'Estat i de l'Ajuntament."
-        },
-        {
-          "title": "Honest amb el preu",
-          "desc": "Et donem referències perquè valoris tu; no inventem cap xifra."
-        },
-        {
-          "title": "En el teu idioma",
-          "desc": "Castellano, català i English."
-        }
-      ]
+    "indep": {
+      "lead": "Per a qui compra un habitatge per viure-hi.",
+      "body": "Ni inversors. Ni pisos turístics. Treballem només per al comprador. <strong>No venem pisos i mai cobrem dels venedors.</strong> Per això et podem dir què falla en un pis, no només què hi queda bé."
+    },
+    "ph": {
+      "lead": "Mai ens inventem un preu.",
+      "body": "Sense valoracions inventades ni estimacions de caixa negra. Et donem les referències oficials de €/m² i la forquilla de preus de tancament recents del barri, i deixem que ho jutgis tu. <strong>Val més ser honest que semblar precís.</strong>",
+      "range": {
+        "low": "Mínim",
+        "mid": "Forquilla del barri",
+        "high": "Màxim",
+        "cap": "Una forquilla real de vendes registrades, no una xifra màgica."
+      }
+    },
+    "partner": {
+      "eyebrow": "Per a professionals",
+      "h2": "Treballes amb compradors d'habitatge?",
+      "p": "Agents del comprador, agents hipotecaris, advocats i gestories fan servir PisoWise per donar als clients una claredat de confiança. Informes amb marca compartida, derivacions i accés per API disponibles."
     },
     "pricing": {
-      "title": "Un preu, sense sorpreses",
+      "eyebrow": "Preus",
+      "h2": "Un sol preu, sense sorpreses.",
       "desc": "Vista prèvia gratuïta. Informe complet i PDF descarregable per {price}.",
-      "cta": "Analitzar el meu pis",
       "note": "Pagament únic. Sense subscripció."
     },
     "faq": {
-      "title": "Preguntes freqüents",
+      "eyebrow": "Preguntes freqüents",
+      "h2": "Preguntes, resoltes.",
       "items": [
         {
           "q": "D'on surten les dades?",
-          "a": "De fonts oficials i obertes: Cadastre, ICAEN, Mapa Urbanístic de Catalunya, SNCZI i dades obertes de l'Ajuntament. No fem scraping de portals."
+          "a": "Només fonts oficials i obertes: el <strong>Catastro</strong>, el registre d'energia (ICAEN), el Mapa Urbanístic, el sistema nacional de risc d'inundació (SNCZI), l'Ajuntament de Barcelona i els preus de tancament registrats de la Generalitat. Sense rastrejar portals. Cada xifra és verificable i datada."
         },
         {
-          "q": "Substitueix un arquitecte o advocat?",
-          "a": "No. És una eina d'orientació; no reemplaça una inspecció tècnica, revisió legal ni taxació. Cada informe ho indica."
+          "q": "Què tan fiable és?",
+          "a": "Expliquem el que diuen els registres oficials i datem cada xifra. Quan les dades són incompletes o una referència no és fiable, ho diem clarament en comptes d'omplir el buit amb una suposició. És una <strong>eina d'orientació</strong>: et mostra què cal comprovar, no una taxació certificada."
+        },
+        {
+          "q": "Puc fer-la servir per negociar?",
+          "a": "Sí. L'apartat de preu mostra la <strong>forquilla de preus de tancament</strong> recents del barri al costat del preu de sortida, així veus la diferència i portes a la taula xifres registrades, no opinions."
+        },
+        {
+          "q": "Substitueix un arquitecte o un advocat?",
+          "a": "<strong>No.</strong> És una eina d'orientació que t'indica què val la pena mirar de prop i quines preguntes fer. No substitueix una inspecció tècnica, una revisió legal ni una taxació formal. T'ajuda a decidir on val la pena pagar-les."
+        },
+        {
+          "q": "I les meves dades?",
+          "a": "Només necessitem l'adreça o la referència cadastral del pis per fer l'informe. No venem les teves dades i mai cobrem dels venedors, així que res de l'informe no l'orienta ningú més que tu."
         },
         {
           "q": "Quant costa?",
-          "a": "La vista prèvia és gratuïta. L'informe complet amb PDF costa {price}, pagament únic."
+          "a": "La vista prèvia és gratuïta. L'informe complet i el PDF descarregable són <strong>{price}</strong>. Un pagament únic, sense subscripció."
         },
         {
           "q": "Només Barcelona?",
-          "a": "De moment, sí. Comencem per la ciutat de Barcelona."
+          "a": "De moment, sí. Cobrim els barris de Barcelona en profunditat en lloc de tot el país per sobre, i t'avisarem si una adreça queda fora de la zona on podem garantir una referència de barri."
         }
       ]
     },
     "footer": {
-      "privacy": "Privacitat",
-      "terms": "Termes",
-      "disclaimer": "Eina d'orientació. No substitueix una inspecció tècnica, revisió legal ni taxació.",
-      "rights": "© {year} {brand}"
+      "privacy": "Privadesa",
+      "terms": "Condicions",
+      "pros": "Per a professionals",
+      "disc": "Una eina d'orientació, no un substitut d'una inspecció tècnica, una revisió legal o una taxació."
     }
   },
   "hero": {
