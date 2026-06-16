@@ -64,67 +64,182 @@
     "downloadPdf": "Download PDF"
   },
   "landing": {
+    "nav": {
+      "find": "What we find",
+      "report": "The report",
+      "how": "How it works",
+      "pricing": "Pricing",
+      "faq": "FAQ"
+    },
+    "cta": {
+      "check": "Check my flat",
+      "sample": "See a sample report",
+      "partner": "Partner with us"
+    },
     "hero": {
-      "eyebrow": "Due diligence · Barcelona",
-      "title": "Check any Barcelona flat before you buy.",
-      "sub": "We pull a flat's official data — cadastre, energy, urban planning, natural risks, neighbourhood — and explain it clearly. So you decide on facts, not hunches.",
-      "ctaPrimary": "Check my flat",
-      "ctaSecondary": "See a sample report"
+      "eyebrow": "Due diligence for Barcelona buyers",
+      "h1": "Know what you're really buying, <em>before you sign.</em>",
+      "titlePlain": "Know what you're really buying, before you sign.",
+      "sub": "We pull a flat's official data and explain it in plain language, so you decide on facts, not hunches."
     },
     "trust": {
-      "title": "Official, open sources only",
-      "note": "No portal scraping. Verifiable, date-stamped data."
+      "label": "Official, open sources only",
+      "note": "No portal scraping. Verifiable, date-stamped data.",
+      "caption": "Reserved · Barcelona"
     },
-    "what": {
-      "title": "What's in the report",
+    "proof": {
+      "eyebrow": "What we surface",
+      "h2": "What a report can surface.",
+      "note": "The kind of thing buyers miss until the notary, or never find at all.",
       "items": [
-        { "title": "5 scores", "desc": "Location, transport, building, price and energy at a glance." },
-        { "title": "Price & value", "desc": "The flat's €/m² and official sources to compare it. We separate asking from closing." },
-        { "title": "Natural risks", "desc": "Flood (SNCZI), seismic and radon, by exact location." },
-        { "title": "Building & condition", "desc": "Year, age, ITE status and what to check before you offer." },
-        { "title": "Legal & documents", "desc": "Nota simple, cédula, minutes, levies: what to request and why." },
-        { "title": "Neighbourhood", "desc": "Metro, healthcare, green space, markets and schools nearby." },
-        { "title": "Urban planning", "desc": "Planning qualification and possible affectations (Mapa Urbanístic)." },
-        { "title": "Energy", "desc": "Registered certificate (ICAEN): class, consumption and emissions." }
+        {
+          "tag": "Urban planning",
+          "h3": "An affectation on the building",
+          "p": "A flat can sit on a building the city has earmarked: one day it could expropriate part of it. We read the city council's official affectation verdict and explain what it means for you."
+        },
+        {
+          "tag": "Heritage protection",
+          "h3": "A protected building",
+          "p": "A heritage listing (BCIN / BCIL) limits what you can change: façade, layout, sometimes the windows. We flag it before it derails your renovation budget."
+        },
+        {
+          "tag": "Price reality",
+          "h3": "Asking far above closing",
+          "p": "Asking prices run above what flats actually sell for. We show the neighbourhood's recent closing-price range so you can see the gap, and use it to negotiate."
+        }
+      ]
+    },
+    "report": {
+      "eyebrow": "The report",
+      "h2": "What's in the report.",
+      "note": "Eight reads on one flat, with the planning and risk work that most checks skip.",
+      "scores": {
+        "h4": "5 scores, one verdict",
+        "p": "The whole flat distilled into five plain scores and a single confident read.",
+        "chips": [
+          "Price",
+          "Risk",
+          "Building",
+          "Legal",
+          "Energy"
+        ]
+      },
+      "cards": [
+        {
+          "h4": "Urban planning",
+          "p": "Affectations, zoning codes and what the city plans for the block."
+        },
+        {
+          "h4": "Natural risks",
+          "p": "Flood and seismic exposure, read from official hazard maps (SNCZI)."
+        },
+        {
+          "h4": "Price & value",
+          "p": "The neighbourhood's closing-price range, never a made-up number."
+        },
+        {
+          "h4": "Building & condition",
+          "p": "Age, building-inspection status and structural notes on the property."
+        },
+        {
+          "h4": "Legal & documents",
+          "p": "Occupancy certificate, charges and the paperwork you'll be asked to sign."
+        },
+        {
+          "h4": "Neighbourhood",
+          "p": "What the neighbourhood is actually like: services, transit, daily life."
+        },
+        {
+          "h4": "Energy",
+          "p": "The certified rating (ICAEN) and what it means for your bills."
+        }
       ]
     },
     "how": {
-      "title": "How it works",
+      "eyebrow": "How it works",
+      "h2": "Three steps. No expertise required.",
       "steps": [
-        { "title": "Enter the flat", "desc": "Address or cadastral reference. We help you find it." },
-        { "title": "We assemble the data", "desc": "We cross-check official sources and write it up clearly, reviewed before publishing." },
-        { "title": "Get your report", "desc": "Free preview; full report and PDF whenever you want." }
+        {
+          "n": "STEP 01",
+          "h4": "Enter the flat",
+          "p": "Address or cadastral reference. We help you find it."
+        },
+        {
+          "n": "STEP 02",
+          "h4": "We assemble the data",
+          "p": "We cross-check official sources and write them up in plain language."
+        },
+        {
+          "n": "STEP 03",
+          "h4": "Get your report",
+          "p": "Free preview; full report and PDF whenever you want."
+        }
       ]
     },
-    "why": {
-      "title": "Why {brand}",
-      "items": [
-        { "title": "Independent", "desc": "We don't sell flats or charge sellers. We work for the buyer." },
-        { "title": "Official sources", "desc": "Cadastre, ICAEN, planning, and state + city-council risk data." },
-        { "title": "Honest on price", "desc": "We give you references to judge for yourself; we don't invent a number." },
-        { "title": "In your language", "desc": "Castellano, català and English." }
-      ]
+    "indep": {
+      "lead": "For people buying a home to live in.",
+      "body": "Not investors. Not short-lets. We work only for the buyer. We <strong>never sell flats and never take money from sellers.</strong> That's why we can tell you what's wrong with a flat, not just what looks nice."
+    },
+    "ph": {
+      "lead": "We never invent a price.",
+      "body": "No made-up valuation, no black-box estimate. We give you the official €/m² references and the recent closing-price range for the neighbourhood, and let you judge for yourself. <strong>Honest beats precise-looking.</strong>",
+      "range": {
+        "low": "Range low",
+        "mid": "Neighbourhood closing range",
+        "high": "Range high",
+        "cap": "A real range from registered sales, not a single magic figure."
+      }
+    },
+    "partner": {
+      "eyebrow": "For professionals",
+      "h2": "Work with home buyers?",
+      "p": "Buyer's agents, mortgage brokers, lawyers and conveyancers use PisoWise to give clients clarity they can trust. Co-branded reports, referrals and API access available."
     },
     "pricing": {
-      "title": "One price, no surprises",
+      "eyebrow": "Pricing",
+      "h2": "One price, no surprises.",
       "desc": "Free preview. Full report and downloadable PDF for {price}.",
-      "cta": "Check my flat",
       "note": "One-off payment. No subscription."
     },
     "faq": {
-      "title": "Frequently asked questions",
+      "eyebrow": "FAQ",
+      "h2": "Questions, answered.",
       "items": [
-        { "q": "Where does the data come from?", "a": "Official, open sources: Cadastre, ICAEN, Mapa Urbanístic de Catalunya, SNCZI and city-council open data. We don't scrape portals." },
-        { "q": "Does it replace an architect or lawyer?", "a": "No. It's an orientation tool; it doesn't replace a technical survey, legal review or valuation. Every report says so." },
-        { "q": "How much is it?", "a": "The preview is free. The full report with PDF is {price}, a one-off payment." },
-        { "q": "Barcelona only?", "a": "For now, yes. We're starting with the city of Barcelona." }
+        {
+          "q": "Where does the data come from?",
+          "a": "Only official, open sources: the <strong>Catastro</strong>, energy registry (ICAEN), the urban-planning map (Mapa Urbanístic), the national flood-risk system (SNCZI), the Ajuntament de Barcelona and the Generalitat's registered closing prices. No portal scraping. Every figure is verifiable and date-stamped."
+        },
+        {
+          "q": "How accurate is it?",
+          "a": "We report what the official records say and date-stamp every figure. Where the data is incomplete or a benchmark isn't reliable, we say so plainly rather than fill the gap with a guess. It's an <strong>orientation tool</strong>: it surfaces what to check, not a certified appraisal."
+        },
+        {
+          "q": "Can I use it to negotiate?",
+          "a": "Yes. The price section shows the neighbourhood's recent <strong>closing-price range</strong> next to the asking price, so you can see the gap and bring registered figures, not opinion, to the table."
+        },
+        {
+          "q": "Does it replace an architect or lawyer?",
+          "a": "<strong>No.</strong> It's an orientation tool that tells you what's worth a closer look and what questions to ask. It doesn't replace a technical survey, a legal review or a formal valuation. It helps you decide where those are worth paying for."
+        },
+        {
+          "q": "What about my data?",
+          "a": "We only need the flat's address or cadastral reference to build a report. We don't sell your data, and we never take money from sellers, so nothing about the report is steered by anyone but you."
+        },
+        {
+          "q": "How much does it cost?",
+          "a": "The preview is free. The full report and downloadable PDF are <strong>{price}</strong>. A one-off payment, no subscription."
+        },
+        {
+          "q": "Barcelona only?",
+          "a": "For now, yes. We cover Barcelona's neighbourhoods in depth rather than the whole country thinly, and we'll tell you if an address falls outside the area where we can stand behind a neighbourhood benchmark."
+        }
       ]
     },
     "footer": {
       "privacy": "Privacy",
       "terms": "Terms",
-      "disclaimer": "Orientation tool. Not a substitute for a technical survey, legal review or valuation.",
-      "rights": "© {year} {brand}"
+      "pros": "For professionals",
+      "disc": "An orientation tool, not a substitute for a technical survey, legal review or valuation."
     }
   },
   "hero": {

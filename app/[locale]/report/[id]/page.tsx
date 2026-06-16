@@ -1,5 +1,7 @@
+import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
+import { TopBar } from "@/components/TopBar";
 import { ReportView } from "@/components/report/ReportView";
 import { sampleSors35 } from "@/data/sample-sors35";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -25,6 +27,16 @@ export default async function ReportPage({
   const { locale, id } = await params;
   setRequestLocale(locale);
 
+  const content = await reportContent(locale, id);
+  return (
+    <>
+      <TopBar />
+      {content}
+    </>
+  );
+}
+
+async function reportContent(locale: string, id: string): Promise<ReactNode> {
   if (id === sampleSors35.id) {
     return <ReportView report={sampleSors35} locale={locale} />;
   }
