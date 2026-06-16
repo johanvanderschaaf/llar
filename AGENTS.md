@@ -63,6 +63,19 @@ In `lib/supabase/`:
 
 Importing the wrong one is the easiest way to leak data or break auth.
 
+## Page chrome is per-page, not in the layout
+
+`app/[locale]/layout.tsx` does **not** render a nav. The marketing homepage
+(`components/landing/`) owns its own sticky `LandingNav`; interior pages
+(`/start`, `/report/[id]`) render `<TopBar/>` themselves. Don't "helpfully" move
+`TopBar` back into the layout — it would double up under the homepage's
+`LandingNav`. A new interior page needs to render its own `<TopBar/>`.
+
+The homepage CSS is a 1:1 port of `design_handoff_pisowise_brand/design_handoff_homepage`,
+scoped under a `.lp` root in `app/globals.css`. Keep landing styles under `.lp`
+(the design uses generic names like `.nav`, `.band`, `.story` that would collide
+otherwise), and edit landing copy in the `landing` namespace of `messages/*.json`.
+
 ## Operational facts
 
 - **Vercel auto-deploys on push to `main`** (production). The `feat/*` branches get Preview deploys.
