@@ -67,35 +67,14 @@
   "landing": {
     "hero": {
       "eyebrow": "Diligència deguda · Barcelona",
-      "title": "Saber què compres de debò, abans de signar.",
-      "sub": "Reunim les dades oficials d'un pis (Cadastre, energia, urbanisme, riscos naturals, barri) i te les expliquem amb claredat. Perquè decideixis amb informació, no amb intuïcions.",
+      "title": "Comprova qualsevol pis de Barcelona abans de comprar.",
+      "sub": "Reunim les dades oficials d'un pis —Cadastre, energia, urbanisme, riscos naturals, barri— i te les expliquem amb claredat. Perquè decideixis amb informació, no amb intuïcions.",
       "ctaPrimary": "Analitzar el meu pis",
       "ctaSecondary": "Veure un informe d'exemple"
     },
     "trust": {
       "title": "Només fonts oficials i obertes",
       "note": "Res de scraping de portals. Dades verificables i datades."
-    },
-    "catch": {
-      "title": "Què pot revelar un informe",
-      "note": "El tipus de cosa que el comprador no veu fins al notari, o no descobreix mai.",
-      "items": [
-        {
-          "tag": "Urbanisme",
-          "title": "Una afectació a la finca",
-          "desc": "Un pis pot estar en un edifici que la ciutat té reservat, algun dia en podria expropiar una part. Llegim el dictamen oficial d'afectació de l'Ajuntament i t'expliquem què significa."
-        },
-        {
-          "tag": "Protecció patrimonial",
-          "title": "Un edifici protegit",
-          "desc": "La catalogació patrimonial (BCIN/BCIL) limita el que pots canviar, façana, distribució, de vegades les finestres. Ho assenyalem abans que et descquadri el pressupost de reforma."
-        },
-        {
-          "tag": "Preu real",
-          "title": "Sortida molt per sobre del tancament",
-          "desc": "Els preus de sortida superen el que els pisos tanquen de debò. Et mostrem el rang de preus de tancament recent del barri perquè vegis la diferència, i la facis servir per negociar."
-        }
-      ]
     },
     "what": {
       "title": "Què inclou l'informe",
@@ -143,7 +122,7 @@
         },
         {
           "title": "Reunim les dades",
-          "desc": "Creuem fonts oficials i ho redactem amb claredat."
+          "desc": "Creuem fonts oficials i ho redactem amb claredat, revisat abans de publicar."
         },
         {
           "title": "Rep el teu informe",
@@ -151,19 +130,26 @@
         }
       ]
     },
-    "who": {
-      "title": "Per a qui compra una llar per viure-hi",
-      "body": "No per a inversors. No per a pisos turístics. Treballem només per al comprador, no venem pisos ni cobrem als venedors. Per això et podem dir què falla en un pis, no només què té de bonic."
-    },
-    "honest": {
-      "title": "Mai inventem un preu",
-      "body": "Sense valoració inventada, sense estimació de caixa negra. Et donem les referències oficials de €/m² i el rang de preus de tancament recent del barri, i jutges tu. Val més honest que aparentar precisió."
-    },
-    "partner": {
-      "eyebrow": "Per a professionals",
-      "title": "Treballes amb compradors d'habitatge?",
-      "body": "Personal shoppers immobiliaris, brokers hipotecaris, advocats i gestories fan servir {brand} per donar als seus clients una claredat fiable. Informes amb marca compartida, derivacions i accés per API.",
-      "cta": "Col·labora amb nosaltres"
+    "why": {
+      "title": "Per què {brand}",
+      "items": [
+        {
+          "title": "Independent",
+          "desc": "No venem pisos ni cobrem als venedors. Treballem per al comprador."
+        },
+        {
+          "title": "Fonts oficials",
+          "desc": "Cadastre, ICAEN, urbanisme, i riscos de l'Estat i de l'Ajuntament."
+        },
+        {
+          "title": "Honest amb el preu",
+          "desc": "Et donem referències perquè valoris tu; no inventem cap xifra."
+        },
+        {
+          "title": "En el teu idioma",
+          "desc": "Castellano, català i English."
+        }
+      ]
     },
     "pricing": {
       "title": "Un preu, sense sorpreses",
@@ -179,20 +165,8 @@
           "a": "De fonts oficials i obertes: Cadastre, ICAEN, Mapa Urbanístic de Catalunya, SNCZI i dades obertes de l'Ajuntament. No fem scraping de portals."
         },
         {
-          "q": "És fiable?",
-          "a": "Fem servir fonts oficials i datades, i ho indiquem quan alguna cosa no s'ha pogut verificar. És una eina d'orientació, no un certificat, ho diem clarament a cada informe."
-        },
-        {
-          "q": "Em serveix per negociar?",
-          "a": "Sí, és un dels usos principals. Les referències de preu i qualsevol tema urbanístic o de l'edifici són just les dades que mouen un preu."
-        },
-        {
           "q": "Substitueix un arquitecte o advocat?",
           "a": "No. És una eina d'orientació; no reemplaça una inspecció tècnica, revisió legal ni taxació. Cada informe ho indica."
-        },
-        {
-          "q": "Què passa amb les meves dades?",
-          "a": "Només necessitem l'adreça del pis per fer l'informe. No la compartim. Consulta la pàgina de privacitat per als detalls."
         },
         {
           "q": "Quant costa?",

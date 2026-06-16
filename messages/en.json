@@ -67,35 +67,14 @@
   "landing": {
     "hero": {
       "eyebrow": "Due diligence · Barcelona",
-      "title": "Know what you're really buying, before you sign.",
-      "sub": "We pull a flat's official data, cadastre, energy, urban planning, natural risks, neighbourhood, and explain it in plain language. So you decide on facts, not hunches.",
+      "title": "Check any Barcelona flat before you buy.",
+      "sub": "We pull a flat's official data — cadastre, energy, urban planning, natural risks, neighbourhood — and explain it clearly. So you decide on facts, not hunches.",
       "ctaPrimary": "Check my flat",
       "ctaSecondary": "See a sample report"
     },
     "trust": {
       "title": "Official, open sources only",
       "note": "No portal scraping. Verifiable, date-stamped data."
-    },
-    "catch": {
-      "title": "What a report can surface",
-      "note": "The kind of thing buyers miss until the notary, or never find at all.",
-      "items": [
-        {
-          "tag": "Urban planning",
-          "title": "An affectation on the finca",
-          "desc": "A flat can sit on a building the city has earmarked, one day it could expropriate part of it. We read the Ajuntament's official affectation verdict and explain what it means for you."
-        },
-        {
-          "tag": "Heritage protection",
-          "title": "A protected building",
-          "desc": "A heritage listing (BCIN/BCIL) limits what you can change, façade, layout, sometimes the windows. We flag it before it derails your renovation budget."
-        },
-        {
-          "tag": "Price reality",
-          "title": "Asking far above closing",
-          "desc": "Asking prices run above what flats actually sell for. We show the neighbourhood's recent closing-price range so you can see the gap, and use it to negotiate."
-        }
-      ]
     },
     "what": {
       "title": "What's in the report",
@@ -143,7 +122,7 @@
         },
         {
           "title": "We assemble the data",
-          "desc": "We cross-check official sources and write them up in plain language."
+          "desc": "We cross-check official sources and write it up clearly, reviewed before publishing."
         },
         {
           "title": "Get your report",
@@ -151,19 +130,26 @@
         }
       ]
     },
-    "who": {
-      "title": "For people buying a home to live in",
-      "body": "Not investors. Not short-lets. We work only for the buyer, we never sell flats and never take money from sellers. That's why we can tell you what's wrong with a flat, not just what looks nice."
-    },
-    "honest": {
-      "title": "We never invent a price",
-      "body": "No made-up valuation, no black-box estimate. We give you the official €/m² references and the recent closing-price range for the neighbourhood, and let you judge for yourself. Honest beats precise-looking."
-    },
-    "partner": {
-      "eyebrow": "For professionals",
-      "title": "Work with home buyers?",
-      "body": "Buyer's agents, mortgage brokers, lawyers and gestories use {brand} to give clients clarity they can trust. Co-branded reports, referrals and API access available.",
-      "cta": "Partner with us"
+    "why": {
+      "title": "Why {brand}",
+      "items": [
+        {
+          "title": "Independent",
+          "desc": "We don't sell flats or charge sellers. We work for the buyer."
+        },
+        {
+          "title": "Official sources",
+          "desc": "Cadastre, ICAEN, planning, and state + city-council risk data."
+        },
+        {
+          "title": "Honest on price",
+          "desc": "We give you references to judge for yourself; we don't invent a number."
+        },
+        {
+          "title": "In your language",
+          "desc": "Castellano, català and English."
+        }
+      ]
     },
     "pricing": {
       "title": "One price, no surprises",
@@ -179,20 +165,8 @@
           "a": "Official, open sources: Cadastre, ICAEN, Mapa Urbanístic de Catalunya, SNCZI and city-council open data. We don't scrape portals."
         },
         {
-          "q": "How accurate is it?",
-          "a": "We use official, date-stamped sources and say so when something couldn't be verified. It's an orientation tool, not a certificate, we're explicit about the limits in every report."
-        },
-        {
-          "q": "Can I use it to negotiate?",
-          "a": "Yes, it's one of the main uses. The price references and any planning or building issues are exactly the facts that move a price."
-        },
-        {
           "q": "Does it replace an architect or lawyer?",
           "a": "No. It's an orientation tool; it doesn't replace a technical survey, legal review or valuation. Every report says so."
-        },
-        {
-          "q": "What about my data?",
-          "a": "We only need the flat's address to build a report. We don't share it. See the privacy page for the details."
         },
         {
           "q": "How much is it?",

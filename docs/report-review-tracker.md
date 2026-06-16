@@ -74,3 +74,14 @@ fed by the real Vila de Gràcia row in `bcn-barri-prices.json`. Footer likewise 
 - "Neighbourhood avg" / "Neighbourhood average" are longer than the old "Barri avg" in the compact number-line labels — may need width tuning or abbreviation.
 - Locked-preview band tags ("Worth a viewing" etc.) still read as recommendations (see batch C note).
 - Cross-section fact repetition (year built, ITE, price) is intentional/structural — candidate for a single shared fact bar (see batch D note).
+
+## Follow-up — data faithfulness (N8) ✅
+
+Found while reviewing: the report asserted **listing-only attributes the pipeline can't source** ("reformed", "Clikalia flip", 3 bed / 2 bath, terrace, lift, heating, "top floor"). The listing URL is an optional field that is stored/linked but never scraped (brand rule), so none of these reach a generated report — they only existed because the sample was transcribed from the real Clikalia dossier.
+
+Fix (option 1: make the sample faithful to live output):
+- **Sample** now mirrors what the pipeline actually produces: hero meta = asking / €-per-m² / energy only; snapshot = Catastro facts only (address, neighbourhood, built/usable area, year built, cadastral ref); `building` derives from `buildBuilding(1965)`; verdict/negotiation/checklist no longer assert reform, fixtures or seller; condition is something to "confirm on a viewing".
+- **AI prompt** (`narrate.ts`): added a LISTING DATA rule — the model has no condition/bed-bath/fixture/seller data and must never state them as fact; the BOTTOM LINE lead no longer asks for "condition, floor".
+- Generic "unreformed … reformed" wording in the price-range explainer is kept (it describes the barri spread, not this flat).
+
+Product idea logged (not built): capture listing details as explicit buyer inputs, shown as "buyer-provided, to verify" — would restore the richer view without scraping.
