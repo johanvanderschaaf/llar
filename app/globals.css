@@ -1063,6 +1063,9 @@ footer strong {
   align-items: center;
   gap: 10px;
   white-space: nowrap;
+  /* clear the global .eyebrow margin-bottom; in this design the title's own
+     margin-top is the only gap (16px on h2, 22px on the hero h1). */
+  margin: 0;
 }
 .lp .eyebrow .idx {
   color: var(--pw-ink-300);
@@ -1155,6 +1158,24 @@ footer strong {
   font-size: 14px;
   padding: 11px 18px;
   border-radius: var(--pw-r-md);
+}
+/* language selector — the design's .lang is a grey (ink-100) track, not the
+   shared white .locale-switch. Override it for the landing only. (Scoped
+   through .nav so the CSS pipeline keeps the rule.) */
+.lp .nav .locale-switch {
+  background: var(--pw-ink-100);
+  border: none;
+  padding: 3px;
+  gap: 2px;
+  overflow: visible;
+}
+.lp .nav .locale-switch button {
+  color: var(--pw-ink-500);
+  border-radius: var(--pw-r-pill);
+}
+.lp .nav .locale-switch button.is-active {
+  background: var(--pw-ink);
+  color: #fff;
 }
 @media (max-width: 1000px) {
   .lp .nav__links {
@@ -1693,6 +1714,8 @@ footer strong {
   letter-spacing: -0.03em;
   line-height: 1.08;
   margin: 16px 0 0;
+  /* on the dark band — the global h2 colour would otherwise hide it. */
+  color: #fff;
 }
 .lp .partner p {
   font-size: 17px;
