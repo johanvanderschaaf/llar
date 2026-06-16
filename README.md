@@ -27,7 +27,8 @@ Ajuntament de Barcelona sources (see below).
 | Scoring (5 pillars + risk override) | ✅ live, deterministic — see `.claude/skills/onboard/SCORING.md` |
 | AI narrative (Anthropic) | 🟡 wired; opt-in per report once unlocked |
 | Stripe checkout + PDF unlock | 🟡 scaffolded; needs production Stripe keys |
-| Landing / SEO / legal polish | 🟡 partial |
+| Marketing homepage ("Field & Air" redesign) | ✅ live — trilingual, ported from `design_handoff_pisowise_brand/design_handoff_homepage` |
+| SEO / legal polish | 🟡 partial |
 
 ## Roadmap (next iterations)
 
@@ -41,6 +42,11 @@ Ajuntament de Barcelona sources (see below).
   building documents (ITE — *inspecció tècnica de l'edifici*, actes de la
   comunitat, etc.) and fold them into the analysis (e.g. an unfavourable ITE
   weighs on the building/risk score and raises an alert).
+- **Homepage mobile nav + hero photo.** The redesigned homepage replicates the
+  handoff prototype's behaviour: the centre nav links hide ≤1000px (no
+  hamburger menu is designed yet) and the hero's right-hand visual is a reserved
+  placeholder, hidden until a real Barcelona photo exists. Both need a spec/asset
+  before a mobile-first launch.
 
 ## Tech
 
@@ -48,7 +54,9 @@ Ajuntament de Barcelona sources (see below).
   docs are bundled in `node_modules/next/dist/docs/`; consult them. The
   `middleware` convention is now `proxy.ts`.
 - **Tailwind v4** (CSS-first) — design tokens + ported component classes live in
-  `app/globals.css`.
+  `app/globals.css`. The marketing homepage's styles are scoped under a `.lp`
+  root (a 1:1 port of the design handoff); the shared `.wrap` stays 920px while
+  the homepage widens to 1180px under `.lp`.
 - **next-intl** — locale-prefixed routing (`/ca`, `/es`, `/en`); UI strings in
   `messages/{ca,es,en}.json`; AI narrative stored per-language inside each report.
 - **Supabase** for storage + auth (operator dashboard).
@@ -98,6 +106,7 @@ app/admin/               operator dashboard (auth-gated)
 app/api/catastro/        catastro search proxies
 app/api/stripe/webhook   stripe webhook handler
 components/              TopBar, LanguageToggle, BuyerForm, PropertyPicker, …
+components/landing/       marketing homepage (Landing + LandingNav + RevealScript + icons)
 components/report/       ReportView + LockedSection (premium teaser)
 adapters/                external data adapters (one file per source)
 pipeline/                generate.ts, narrate.ts, template.ts (seeders)
