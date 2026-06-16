@@ -4,6 +4,7 @@ import { buildPricingPayload } from "@/pipeline/template";
 import barriPrices from "@/data/bcn-barri-prices.json";
 import { buildFooter } from "@/config/footer";
 import { buildLegal } from "@/config/legal";
+import { buildBuilding } from "@/config/building";
 
 /**
  * Sample report transcribed from the canonical reference design
@@ -46,42 +47,33 @@ export const sampleSors35: Report = {
     title: "Carrer de Sors 35",
     floorLabel: { en: "3rd floor", es: "3.º piso", ca: "3r pis" },
     sub: {
-      en: "A reformed 90 m² apartment in upper Vila de Gràcia, listed by Clikalia. An independent check of its price, building, planning and neighbourhood before you offer.",
-      es: "Un piso reformado de 90 m² en la parte alta de la Vila de Gràcia, anunciado por Clikalia. Una revisión independiente de su precio, edificio, urbanismo y entorno antes de que hagas una oferta.",
-      ca: "Un pis reformat de 90 m² a la part alta de la Vila de Gràcia, anunciat per Clikalia. Una revisió independent del seu preu, edifici, urbanisme i entorn abans que facis una oferta.",
+      en: "A 90 m² flat in upper Vila de Gràcia. An independent check of its price, building, planning and neighbourhood before you offer.",
+      es: "Un piso de 90 m² en la parte alta de la Vila de Gràcia. Una revisión independiente de su precio, edificio, urbanismo y entorno antes de que hagas una oferta.",
+      ca: "Un pis de 90 m² a la part alta de la Vila de Gràcia. Una revisió independent del seu preu, edifici, urbanisme i entorn abans que facis una oferta.",
     },
+    // Hero meta mirrors the live pipeline: asking price (buyer-entered), derived
+    // €/m², and energy class (ICAEN). Bed/bath count, lift and terrace are listing
+    // attributes we don't ingest, so they are not shown.
     meta: [
       { labelKey: "meta.asking", value: "€455,000", accent: true },
       { labelKey: "meta.pricePerM2", value: "€5,056" },
       {
-        labelKey: "meta.size",
-        value: { en: "90 m² · 3 bed · 2 bath", es: "90 m² · 3 hab · 2 baños", ca: "90 m² · 3 hab · 2 banys" },
-      },
-      {
         labelKey: "meta.energy",
         value: { en: "Class E", es: "Clase E", ca: "Classe E" },
-      },
-      {
-        labelKey: "meta.floor",
-        value: {
-          en: "3rd · lift · terrace",
-          es: "3.º · ascensor · terraza",
-          ca: "3r · ascensor · terrassa",
-        },
       },
     ],
   },
 
   verdict: {
     headline: {
-      en: "Reformed 90 m² top-floor flat in Vila de Gràcia, asking about 9% below the neighbourhood average.",
-      es: "Piso reformado de 90 m² en última planta en la Vila de Gràcia, pedido un 9% por debajo de la media del barrio.",
-      ca: "Pis reformat de 90 m² en última planta a la Vila de Gràcia, demanat un 9% per sota de la mitjana del barri.",
+      en: "90 m² flat in Vila de Gràcia, asking about 9% below the neighbourhood average.",
+      es: "Piso de 90 m² en la Vila de Gràcia, pedido un 9% por debajo de la media del barrio.",
+      ca: "Pis de 90 m² a la Vila de Gràcia, demanat un 9% per sota de la mitjana del barri.",
     },
     body: {
-      en: "The asking €455,000 (€5,056/m²) is about 9% below the €5,584/m² that second-hand flats in Vila de Gràcia registered at the notary across 2025. The flat is reformed, with a lift, a terrace and top-floor exterior light; the building dates from 1965, so its ITE technical inspection is due, and it is a professional resale by Clikalia. No planning affectation or heritage listing limits its use as a home. Before offering, confirm the building's collective health (reserve fund, pending derramas) and the standard purchase documents.",
-      es: "El precio pedido de 455.000 € (5.056 €/m²) está alrededor de un 9% por debajo de los 5.584 €/m² a los que los pisos de segunda mano de la Vila de Gràcia se registraron en notaría durante 2025. El piso está reformado, con ascensor, terraza y luz exterior en última planta; el edificio es de 1965, por lo que su inspección técnica ITE está pendiente, y es una reventa profesional de Clikalia. Ninguna afectación urbanística ni protección patrimonial limita su uso como vivienda. Antes de ofertar, comprueba la salud colectiva del edificio (fondo de reserva, derramas pendientes) y los documentos habituales de compra.",
-      ca: "El preu demanat de 455.000 € (5.056 €/m²) està al voltant d'un 9% per sota dels 5.584 €/m² als quals els pisos de segona mà de la Vila de Gràcia es van registrar a notaria durant el 2025. El pis està reformat, amb ascensor, terrassa i llum exterior en última planta; l'edifici és del 1965, de manera que la seva inspecció tècnica ITE està pendent, i és una revenda professional de Clikalia. Cap afectació urbanística ni protecció patrimonial no en limita l'ús com a habitatge. Abans d'ofertar, comprova la salut col·lectiva de l'edifici (fons de reserva, derrames pendents) i els documents habituals de compra.",
+      en: "The asking €455,000 (€5,056/m²) is about 9% below the €5,584/m² that second-hand flats in Vila de Gràcia registered at the notary across 2025. The building dates from 1965, so its ITE technical inspection is due and a pre-2002 build can carry asbestos in old installations. No planning affectation or heritage listing limits its use as a home. Before offering, confirm the building's collective health (reserve fund, pending derramas), the documents, and the flat's actual condition and layout on a viewing.",
+      es: "El precio pedido de 455.000 € (5.056 €/m²) está alrededor de un 9% por debajo de los 5.584 €/m² a los que los pisos de segunda mano de la Vila de Gràcia se registraron en notaría durante 2025. El edificio es de 1965, por lo que su inspección técnica ITE está pendiente y una construcción anterior a 2002 puede tener amianto en instalaciones antiguas. Ninguna afectación urbanística ni protección patrimonial limita su uso como vivienda. Antes de ofertar, comprueba la salud colectiva del edificio (fondo de reserva, derramas pendientes), los documentos y el estado y la distribución reales del piso en una visita.",
+      ca: "El preu demanat de 455.000 € (5.056 €/m²) està al voltant d'un 9% per sota dels 5.584 €/m² als quals els pisos de segona mà de la Vila de Gràcia es van registrar a notaria durant el 2025. L'edifici és del 1965, de manera que la seva inspecció tècnica ITE està pendent i una construcció anterior al 2002 pot tenir amiant en instal·lacions antigues. Cap afectació urbanística ni protecció patrimonial no en limita l'ús com a habitatge. Abans d'ofertar, comprova la salut col·lectiva de l'edifici (fons de reserva, derrames pendents), els documents i l'estat i la distribució reals del pis en una visita.",
     },
     overall: 71,
     tag: {
@@ -131,47 +123,13 @@ export const sampleSors35: Report = {
       },
       {
         labelKey: "snapshot.neighbourhood",
-        value: {
-          en: "Vila de Gràcia (upper edge)",
-          es: "Vila de Gràcia (parte alta)",
-          ca: "Vila de Gràcia (part alta)",
-        },
+        value: "la Vila de Gràcia · Gràcia",
       },
       { labelKey: "snapshot.builtArea", value: "90 m²" },
       { labelKey: "snapshot.usableArea", value: "~80–82 m²" },
       {
-        labelKey: "snapshot.bedsBaths",
-        value: { en: "3 / 2", es: "3 / 2", ca: "3 / 2" },
-      },
-      {
-        labelKey: "snapshot.floor",
-        value: {
-          en: "3rd, exterior · top floor",
-          es: "3.º, exterior · última planta",
-          ca: "3r, exterior · àtic",
-        },
-      },
-      { labelKey: "snapshot.lift", value: { en: "Yes", es: "Sí", ca: "Sí" } },
-      { labelKey: "snapshot.terrace", value: { en: "Yes", es: "Sí", ca: "Sí" } },
-      {
-        labelKey: "snapshot.heating",
-        value: {
-          en: "Individual heating · A/C",
-          es: "Calefacción individual · A/A",
-          ca: "Calefacció individual · A/A",
-        },
-      },
-      {
         labelKey: "snapshot.yearBuilt",
         value: { en: "1965 (61 years)", es: "1965 (61 años)", ca: "1965 (61 anys)" },
-      },
-      {
-        labelKey: "snapshot.condition",
-        value: {
-          en: "Reformed (Clikalia flip)",
-          es: "Reformado (reventa Clikalia)",
-          ca: "Reformat (revenda Clikalia)",
-        },
       },
       { labelKey: "snapshot.cadastralRef", value: "9648812DF2894H0013RQ" },
     ],
@@ -210,35 +168,11 @@ export const sampleSors35: Report = {
     ladder: [],
   },
 
-  building: {
-    panels: [
-      {
-        heading: { en: "What's good", es: "Lo bueno", ca: "El bo" },
-        body: {
-          en: "Interior is freshly reformed with a lift, A/C and a terrace, uncommon in this part of Gràcia. Top-floor exterior gives light and quiet, and individual heating keeps running costs in your control.",
-          es: "El interior está recién reformado, con ascensor, aire acondicionado y terraza, algo poco común en esta parte de Gràcia. La última planta exterior aporta luz y tranquilidad, y la calefacción individual mantiene los costes bajo tu control.",
-          ca: "L'interior està acabat de reformar, amb ascensor, aire condicionat i terrassa, una cosa poc habitual en aquesta part de Gràcia. L'àtic exterior aporta llum i tranquil·litat, i la calefacció individual manté els costos sota el teu control.",
-        },
-      },
-      {
-        heading: {
-          en: "What to scrutinise",
-          es: "Lo que hay que escrutar",
-          ca: "Què cal escrutar",
-        },
-        body: {
-          en: "The 1965 structure (61 years) makes an ITE technical inspection mandatory; demand the current valid certificate. A pre-2002 build can mean asbestos in old pipes or elements. On the top floor, check the roof for damp and who pays for its upkeep.",
-          es: "La estructura de 1965 (61 años) hace obligatoria la inspección técnica ITE; exige el certificado vigente. Una construcción anterior a 2002 puede implicar amianto en tuberías o elementos antiguos. En la última planta, revisa la cubierta por humedades y quién paga su mantenimiento.",
-          ca: "L'estructura del 1965 (61 anys) fa obligatòria la inspecció tècnica ITE; exigeix el certificat vigent. Una construcció anterior al 2002 pot implicar amiant en canonades o elements antics. A l'àtic, revisa la coberta per humitats i qui en paga el manteniment.",
-        },
-      },
-    ],
-    keyline: {
-      en: "Reform ≠ structure. A nice kitchen doesn't fix a tired façade or roof. The reform is cosmetic value; the building's collective health (reserve fund, pending derramas) is the real risk, verify it in the community minutes (actas) before you commit.",
-      es: "Reforma ≠ estructura. Una cocina bonita no arregla una fachada o cubierta cansadas. La reforma es valor estético; la salud colectiva del edificio (fondo de reserva, derramas pendientes) es el verdadero riesgo: verifícalo en las actas de la comunidad antes de comprometerte.",
-      ca: "Reforma ≠ estructura. Una cuina bonica no arregla una façana o coberta cansades. La reforma és valor estètic; la salut col·lectiva de l'edifici (fons de reserva, derrames pendents) és el risc real: verifica-ho a les actes de la comunitat abans de comprometre't.",
-    },
-  },
+  // Building & condition is deterministic in the live pipeline (year-based, from
+  // Catastro), so the demo derives it from the same builder. It states what's
+  // verifiable from the build year (ITE obligation, possible asbestos) and what
+  // to check, never the interior condition, which we don't have a source for.
+  building: buildBuilding(1965),
 
   risks: [
     {
@@ -263,9 +197,9 @@ export const sampleSors35: Report = {
       labelKey: "risk.radon",
       tone: "good",
       detail: {
-        en: "Barcelona is a low-radon area; top floor makes it a non-issue.",
-        es: "Barcelona es zona de radón bajo; la última planta lo hace irrelevante.",
-        ca: "Barcelona és zona de radó baix; l'àtic ho fa irrellevant.",
+        en: "Barcelona is a low-radon area.",
+        es: "Barcelona es una zona de radón bajo.",
+        ca: "Barcelona és una zona de radó baix.",
       },
     },
     {
@@ -470,16 +404,11 @@ export const sampleSors35: Report = {
 
   negotiation: {
     intro: {
-      en: "The asking sits below the neighbourhood average, so this is fine-tuning. Three fact-based levers:",
-      es: "El precio pedido está por debajo de la media del barrio, así que esto es afinar. Tres palancas objetivas:",
-      ca: "El preu demanat està per sota de la mitjana del barri, així que això és afinar. Tres palanques objectives:",
+      en: "The asking sits below the neighbourhood average, so this is fine-tuning. Two fact-based levers:",
+      es: "El precio pedido está por debajo de la media del barrio, así que esto es afinar. Dos palancas objetivas:",
+      ca: "El preu demanat està per sota de la mitjana del barri, així que això és afinar. Dues palanques objectives:",
     },
     items: [
-      {
-        en: "It's a professional flip. Clikalia bought to resell, there's built-in margin, and a clean, fast close is worth real money to them.",
-        es: "Es una reventa profesional. Clikalia compró para revender: hay margen incorporado, y un cierre limpio y rápido vale dinero real para ellos.",
-        ca: "És una revenda professional. Clikalia va comprar per revendre: hi ha marge incorporat, i un tancament net i ràpid val diners reals per a ells.",
-      },
       {
         en: "Building age & ITE. A 61-year-old building with inspection obligations and an unknown reserve fund is a basis for trimming the number.",
         es: "Edad del edificio e ITE. Un edificio de 61 años con obligaciones de inspección y un fondo de reserva desconocido es una base para recortar la cifra.",
@@ -492,9 +421,9 @@ export const sampleSors35: Report = {
       },
     ],
     tactic: {
-      en: "Tactic: open around €438k on building-age and flip grounds, settle near €448k. Make any offer conditional on receiving valid ITE, cédula and clean community minutes, that protects you and is the cleanest justification for shaving the price.",
-      es: "Táctica: abre en torno a 438.000 € por la edad del edificio y la reventa, cierra cerca de 448.000 €. Condiciona cualquier oferta a recibir una ITE vigente, la cédula y unas actas de comunidad limpias: eso te protege y es la justificación más limpia para rebajar el precio.",
-      ca: "Tàctica: obre al voltant de 438.000 € per l'edat de l'edifici i la revenda, tanca prop dels 448.000 €. Condiciona qualsevol oferta a rebre una ITE vigent, la cèdula i unes actes de comunitat netes: això et protegeix i és la justificació més neta per rebaixar el preu.",
+      en: "Tactic: open around €438k on building-age and inspection grounds, settle near €448k. Make any offer conditional on receiving a valid ITE, cédula and clean community minutes, which protects you and is the cleanest justification for shaving the price.",
+      es: "Táctica: abre en torno a 438.000 € por la edad del edificio y la inspección, cierra cerca de 448.000 €. Condiciona cualquier oferta a recibir una ITE vigente, la cédula y unas actas de comunidad limpias: eso te protege y es la justificación más limpia para rebajar el precio.",
+      ca: "Tàctica: obre al voltant de 438.000 € per l'edat de l'edifici i la inspecció, tanca prop dels 448.000 €. Condiciona qualsevol oferta a rebre una ITE vigent, la cèdula i unes actes de comunitat netes: això et protegeix i és la justificació més neta per rebaixar el preu.",
     },
   },
 
@@ -507,9 +436,9 @@ export const sampleSors35: Report = {
       ca: "Compta les bústies i els timbres in situ per confirmar el nombre real d'habitatges del bloc.",
     },
     {
-      en: "Inspect the roof and top-floor ceilings for damp, and confirm the lift's maintenance status.",
-      es: "Inspecciona la cubierta y los techos de la última planta por humedades, y confirma el estado de mantenimiento del ascensor.",
-      ca: "Inspecciona la coberta i els sostres de l'àtic per humitats, i confirma l'estat de manteniment de l'ascensor.",
+      en: "Inspect the flat and stairwell for damp, and ask about the roof and any lift's maintenance.",
+      es: "Inspecciona el piso y la escalera por humedades, y pregunta por la cubierta y el mantenimiento de cualquier ascensor.",
+      ca: "Inspecciona el pis i l'escala per humitats, i pregunta per la coberta i el manteniment de qualsevol ascensor.",
     },
     {
       en: "Visit at different times of day to judge light, street noise and tourist foot-traffic.",
@@ -517,9 +446,9 @@ export const sampleSors35: Report = {
       ca: "Visita a diferents hores del dia per valorar la llum, el soroll del carrer i el trànsit turístic.",
     },
     {
-      en: "Check the reform had the required permits, if it was structural.",
-      es: "Comprueba que la reforma tuvo los permisos necesarios, si fue estructural.",
-      ca: "Comprova que la reforma va tenir els permisos necessaris, si va ser estructural.",
+      en: "If the flat has been renovated, check the works had the required permits.",
+      es: "Si el piso ha sido reformado, comprueba que las obras tuvieron los permisos necesarios.",
+      ca: "Si el pis ha estat reformat, comprova que les obres van tenir els permisos necessaris.",
     },
     {
       en: "Line up your mortgage decision-in-principle before making a written offer.",
