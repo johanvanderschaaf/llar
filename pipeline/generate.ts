@@ -68,6 +68,8 @@ async function geocodeWithRetry(
 const CACHE_TTL_MS = 1000 * 60 * 60 * 24 * 30; // 30 days
 // Bump when the parsed CatastroData shape changes, to auto-invalidate old rows.
 const CATASTRO_CACHE_VERSION = "v2";
+// Total Catastro fetch attempts (1 try + retries) before treating it as down.
+const CATASTRO_ATTEMPTS = 3;
 
 /** Catastro lookup with a 30-day cache keyed by cadastral ref (cost control). */
 async function cachedCatastro(
@@ -96,7 +98,16 @@ async function cachedCatastro(
     };
   }
 
-  const result = await fetchCatastro(ref);
+  // Catastro is the spine of the whole report — when it fails, every
+  // surface/year/location/pricing section degrades to "key data missing". A
+  // bare "fetch failed" is almost always a transient network blip, so retry a
+  // couple of times before giving up (same rationale as geocodeWithRetry).
+  // Only retry the transient `error` status; `unavailable` means the ref has no
+  // cadastral record, which retrying won't fix.
+  let result = await fetchCatastro(ref);
+  for (let i = 1; i < CATASTRO_ATTEMPTS && result.status === "error"; i++) {
+    result = await fetchCatastro(ref);
+  }
   if (result.status === "ok" && result.data) {
     await db.from("source_cache").upsert(
       {
@@ -114,8 +125,11 @@ async function cachedCatastro(
 /**
  * Generate a new report from operator input. Runs the (Catastro-only, for now)
  * pipeline, seeds a draft Report, persists it as `in_review`, and logs source
- * provenance. Never throws on missing data — falls back to manual entry.
- * Returns the new report id.
+ * provenance. Degrades gracefully on any *secondary* source failure (manual
+ * entry), but **throws if Catastro itself is unavailable** — without the
+ * cadastral spine the report is an empty "key data missing" shell, and with no
+ * operator gate at MVP it would ship straight to the buyer. The caller catches
+ * this and shows a retry prompt instead. Returns the new report id.
  */
 export async function generateReport(input: ReportInput): Promise<string> {
   const db = createAdminClient();
@@ -123,7 +137,13 @@ export async function generateReport(input: ReportInput): Promise<string> {
   const ref = normaliseRef(rawRef);
 
   const cat = await cachedCatastro(ref);
-  const resolvedRef = cat.data?.unit.cadastralRef ?? ref;
+  // Spine check: never persist (and bill for) a report with no cadastral data.
+  if (cat.status !== "ok" || !cat.data) {
+    throw new Error(
+      `Catastro unavailable for "${ref}": ${cat.note ?? cat.status}`,
+    );
+  }
+  const resolvedRef = cat.data.unit.cadastralRef;
 
   const { data: row, error } = await db
     .from("reports")

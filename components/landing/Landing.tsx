@@ -7,6 +7,11 @@ interface Item {
   title: string;
   desc: string;
 }
+interface Catch {
+  tag: string;
+  title: string;
+  desc: string;
+}
 interface Faq {
   q: string;
   a: string;
@@ -26,9 +31,9 @@ function formatPrice(locale: string): string {
 export async function Landing({ locale }: { locale: string }) {
   const t = await getTranslations("landing");
   const price = formatPrice(locale);
+  const catches = t.raw("catch.items") as Catch[];
   const what = t.raw("what.items") as Item[];
   const steps = t.raw("how.steps") as Item[];
-  const why = t.raw("why.items") as Item[];
   const faqs = t.raw("faq.items") as Faq[];
   const year = new Date().getFullYear();
 
@@ -62,8 +67,25 @@ export async function Landing({ locale }: { locale: string }) {
         </div>
       </section>
 
+      {/* WHAT WE CATCH — proof */}
+      <section className="lp-section lp-catch">
+        <div className="wrap">
+          <h2 className="serif lp-h2">{t("catch.title")}</h2>
+          <p className="lp-section-note">{t("catch.note")}</p>
+          <div className="lp-grid">
+            {catches.map((c) => (
+              <div className="panel lp-card lp-catch-card" key={c.title}>
+                <span className="eyebrow">{c.tag}</span>
+                <h3 className="serif">{c.title}</h3>
+                <p>{c.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* WHAT'S IN THE REPORT */}
-      <section className="lp-section">
+      <section className="lp-section lp-alt">
         <div className="wrap">
           <h2 className="serif lp-h2">{t("what.title")}</h2>
           <div className="lp-grid">
@@ -78,7 +100,7 @@ export async function Landing({ locale }: { locale: string }) {
       </section>
 
       {/* HOW IT WORKS */}
-      <section className="lp-section lp-alt" id="how">
+      <section className="lp-section" id="how">
         <div className="wrap">
           <h2 className="serif lp-h2">{t("how.title")}</h2>
           <div className="lp-steps">
@@ -93,23 +115,38 @@ export async function Landing({ locale }: { locale: string }) {
         </div>
       </section>
 
-      {/* WHY */}
-      <section className="lp-section">
-        <div className="wrap">
-          <h2 className="serif lp-h2">{t("why.title", { brand: brand.name })}</h2>
-          <div className="lp-why">
-            {why.map((w) => (
-              <div className="lp-why-item" key={w.title}>
-                <h3 className="serif">{w.title}</h3>
-                <p>{w.desc}</p>
-              </div>
-            ))}
-          </div>
+      {/* WHO IT'S FOR — independence */}
+      <section className="lp-section lp-alt lp-statement">
+        <div className="wrap" style={{ maxWidth: 720 }}>
+          <h2 className="serif lp-h2">{t("who.title")}</h2>
+          <p className="lp-statement-body">{t("who.body")}</p>
+        </div>
+      </section>
+
+      {/* HONEST ON PRICE */}
+      <section className="lp-section lp-statement">
+        <div className="wrap" style={{ maxWidth: 720 }}>
+          <h2 className="serif lp-h2">{t("honest.title")}</h2>
+          <p className="lp-statement-body">{t("honest.body")}</p>
+        </div>
+      </section>
+
+      {/* FOR PROFESSIONALS & PARTNERS */}
+      <section className="lp-section lp-alt lp-partner">
+        <div className="wrap" style={{ maxWidth: 720 }}>
+          <div className="eyebrow">{t("partner.eyebrow")}</div>
+          <h2 className="serif lp-h2">{t("partner.title")}</h2>
+          <p className="lp-partner-body">
+            {t("partner.body", { brand: brand.name })}
+          </p>
+          <Link href="/partners" className="btn btn-ghost">
+            {t("partner.cta")}
+          </Link>
         </div>
       </section>
 
       {/* PRICING */}
-      <section className="lp-section lp-alt">
+      <section className="lp-section">
         <div className="wrap">
           <div className="lp-price-card">
             <h2 className="serif lp-h2" style={{ marginBottom: 6 }}>
@@ -126,14 +163,14 @@ export async function Landing({ locale }: { locale: string }) {
       </section>
 
       {/* FAQ */}
-      <section className="lp-section">
+      <section className="lp-section lp-alt">
         <div className="wrap" style={{ maxWidth: 720 }}>
           <h2 className="serif lp-h2">{t("faq.title")}</h2>
           <div className="lp-faq">
             {faqs.map((f) => (
               <div className="lp-faq-item" key={f.q}>
                 <h3 className="serif">{f.q}</h3>
-                <p>{f.a}</p>
+                <p>{f.a.replace("{price}", price)}</p>
               </div>
             ))}
           </div>
