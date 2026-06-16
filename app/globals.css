@@ -908,31 +908,159 @@ footer strong {
    rebrand (editing :root tokens) reflows this automatically.
    ============================================================ */
 
-.locale-switch {
+/* Branded language dropdown (LocaleSwitcher) — ported from
+   design_handoff_homepage_language_toggle. The trigger reuses the
+   secondary-button shell and always shows the active locale; the menu is a
+   listbox of native language names that navigate to the locale path. Used in
+   both the marketing nav and the interior-page TopBar. */
+.langdd {
+  position: relative;
+}
+.langdd__btn {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: -0.01em;
+  line-height: 1;
   display: inline-flex;
-  border: 1px solid var(--line-2);
-  border-radius: 999px;
-  overflow: hidden;
-  background: var(--card);
-}
-.locale-switch button {
-  font: inherit;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  padding: 6px 11px;
-  border: none;
-  background: none;
-  color: var(--muted);
+  align-items: center;
+  gap: 8px;
+  padding: 11px 12px 11px 14px;
+  background: var(--pw-panel);
+  color: var(--pw-ink);
+  border: 1.5px solid var(--pw-ink-200);
+  border-radius: var(--pw-r-md);
   cursor: pointer;
-  transition: color 0.15s, background 0.15s;
+  transition: border-color var(--pw-fast, 130ms) var(--pw-ease),
+    background var(--pw-fast, 130ms) var(--pw-ease),
+    box-shadow var(--pw-fast, 130ms) var(--pw-ease);
 }
-.locale-switch button.is-active {
-  background: var(--ink);
-  color: var(--paper);
+.langdd__btn:hover {
+  border-color: var(--pw-ink);
 }
-.locale-switch button:not(.is-active):hover {
-  color: var(--accent-deep);
+.langdd__btn:focus-visible {
+  outline: 3px solid var(--pw-blue-200);
+  outline-offset: 2px;
+}
+.langdd__btn[aria-expanded="true"] {
+  border-color: var(--pw-blue);
+  box-shadow: 0 0 0 3px var(--pw-blue-100);
+}
+.langdd__btn .globe {
+  width: 16px;
+  height: 16px;
+  color: var(--pw-ink-500);
+  flex: none;
+}
+.langdd__btn[aria-expanded="true"] .globe {
+  color: var(--pw-blue);
+}
+.langdd__btn .chev {
+  width: 13px;
+  height: 13px;
+  color: var(--pw-ink-500);
+  flex: none;
+  transition: transform var(--pw-base, 200ms) var(--pw-ease),
+    color var(--pw-fast, 130ms) var(--pw-ease);
+}
+.langdd__btn[aria-expanded="true"] .chev {
+  transform: rotate(180deg);
+  color: var(--pw-blue);
+}
+.langdd__menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 196px;
+  background: var(--pw-panel);
+  border: 1px solid var(--pw-ink-100);
+  border-radius: var(--pw-r-md);
+  box-shadow: var(--pw-sh-2);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 50;
+  transform-origin: top right;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .langdd__menu {
+    animation: ddIn var(--pw-base, 200ms) var(--pw-ease);
+  }
+}
+@keyframes ddIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.langdd__head {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--pw-ink-300);
+  padding: 6px 10px 4px;
+}
+.langdd__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  padding: 9px 10px 9px 12px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: var(--pw-r-sm);
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--pw-ink-700);
+  text-decoration: none;
+  transition: background var(--pw-fast, 130ms) var(--pw-ease),
+    color var(--pw-fast, 130ms) var(--pw-ease);
+}
+.langdd__item:hover {
+  background: var(--pw-blue-50);
+  color: var(--pw-blue-700);
+}
+.langdd__item:focus-visible {
+  outline: 2px solid var(--pw-blue-200);
+  outline-offset: -2px;
+}
+.langdd__item .name {
+  flex: 1;
+}
+.langdd__item .tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--pw-ink-300);
+}
+.langdd__item .check {
+  width: 16px;
+  height: 16px;
+  color: var(--pw-blue);
+  opacity: 0;
+  flex: none;
+}
+.langdd__item[aria-selected="true"] {
+  background: var(--pw-blue-50);
+  color: var(--pw-blue-700);
+  font-weight: 700;
+}
+.langdd__item[aria-selected="true"] .check {
+  opacity: 1;
+}
+.langdd__item[aria-selected="true"] .tag {
+  display: none;
 }
 
 /* logo (PisoWise mark + wordmark) */
@@ -1159,29 +1287,48 @@ footer strong {
   padding: 11px 18px;
   border-radius: var(--pw-r-md);
 }
-/* language selector — the design's .lang is a grey (ink-100) track, not the
-   shared white .locale-switch. Override it for the landing only. (Scoped
-   through .nav so the CSS pipeline keeps the rule.) */
-.lp .nav .locale-switch {
-  background: var(--pw-ink-100);
-  border: none;
-  padding: 3px;
-  gap: 2px;
-  overflow: visible;
-}
-.lp .nav .locale-switch button {
-  color: var(--pw-ink-500);
-  border-radius: var(--pw-r-pill);
-}
-.lp .nav .locale-switch button.is-active {
-  background: var(--pw-ink);
-  color: #fff;
-}
 @media (max-width: 1000px) {
   .lp .nav__links {
     display: none;
   }
   .lp .nav__cta .btn-ghost {
+    display: none;
+  }
+}
+/* phones — tighten the header so logo + the compact language dropdown + CTA
+   fit without overflowing the viewport (worse in CA/ES whose labels run long). */
+@media (max-width: 520px) {
+  .lp .nav .pw-wordmark {
+    font-size: 18px;
+  }
+  .lp .nav__cta {
+    gap: 6px;
+  }
+  .lp .nav .btn-primary {
+    padding: 9px 13px;
+    font-size: 13px;
+  }
+  /* drop the CTA's inline arrow on phones — it's redundant chrome and the space
+     lets the longer CA/ES label ("Analitza el meu pis") stay on one line. */
+  .lp .nav .btn-primary svg {
+    display: none;
+  }
+  /* eyebrows are nowrap by design; on phones the long ones (hero, and the
+     CA/ES variants) overflow the viewport, so let them wrap. */
+  .lp .eyebrow {
+    white-space: normal;
+  }
+  .lp .wrap {
+    padding: 0 14px;
+  }
+}
+/* phones (≤430px, covers all common handsets): drop the wordmark to a
+   mark-only lockup so the logo + branded language dropdown + CTA fit without
+   overflow — the dropdown trigger plus the long CA/ES CTA need the room.
+   (Selector scoped through .pw-lockup so the CSS pipeline doesn't dedupe-drop
+   it against the ≤520px `.lp .nav .pw-wordmark` rule above.) */
+@media (max-width: 430px) {
+  .lp .nav .pw-lockup .pw-wordmark {
     display: none;
   }
 }
@@ -2005,7 +2152,7 @@ footer strong {
   .topbar,
   .no-print,
   .nav-cta,
-  .locale-switch,
+  .langdd,
   .unlock-banner,
   .lp .nav,
   .lp .footer {
