@@ -935,6 +935,42 @@ footer strong {
   color: var(--accent-deep);
 }
 
+/* compact language dropdown — hidden by default; the landing shows it on
+   phones (≤520px) in place of the segmented switch. Native <select> so the
+   active locale stays legible (renders "CA" + the caret below = "CA ▾"). */
+.locale-select-wrap {
+  display: none;
+  position: relative;
+  align-items: center;
+}
+.locale-select {
+  appearance: none;
+  -webkit-appearance: none;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--pw-ink);
+  background: var(--pw-ink-100);
+  border: none;
+  border-radius: var(--pw-r-pill);
+  padding: 7px 26px 7px 13px;
+  cursor: pointer;
+}
+.locale-select:focus-visible {
+  outline: 2px solid var(--pw-blue-200);
+  outline-offset: 1px;
+}
+.locale-select__caret {
+  position: absolute;
+  right: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 10px;
+  color: var(--pw-ink-500);
+  pointer-events: none;
+}
+
 /* logo (PisoWise mark + wordmark) */
 .pw-lockup {
   display: inline-flex;
@@ -1182,6 +1218,49 @@ footer strong {
     display: none;
   }
   .lp .nav__cta .btn-ghost {
+    display: none;
+  }
+}
+/* phones — the full header (logo + segmented locale switch + CTA) overflows
+   below ~464px, so swap the switch for the compact dropdown and tighten the
+   row. Switching at 520px keeps a margin above the overflow point. */
+@media (max-width: 520px) {
+  .lp .nav .locale-switch {
+    display: none;
+  }
+  .lp .nav .locale-select-wrap {
+    display: inline-flex;
+  }
+  .lp .nav .pw-wordmark {
+    font-size: 18px;
+  }
+  .lp .nav__cta {
+    gap: 6px;
+  }
+  .lp .nav .btn-primary {
+    padding: 9px 13px;
+    font-size: 13px;
+  }
+  /* drop the CTA's inline arrow on phones — it's redundant chrome and the space
+     lets the longer CA/ES label ("Analitza el meu pis") stay on one line. */
+  .lp .nav .btn-primary svg {
+    display: none;
+  }
+  /* eyebrows are nowrap by design; on phones the long ones (hero, and the
+     CA/ES variants) overflow the viewport, so let them wrap. */
+  .lp .eyebrow {
+    white-space: normal;
+  }
+  .lp .wrap {
+    padding: 0 14px;
+  }
+}
+/* very narrow / older phones (<360px): drop the wordmark to a mark-only lockup
+   so the logo + locale dropdown + CTA still fit without overflow. (Selector
+   scoped through .pw-lockup so the CSS pipeline doesn't dedupe-drop it against
+   the ≤520px `.lp .nav .pw-wordmark` rule above.) */
+@media (max-width: 359px) {
+  .lp .nav .pw-lockup .pw-wordmark {
     display: none;
   }
 }
