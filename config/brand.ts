@@ -23,6 +23,6 @@ export const pricing = {
    * Kept trivially changeable per the brief (e.g. 14.90, 16.90, 17.90).
    * In later phases this can be sourced from process.env.REPORT_PRICE_EUR.
    */
-  reportPriceEur: 14.9,
+  reportPriceEur: 35,
   currency: "EUR" as const,
 } as const;
