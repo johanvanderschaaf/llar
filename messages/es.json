@@ -67,35 +67,14 @@
   "landing": {
     "hero": {
       "eyebrow": "Diligencia debida · Barcelona",
-      "title": "Saber qué compras de verdad, antes de firmar.",
-      "sub": "Reunimos los datos oficiales de un piso (Catastro, energía, urbanismo, riesgos naturales, barrio) y te los explicamos con claridad. Para que decidas con información, no con corazonadas.",
+      "title": "Comprueba cualquier piso de Barcelona antes de comprar.",
+      "sub": "Reunimos los datos oficiales de un piso —Catastro, energía, urbanismo, riesgos naturales, barrio— y te los explicamos con claridad. Para que decidas con información, no con corazonadas.",
       "ctaPrimary": "Analizar mi piso",
       "ctaSecondary": "Ver un informe de ejemplo"
     },
     "trust": {
       "title": "Solo fuentes oficiales y abiertas",
       "note": "Nada de scraping de portales. Datos verificables y con fecha."
-    },
-    "catch": {
-      "title": "Qué puede revelar un informe",
-      "note": "El tipo de cosa que el comprador no ve hasta el notario, o no descubre nunca.",
-      "items": [
-        {
-          "tag": "Urbanismo",
-          "title": "Una afectación en la finca",
-          "desc": "Un piso puede estar en un edificio que la ciudad tiene reservado, algún día podría expropiar parte. Leemos el dictamen oficial de afectación del Ayuntamiento y te explicamos qué significa."
-        },
-        {
-          "tag": "Protección patrimonial",
-          "title": "Un edificio protegido",
-          "desc": "La catalogación patrimonial (BCIN/BCIL) limita lo que puedes cambiar, fachada, distribución, a veces las ventanas. Lo señalamos antes de que descuadre tu presupuesto de reforma."
-        },
-        {
-          "tag": "Precio real",
-          "title": "Oferta muy por encima del cierre",
-          "desc": "Los precios de salida superan lo que los pisos cierran de verdad. Te mostramos el rango de precios de cierre reciente del barrio para que veas la diferencia, y la uses para negociar."
-        }
-      ]
     },
     "what": {
       "title": "Qué incluye el informe",
@@ -143,7 +122,7 @@
         },
         {
           "title": "Reunimos los datos",
-          "desc": "Cruzamos fuentes oficiales y las redactamos con claridad."
+          "desc": "Cruzamos fuentes oficiales y lo redactamos con claridad, revisado antes de publicar."
         },
         {
           "title": "Recibe tu informe",
@@ -151,19 +130,26 @@
         }
       ]
     },
-    "who": {
-      "title": "Para quien compra una casa para vivir",
-      "body": "No para inversores. No para pisos turísticos. Trabajamos solo para el comprador, no vendemos pisos ni cobramos a los vendedores. Por eso podemos decirte qué falla en un piso, no solo lo que tiene de bonito."
-    },
-    "honest": {
-      "title": "Nunca inventamos un precio",
-      "body": "Sin valoración inventada, sin estimación de caja negra. Te damos las referencias oficiales de €/m² y el rango de precios de cierre reciente del barrio, y juzgas tú. Más vale honesto que aparentar precisión."
-    },
-    "partner": {
-      "eyebrow": "Para profesionales",
-      "title": "¿Trabajas con compradores de vivienda?",
-      "body": "Personal shoppers inmobiliarios, brokers hipotecarios, abogados y gestorías usan {brand} para dar a sus clientes una claridad fiable. Informes con marca compartida, derivaciones y acceso por API.",
-      "cta": "Colabora con nosotros"
+    "why": {
+      "title": "Por qué {brand}",
+      "items": [
+        {
+          "title": "Independiente",
+          "desc": "No vendemos pisos ni cobramos a vendedores. Trabajamos para el comprador."
+        },
+        {
+          "title": "Fuentes oficiales",
+          "desc": "Catastro, ICAEN, urbanismo, y riesgos del Estado y del Ayuntamiento."
+        },
+        {
+          "title": "Honesto con el precio",
+          "desc": "Te damos referencias para que valores tú; no inventamos una cifra."
+        },
+        {
+          "title": "En tu idioma",
+          "desc": "Castellano, català y English."
+        }
+      ]
     },
     "pricing": {
       "title": "Un precio, sin sorpresas",
@@ -179,20 +165,8 @@
           "a": "De fuentes oficiales y abiertas: Catastro, ICAEN, Mapa Urbanístic de Catalunya, SNCZI y datos abiertos del Ayuntamiento. No hacemos scraping de portales."
         },
         {
-          "q": "¿Es fiable?",
-          "a": "Usamos fuentes oficiales y fechadas, y lo indicamos cuando algo no se ha podido verificar. Es una herramienta de orientación, no un certificado, lo decimos claramente en cada informe."
-        },
-        {
-          "q": "¿Me sirve para negociar?",
-          "a": "Sí, es uno de los usos principales. Las referencias de precio y cualquier tema urbanístico o del edificio son justo los datos que mueven un precio."
-        },
-        {
           "q": "¿Sustituye a un arquitecto o abogado?",
           "a": "No. Es una herramienta de orientación; no reemplaza una inspección técnica, revisión legal ni tasación. Cada informe lo indica."
-        },
-        {
-          "q": "¿Qué pasa con mis datos?",
-          "a": "Solo necesitamos la dirección del piso para hacer el informe. No la compartimos. Consulta la página de privacidad para los detalles."
         },
         {
           "q": "¿Cuánto cuesta?",
