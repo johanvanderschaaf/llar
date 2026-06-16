@@ -76,6 +76,18 @@ scoped under a `.lp` root in `app/globals.css`. Keep landing styles under `.lp`
 (the design uses generic names like `.nav`, `.band`, `.story` that would collide
 otherwise), and edit landing copy in the `landing` namespace of `messages/*.json`.
 
+Two traps when overriding shared styles under `.lp`:
+- **Global element/class rules bleed in.** A bare `h2`, `.eyebrow`, etc. still
+  applies inside `.lp`, so a `.lp` override must explicitly reset what it
+  doesn't want (e.g. `.lp .eyebrow` had to zero the global `margin-bottom`, and
+  `.lp .partner h2` must set `color:#fff` or the global `h2` colour hides it on
+  the dark band).
+- **The CSS pipeline (Lightning CSS) can silently drop a redundant-looking
+  override.** A bare `.lp .locale-switch` overriding the global `.locale-switch`
+  was dropped from the compiled output entirely. Scope through a parent
+  (`.lp .nav .locale-switch`) or otherwise change the selector so it survives —
+  and verify it landed (check the rule in the built CSS, not just the source).
+
 ## Operational facts
 
 - **Vercel auto-deploys on push to `main`** (production). The `feat/*` branches get Preview deploys.
