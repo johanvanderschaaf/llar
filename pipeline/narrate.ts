@@ -14,7 +14,6 @@ const Loc = z.object({ en: z.string(), es: z.string(), ca: z.string() });
 const NarrativeSchema = z.object({
   verdictHeadline: Loc,
   verdictBody: Loc,
-  verdictTag: Loc,
   snapshotNote: Loc,
   neighbourhoodLede: Loc,
   neighbourhoodNote: Loc,
@@ -79,7 +78,6 @@ STRICT RULES, these are non-negotiable:
 - PERIOD: "barriClosing.asOf" arrives in Catalan (e.g. "gener 2025 - desembre 2025"). When you state the period, write the month names in the language you are writing (EN "January to December 2025", ES "enero a diciembre de 2025"), never leave Catalan months in the English or Spanish text.
 - Where a fact is unknown, say it must be verified rather than guessing.
 - FACTS-FIRST, in EVERY field: state facts and figures and let the buyer judge. Do NOT editorialise the flat or its price with verdict words in any language ("fair"/"justo"/"just", "good"/"bueno"/"bo", "great", "a bargain"/"chollo"/"ganga", "reasonable"/"razonable"/"raonable", "overpriced"/"sobrevalorado", "prime", "solid", "strong"). Describe instead (e.g. "9% below the barri closing average", "1965 building, ITE due"). Do not call the report or yourself "honest"; just be accurate.
-- verdictTag: a short FACTUAL descriptor (max ~6 words), not a recommendation, e.g. "Asking below the barri average" or "Planning affectation on the finca", never "Solid buy" / "Worth a viewing".
 - Tone: trustworthy proptech, concise, practical, no fluff. Distinguish asking vs closing prices when prices are discussed.
 - PUNCTUATION: never use em-dashes (—) in any language. Use commas, colons, or parentheses instead.
 - Spanish must be natural, native-quality Spanish (es-ES), not a literal translation.
@@ -87,7 +85,8 @@ STRICT RULES, these are non-negotiable:
 - Keep each field tight: headline ≤ 14 words; body paragraphs 2–4 sentences; list items one sentence each.
 - legalItems: the standard get-before-you-offer DOCUMENTS to request for a Catalonia resale (nota simple, cédula d'habitabilitat, división horizontal, valid ITE, community minutes/actas, pending derrama, updated energy certificate, surface check, up-to-date community-fee certificate). 5–8 items.
 - checklist: 4–6 ON-SITE and PROCESS actions only (e.g. count mailboxes, inspect the roof, visit at different times, check reform permits, line up the mortgage decision-in-principle). Do NOT repeat the documents listed in legalItems; the checklist is what the buyer does, not what they request.
-- negotiationItems: 2–3 legitimate, fact-based negotiation levers.
+- negotiationItems: 2–3 legitimate, fact-based reasons to negotiate the price down (e.g. building age/ITE obligations, asking-vs-closing gap).
+- negotiationTactic: explain HOW to use those levers (conditions to attach to the offer, what justifies a lower price). NEVER propose a specific opening offer or target € amount, a percentage discount, or a "settle near" figure, we cannot know a sound number from this data; the buyer sets it after a viewing.
 Return ONLY the structured JSON.`;
 
 /* ---------- generate + merge ---------- */
@@ -127,7 +126,6 @@ function mergeNarrative(report: Report, n: Narrative): Report {
 
   r.verdict.headline = n.verdictHeadline;
   r.verdict.body = n.verdictBody;
-  r.verdict.tag = n.verdictTag;
   r.snapshot.note = n.snapshotNote;
 
   r.neighbourhood.lede = n.neighbourhoodLede;

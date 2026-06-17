@@ -291,7 +291,7 @@ export async function generateReport(input: ReportInput): Promise<string> {
     flood: flood?.status === "ok" ? flood.data?.level : undefined,
     heritageLevel: heritage?.status === "ok" ? heritage.data?.level : undefined,
   };
-  const { values, overall, risk: riskOutcome } = computeScores({
+  const { values, overall } = computeScores({
     yearBuilt,
     energyClass,
     amenities: amenities?.data,
@@ -303,7 +303,6 @@ export async function generateReport(input: ReportInput): Promise<string> {
     values,
     overall,
     { year: yearBuilt, energyClass, amenities: amenities?.data, deltaPct },
-    riskOutcome,
   );
 
   await db.from("reports").update({ data: report }).eq("id", id);
