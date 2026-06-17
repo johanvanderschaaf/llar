@@ -185,11 +185,11 @@ export async function ReportView({
           <b>{overall}</b>
           <span>{t("verdict.overallSuffix")}</span>
         </div>
-        <div>
-          <span className="vtag">
-            {preview ? previewTag : L(report.verdict.tag, locale)}
-          </span>
-        </div>
+        {preview ? (
+          <div>
+            <span className="vtag">{previewTag}</span>
+          </div>
+        ) : null}
       </div>
 
       {/* ALERTS — serious issues surfaced above the fold (e.g. affectation) */}

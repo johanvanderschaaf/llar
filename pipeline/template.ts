@@ -18,12 +18,7 @@ import { buildLiveSearches } from "@/adapters/live-listings";
 import type { Pricing } from "@/types/report";
 import type { CompRow } from "@/types/report";
 import type { ReportInput } from "@/types/db";
-import {
-  scoreOrder,
-  type ScoreKey,
-  type RiskOutcome,
-  type RiskSeverity,
-} from "@/config/scoring";
+import { scoreOrder, type ScoreKey } from "@/config/scoring";
 
 const EMPTY: Localized = { en: "", es: "", ca: "" };
 
@@ -38,7 +33,6 @@ export function emptyReport(id: string, cadastralRef: string): Report {
       headline: { ...EMPTY },
       body: { ...EMPTY },
       overall: 0,
-      tag: { ...EMPTY },
     },
     alerts: [],
     scores: [],
@@ -1264,37 +1258,11 @@ interface ScoreCtx {
   deltaPct?: number;
 }
 
-/**
- * Verdict tag for a risk that overrode / dragged the overall, so the headline
- * number and the top-of-report alert agree. Returns null for none/mild, those
- * don't materially move the score and need no caveat. The detail lives in the
- * affectation/heritage/flood alerts; this is just the one-line label.
- */
-function riskTag(severity: RiskSeverity): Localized | null {
-  switch (severity) {
-    case "critical":
-      return {
-        en: "Serious restriction, verify before offering",
-        es: "Restricción grave, verifica antes de ofertar",
-        ca: "Restricció greu, verifica abans d'oferir",
-      };
-    case "serious":
-      return {
-        en: "Notable restriction to check",
-        es: "Restricción relevante a revisar",
-        ca: "Restricció rellevant a revisar",
-      };
-    default:
-      return null;
-  }
-}
-
 export function seedScores(
   report: Report,
   values: Partial<Record<ScoreKey, number>>,
   overall: number | null,
   ctx: ScoreCtx,
-  risk?: RiskOutcome,
 ): Report {
   const r: Report = structuredClone(report);
   const scores: Score[] = [];
@@ -1305,9 +1273,5 @@ export function seedScores(
   }
   r.scores = scores;
   if (overall != null) r.verdict.overall = overall;
-  if (risk) {
-    const tag = riskTag(risk.severity);
-    if (tag) r.verdict.tag = tag;
-  }
   return r;
 }

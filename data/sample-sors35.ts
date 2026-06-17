@@ -4,6 +4,7 @@ import { buildPricingPayload } from "@/pipeline/template";
 import barriPrices from "@/data/bcn-barri-prices.json";
 import { buildFooter } from "@/config/footer";
 import { buildLegal } from "@/config/legal";
+import { buildCostFacts, buildSubsidyPanels } from "@/config/costs";
 import { buildBuilding } from "@/config/building";
 
 /**
@@ -76,11 +77,6 @@ export const sampleSors35: Report = {
       ca: "El preu demanat de 455.000 € (5.056 €/m²) està al voltant d'un 9% per sota dels 5.584 €/m² als quals els pisos de segona mà de la Vila de Gràcia es van registrar a notaria durant el 2025. L'edifici és del 1965, de manera que la seva inspecció tècnica ITE està pendent i una construcció anterior al 2002 pot tenir amiant en instal·lacions antigues. Cap afectació urbanística ni protecció patrimonial no en limita l'ús com a habitatge. Abans d'ofertar, comprova la salut col·lectiva de l'edifici (fons de reserva, derrames pendents), els documents i l'estat i la distribució reals del pis en una visita.",
     },
     overall: 71,
-    tag: {
-      en: "Asking below the neighbourhood average",
-      es: "Pedido por debajo de la media del barrio",
-      ca: "Demanat per sota de la mitjana del barri",
-    },
   },
 
   scores: [
@@ -343,64 +339,12 @@ export const sampleSors35: Report = {
     ],
   },
 
-  costs: {
-    intro: {
-      en: "As a resale in Catalonia, the purchase carries transfer tax (ITP) rather than VAT. Budget ~12–14% on top of the price for taxes and fees.",
-      es: "Al ser una segunda transmisión en Cataluña, la compra conlleva el impuesto de transmisiones (ITP) en lugar de IVA. Presupuesta ~12–14% sobre el precio para impuestos y gastos.",
-      ca: "Com que és una segona transmissió a Catalunya, la compra comporta l'impost de transmissions (ITP) en lloc d'IVA. Pressuposta ~12–14% sobre el preu per a impostos i despeses.",
-    },
-    facts: [
-      {
-        labelKey: "costs.itp",
-        value: {
-          en: "~10–11% (tiered), confirm 2026 rate",
-          es: "~10–11% (por tramos), confirma el tipo de 2026",
-          ca: "~10–11% (per trams), confirma el tipus de 2026",
-        },
-        toVerify: true,
-      },
-      {
-        labelKey: "costs.notary",
-        value: "~€2,000–3,500",
-      },
-      {
-        labelKey: "costs.gestoria",
-        value: {
-          en: "~€1,000–4,000 (recommended)",
-          es: "~1.000–4.000 € (recomendado)",
-          ca: "~1.000–4.000 € (recomanat)",
-        },
-      },
-      { labelKey: "costs.valuation", value: "~€300–500" },
-      { labelKey: "costs.allIn", value: "~€510,000–520,000" },
-    ],
-    footnote: {
-      en: "Catalan ITP brackets were revised in 2025, confirm the exact current rate with your gestor before budgeting. Reduced rates may apply (e.g. habitual residence, buyers ≤35, large families).",
-      es: "Los tramos del ITP catalán se revisaron en 2025: confirma el tipo exacto vigente con tu gestor antes de presupuestar. Pueden aplicar tipos reducidos (p. ej. vivienda habitual, compradores ≤35 años, familia numerosa).",
-      ca: "Els trams de l'ITP català es van revisar el 2025: confirma el tipus exacte vigent amb el teu gestor abans de pressupostar. Poden aplicar-se tipus reduïts (p. ex. habitatge habitual, compradors ≤35 anys, família nombrosa).",
-    },
-  },
+  // Costs & subsidies are deterministic/maintained in the live pipeline, so the
+  // demo derives them from the same builders (no per-property "to verify": the
+  // Catalan ITP brackets are maintained, with the caveats kept in the footnote).
+  costs: buildCostFacts(455000),
 
-  subsidies: {
-    panels: [
-      {
-        heading: { en: "Still available", es: "Aún disponible", ca: "Encara disponible" },
-        body: {
-          en: "IRPF energy deductions, 20% / 40% / 60% income-tax relief for qualifying efficiency works. Useful if you upgrade windows or insulation later.",
-          es: "Deducciones de IRPF por eficiencia, desgravación del 20% / 40% / 60% por obras que cumplan requisitos. Útil si más adelante mejoras ventanas o aislamiento.",
-          ca: "Deduccions d'IRPF per eficiència, desgravació del 20% / 40% / 60% per obres que compleixin els requisits. Útil si més endavant millores finestres o aïllament.",
-        },
-      },
-      {
-        heading: { en: "Closing window", es: "Ventana que se cierra", ca: "Finestra que es tanca" },
-        body: {
-          en: "Next Generation grants (40–80% of works, up to ~€21k/home) are largely exhausted/waitlisted in Catalonia and must be justified by 30 June 2026, don't count on them for a future reform.",
-          es: "Las ayudas Next Generation (40–80% de la obra, hasta ~21.000 €/vivienda) están en gran parte agotadas o en lista de espera en Cataluña y deben justificarse antes del 30 de junio de 2026: no cuentes con ellas para una reforma futura.",
-          ca: "Els ajuts Next Generation (40–80% de l'obra, fins a ~21.000 €/habitatge) estan en gran part exhaurits o en llista d'espera a Catalunya i s'han de justificar abans del 30 de juny de 2026: no comptis amb ells per a una reforma futura.",
-        },
-      },
-    ],
-  },
+  subsidies: { panels: buildSubsidyPanels() },
 
   negotiation: {
     intro: {
@@ -421,9 +365,9 @@ export const sampleSors35: Report = {
       },
     ],
     tactic: {
-      en: "Tactic: open around €438k on building-age and inspection grounds, settle near €448k. Make any offer conditional on receiving a valid ITE, cédula and clean community minutes, which protects you and is the cleanest justification for shaving the price.",
-      es: "Táctica: abre en torno a 438.000 € por la edad del edificio y la inspección, cierra cerca de 448.000 €. Condiciona cualquier oferta a recibir una ITE vigente, la cédula y unas actas de comunidad limpias: eso te protege y es la justificación más limpia para rebajar el precio.",
-      ca: "Tàctica: obre al voltant de 438.000 € per l'edat de l'edifici i la inspecció, tanca prop dels 448.000 €. Condiciona qualsevol oferta a rebre una ITE vigent, la cèdula i unes actes de comunitat netes: això et protegeix i és la justificació més neta per rebaixar el preu.",
+      en: "Anchor any reduction to the building's age and inspection obligations, and make the offer conditional on receiving a valid ITE, cédula and clean community minutes. That protects you and is the cleanest justification for a lower price. Set the figure yourself once you've seen the flat and concrete comparables.",
+      es: "Fundamenta cualquier rebaja en la antigüedad del edificio y las obligaciones de inspección, y condiciona la oferta a recibir una ITE vigente, la cédula y unas actas de comunidad limpias. Eso te protege y es la justificación más limpia para un precio más bajo. La cifra la fijas tú tras ver el piso y comparables concretos.",
+      ca: "Fonamenta qualsevol rebaixa en l'antiguitat de l'edifici i les obligacions d'inspecció, i condiciona l'oferta a rebre una ITE vigent, la cèdula i unes actes de comunitat netes. Això et protegeix i és la justificació més neta per a un preu més baix. La xifra la fixes tu després de veure el pis i comparables concrets.",
     },
   },
 

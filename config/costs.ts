@@ -54,7 +54,6 @@ export function buildCostFacts(askingPriceEur?: number): {
         es: `~${eur(itp)} (10–13% por tramos)`,
         ca: `~${eur(itp)} (10–13% per trams)`,
       },
-      toVerify: true,
     });
   } else {
     facts.push({
@@ -64,7 +63,6 @@ export function buildCostFacts(askingPriceEur?: number): {
         es: "10–13% del precio (por tramos)",
         ca: "10–13% del preu (per trams)",
       },
-      toVerify: true,
     });
   }
 

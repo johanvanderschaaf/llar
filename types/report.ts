@@ -177,8 +177,6 @@ export interface Report {
     headline: Localized;
     body: Localized;
     overall: number;
-    /** Short tag, e.g. "Solid buy — negotiate on the details". */
-    tag: Localized;
   };
 
   /**
