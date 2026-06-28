@@ -75,13 +75,13 @@ export const sampleSors35: Report = {
   verdict: {
     headline: {
       en: "90 m² flat in Vila de Gràcia, asking about 9% below the neighbourhood average.",
-      es: "Piso de 90 m² en la Vila de Gràcia, pedido un 9% por debajo de la media del barrio.",
+      es: "Piso de 90 m² en la Vila de Gràcia, con un precio de salida un 9% por debajo de la media del barrio.",
       ca: "Pis de 90 m² a la Vila de Gràcia, demanat un 9% per sota de la mitjana del barri.",
     },
     body: {
       en: "The asking €455,000 (€5,056/m²) is about 9% below the €5,584/m² that second-hand flats in Vila de Gràcia registered at the notary across 2025. The building dates from 1965, so its ITE technical inspection is due and a pre-2002 build can carry asbestos in old installations. No planning affectation or heritage listing limits its use as a home. Before offering, confirm the building's collective health (reserve fund, pending derramas), the documents, and the flat's actual condition and layout on a viewing.",
-      es: "El precio pedido de 455.000 € (5.056 €/m²) está alrededor de un 9% por debajo de los 5.584 €/m² a los que los pisos de segunda mano de la Vila de Gràcia se registraron en notaría durante 2025. El edificio es de 1965, por lo que su inspección técnica ITE está pendiente y una construcción anterior a 2002 puede tener amianto en instalaciones antiguas. Ninguna afectación urbanística ni protección patrimonial limita su uso como vivienda. Antes de ofertar, comprueba la salud colectiva del edificio (fondo de reserva, derramas pendientes), los documentos y el estado y la distribución reales del piso en una visita.",
-      ca: "El preu demanat de 455.000 € (5.056 €/m²) està al voltant d'un 9% per sota dels 5.584 €/m² als quals els pisos de segona mà de la Vila de Gràcia es van registrar a notaria durant el 2025. L'edifici és del 1965, de manera que la seva inspecció tècnica ITE està pendent i una construcció anterior al 2002 pot tenir amiant en instal·lacions antigues. Cap afectació urbanística ni protecció patrimonial no en limita l'ús com a habitatge. Abans d'ofertar, comprova la salut col·lectiva de l'edifici (fons de reserva, derrames pendents), els documents i l'estat i la distribució reals del pis en una visita.",
+      es: "El precio de salida de 455.000 € (5.056 €/m²) está alrededor de un 9% por debajo de los 5.584 €/m² a los que los pisos de segunda mano de la Vila de Gràcia se registraron ante notario durante 2025. El edificio es de 1965, por lo que su inspección técnica ITE está pendiente y una construcción anterior a 2002 puede tener amianto en instalaciones antiguas. Ninguna afectación urbanística ni protección patrimonial limita su uso como vivienda. Antes de ofertar, comprueba la salud colectiva del edificio (fondo de reserva, derramas pendientes), los documentos y el estado y la distribución reales del piso en una visita.",
+      ca: "El preu demanat de 455.000 € (5.056 €/m²) està al voltant d'un 9% per sota dels 5.584 €/m² als quals els pisos de segona mà de la Vila de Gràcia es van registrar a la notaria durant el 2025. L'edifici és de 1965, de manera que la seva inspecció tècnica ITE està pendent i una construcció anterior al 2002 pot tenir amiant en instal·lacions antigues. Cap afectació urbanística ni protecció patrimonial no en limita l'ús com a habitatge. Abans d'ofertar, comprova la salut col·lectiva de l'edifici (fons de reserva, derrames pendents), els documents i l'estat i la distribució reals del pis en una visita.",
     },
     overall: 71,
   },
@@ -111,7 +111,7 @@ export const sampleSors35: Report = {
       caption: {
         en: "1965 block, 61 yrs · ITE due",
         es: "Bloque de 1965, 61 años · ITE pendiente",
-        ca: "Bloc del 1965, 61 anys · ITE pendent",
+        ca: "Bloc de 1965, 61 anys · ITE pendent",
       },
     },
     {
@@ -158,8 +158,8 @@ export const sampleSors35: Report = {
     ],
     note: {
       en: "On the building: aggregators show \"1 dwelling\" at this address, but the cadastral suffix 0013 means your flat is unit #13 in the parcel, so it's a normal multi-unit block, not a single home. The other units are filed under the adjacent entrance. Confirm the true count on-site (count the mailboxes) and via the building's división horizontal.",
-      es: "Sobre el edificio: los portales muestran \"1 vivienda\" en esta dirección, pero el sufijo catastral 0013 indica que tu piso es la unidad n.º 13 de la parcela, así que es un bloque normal de varias viviendas, no una casa única. Las demás unidades constan en la entrada contigua. Confirma el número real in situ (cuenta los buzones) y mediante la división horizontal del edificio.",
-      ca: "Sobre l'edifici: els portals mostren \"1 habitatge\" en aquesta adreça, però el sufix cadastral 0013 indica que el teu pis és la unitat núm. 13 de la parcel·la, així que és un bloc normal de diversos habitatges, no una casa única. La resta d'unitats consten a l'entrada contigua. Confirma el nombre real in situ (compta les bústies) i mitjançant la divisió horitzontal de l'edifici.",
+      es: "Sobre el edificio: los portales muestran \"1 vivienda\" en esta dirección, pero el sufijo catastral 0013 indica que tu piso es la unidad n.º 13 de la parcela, así que es un bloque normal de varias viviendas, no una vivienda unifamiliar. Las demás unidades constan en la entrada contigua. Confirma el número real in situ (cuenta los buzones) y mediante la división horizontal del edificio.",
+      ca: "Sobre l'edifici: els portals mostren \"1 habitatge\" en aquesta adreça, però el sufix cadastral 0013 indica que el teu pis és la unitat núm. 13 de la parcel·la, així que és un bloc normal de diversos habitatges, no un habitatge unifamiliar. La resta d'unitats consten a l'entrada contigua. Confirma el nombre real in situ (compta les bústies) i mitjançant la divisió horitzontal de l'edifici.",
     },
   },
 
@@ -169,7 +169,7 @@ export const sampleSors35: Report = {
     // ladder are unused by the current design (offer guidance is in negotiation).
     lede: {
       en: "Asking €455,000 (€5,056/m²), about 9% below the Vila de Gràcia registered closing-price average.",
-      es: "Precio pedido 455.000 € (5.056 €/m²), alrededor de un 9% por debajo de la media de cierre registrada de la Vila de Gràcia.",
+      es: "Precio de salida 455.000 € (5.056 €/m²), alrededor de un 9% por debajo de la media de cierre registrada de la Vila de Gràcia.",
       ca: "Preu demanat 455.000 € (5.056 €/m²), al voltant d'un 9% per sota de la mitjana de tancament registrada de la Vila de Gràcia.",
     },
     panels: [],
@@ -184,7 +184,7 @@ export const sampleSors35: Report = {
       builtM2: 90,
     }),
     fairValue: {
-      en: "Flats around 90 m² in Vila de Gràcia registered between about €427,000 and €578,000 over 2025 (neighbourhood €/m² ±15%). Position the offer by this flat's specific features, then verify against concrete comparables.",
+      en: "Flats around 90 m² in Vila de Gràcia registered between about €427,000 and €578,000 over 2025 (neighbourhood €/m² ±15%). Position your offer based on this flat's specific features, then verify against concrete comparables.",
       es: "Los pisos de unos 90 m² en la Vila de Gràcia se registraron entre unos 427.000 € y 578.000 € durante 2025 (€/m² del barrio ±15%). Sitúa la oferta según las características concretas de este piso y contrástala con comparables.",
       ca: "Els pisos d'uns 90 m² a la Vila de Gràcia es van registrar entre uns 427.000 € i 578.000 € durant el 2025 (€/m² del barri ±15%). Situa l'oferta segons les característiques concretes d'aquest pis i contrasta-la amb comparables.",
     },
@@ -328,9 +328,9 @@ export const sampleSors35: Report = {
       },
     ],
     note: {
-      en: "Note: Park Güell is a short walk uphill, which also brings tourist foot-traffic on the upper streets. The Abaceria market is due to reopen in 2026 to 2027.",
-      es: "Nota: el Park Güell queda a poca distancia cuesta arriba, lo que también atrae tránsito turístico en las calles altas. El mercado de l'Abaceria tiene prevista su reapertura en 2026 a 2027.",
-      ca: "Nota: el Park Güell queda a poca distància costa amunt, cosa que també atrau trànsit turístic als carrers alts. El Mercat de l'Abaceria té prevista la reobertura el 2026 a 2027.",
+      en: "Note: Park Güell is a short walk uphill, which also brings tourist foot-traffic on the upper streets. The Abaceria market is due to reopen between 2026 and 2027.",
+      es: "Nota: el Park Güell queda a poca distancia cuesta arriba, lo que también atrae tránsito turístico en las calles altas. El mercado de l'Abaceria tiene prevista su reapertura entre 2026 y 2027.",
+      ca: "Nota: el Park Güell queda a poca distància costa amunt, cosa que també atrau trànsit turístic als carrers alts. El Mercat de l'Abaceria té prevista la reobertura entre el 2026 i el 2027.",
     },
   },
 
@@ -388,7 +388,7 @@ export const sampleSors35: Report = {
         },
         text: {
           en: "Like all of central Barcelona, this address is inside the Low Emission Zone. Only relevant if you keep a car without an emissions sticker.",
-          es: "Como toda Barcelona central, esta dirección está dentro de la Zona de Bajas Emisiones. Solo importa si mantienes un coche sin etiqueta ambiental.",
+          es: "Como toda Barcelona central, esta dirección está dentro de la Zona de Bajas Emisiones. Solo importa si tienes un coche sin etiqueta ambiental.",
           ca: "Com tota la Barcelona central, aquesta adreça és dins la Zona de Baixes Emissions. Només importa si tens cotxe sense etiqueta ambiental.",
         },
       },
@@ -405,8 +405,8 @@ export const sampleSors35: Report = {
   negotiation: {
     intro: {
       en: "The asking sits below the neighbourhood average, so this is fine-tuning. Two fact-based levers:",
-      es: "El precio pedido está por debajo de la media del barrio, así que esto es afinar. Dos palancas objetivas:",
-      ca: "El preu demanat està per sota de la mitjana del barri, així que això és afinar. Dues palanques objectives:",
+      es: "El precio de salida está por debajo de la media del barrio, así que se trata de ajustar detalles. Dos palancas objetivas:",
+      ca: "El preu demanat està per sota de la mitjana del barri, així que es tracta d'ajustar detalls. Dues palanques objectives:",
     },
     items: [
       {
@@ -424,12 +424,12 @@ export const sampleSors35: Report = {
       {
         title: {
           en: "Asking is not closing",
-          es: "La oferta no es el cierre",
-          ca: "L'oferta no és el tancament",
+          es: "Pedir no es cerrar",
+          ca: "Demanar no és tancar",
         },
         desc: {
           en: "Listed prices usually settle a little below the asking price, which leaves room for a measured offer.",
-          es: "Los precios anunciados suelen cerrarse algo por debajo del precio pedido, lo que deja margen para una propuesta medida.",
+          es: "Los precios anunciados suelen cerrarse algo por debajo del precio de salida, lo que deja margen para una propuesta medida.",
           ca: "Els preus anunciats solen tancar-se una mica per sota del preu demanat, cosa que deixa marge per a una proposta mesurada.",
         },
       },
@@ -450,7 +450,7 @@ export const sampleSors35: Report = {
       ca: "Compta les bústies i els timbres in situ per confirmar el nombre real d'habitatges del bloc.",
     },
     {
-      en: "Inspect the flat and stairwell for damp, and ask about the roof and any lift's maintenance.",
+      en: "Inspect the flat and stairwell for damp, and ask about the roof and how any lift is maintained.",
       es: "Inspecciona el piso y la escalera por humedades, y pregunta por la cubierta y el mantenimiento de cualquier ascensor.",
       ca: "Inspecciona el pis i l'escala per humitats, i pregunta per la coberta i el manteniment de qualsevol ascensor.",
     },
@@ -460,7 +460,7 @@ export const sampleSors35: Report = {
       ca: "Visita a diferents hores del dia per valorar la llum, el soroll del carrer i el trànsit turístic.",
     },
     {
-      en: "If the flat has been renovated, check the works had the required permits.",
+      en: "If the flat has been renovated, check that the works had the required permits.",
       es: "Si el piso ha sido reformado, comprueba que las obras tuvieron los permisos necesarios.",
       ca: "Si el pis ha estat reformat, comprova que les obres van tenir els permisos necessaris.",
     },

@@ -336,14 +336,14 @@ export function seedBarriPricing(
           : { en: "in line with", es: "en línea con", ca: "en línia amb" };
     r.price.lede = {
       en: `Asking €${askStr}/m² in ${barri.name}, ${absDelta}% ${dir.en} the neighbourhood's €${ppmStr}/m² closing-price average (${barri.asOf}, registered second-hand sales).`,
-      es: `Precio pedido €${askStr}/m² en ${barri.name}, ${absDelta}% ${dir.es} la media de cierre del barrio €${ppmStr}/m² (${barri.asOf}, ventas registradas de segunda mano).`,
+      es: `Precio de salida €${askStr}/m² en ${barri.name}, ${absDelta}% ${dir.es} la media de cierre del barrio €${ppmStr}/m² (${barri.asOf}, ventas registradas de segunda mano).`,
       ca: `Preu demanat €${askStr}/m² a ${barri.name}, ${absDelta}% ${dir.ca} la mitjana de tancament del barri €${ppmStr}/m² (${barri.asOf}, vendes registrades de segona mà).`,
     };
   } else {
     // Asking unknown, verdict-less version centred on the barri figure.
     r.price.lede = {
       en: `${barri.name}: €${ppmStr}/m² closing-price average across registered second-hand sales (${barri.asOf}). The range below is what flats this size actually close at, position the asking price within it.`,
-      es: `${barri.name}: €${ppmStr}/m² de media de cierre en ventas registradas de segunda mano (${barri.asOf}). El rango siguiente refleja a qué precio se cierran realmente los pisos de este tamaño, sitúa el precio pedido dentro de él.`,
+      es: `${barri.name}: €${ppmStr}/m² de media de cierre en ventas registradas de segunda mano (${barri.asOf}). La horquilla siguiente refleja a qué precio se cierran realmente los pisos de este tamaño, sitúa el precio de salida dentro de ella.`,
       ca: `${barri.name}: €${ppmStr}/m² de mitjana de tancament en vendes registrades de segona mà (${barri.asOf}). El rang següent reflecteix a quin preu es tanquen realment els pisos d'aquesta mida, situa el preu demanat dins d'aquest rang.`,
     };
   }
@@ -611,7 +611,7 @@ export function buildPricingPayload(
   // `.price-verdict` / `.price-sub` two-line treatment.
   const verdict: Localized = {
     en: `Asking sits ${positionHeadline.en} of the area's recent closing range.`,
-    es: `El precio pedido se sitúa ${positionHeadline.es} del intervalo de cierre reciente de la zona.`,
+    es: `El precio de salida se sitúa ${positionHeadline.es} del intervalo de cierre reciente de la zona.`,
     ca: `El preu demanat se situa ${positionHeadline.ca} de l'interval de tancament recent de la zona.`,
   };
   const askPpmStr = Math.round(askPerM2).toLocaleString("en-GB");

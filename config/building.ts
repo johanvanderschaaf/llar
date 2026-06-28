@@ -30,7 +30,7 @@ export function buildBuilding(yearBuilt?: number): {
     def: yearBuilt
       ? {
           en: `Completed ${yearBuilt}, so ${age} years old.${
-            iteDue ? " Inside the window where the ITE is obligatory." : " Not yet within the ITE-obligatory age window."
+            iteDue ? " Within the age window where the ITE is required." : " Not yet within the ITE-obligatory age window."
           }`,
           es: `Terminado en ${yearBuilt}, ${age} años.${
             iteDue ? " Dentro del periodo en que la ITE es obligatoria." : " Aún fuera del periodo de ITE obligatoria por antigüedad."

@@ -79,8 +79,8 @@
     },
     "hero": {
       "eyebrow": "Due diligence per a compradors de Barcelona",
-      "h1": "Sàpigues què compres de veritat, <em>abans de signar.</em>",
-      "titlePlain": "Sàpigues què compres de veritat, abans de signar.",
+      "h1": "Coneix què compres de veritat, <em>abans de signar.</em>",
+      "titlePlain": "Coneix què compres de veritat, abans de signar.",
       "sub": "Reunim les dades oficials d'un pis i te les expliquem en llenguatge clar, així decideixes amb fets, no amb intuïcions."
     },
     "trust": {
@@ -101,7 +101,7 @@
         {
           "tag": "Protecció patrimonial",
           "h3": "Un edifici protegit",
-          "p": "Una catalogació patrimonial (BCIN / BCIL) limita què pots canviar: la façana, la distribució, de vegades les finestres. T'ho advertim abans que et trastoqui el pressupost de reforma."
+          "p": "Una catalogació patrimonial (BCIN / BCIL) limita què pots canviar: la façana, la distribució, de vegades les finestres. T'avisem abans no et descontroli el pressupost de la reforma."
         },
         {
           "tag": "Realitat del preu",
@@ -113,10 +113,10 @@
     "report": {
       "eyebrow": "L'informe",
       "h2": "Què inclou l'informe.",
-      "note": "Vuit lectures d'un mateix pis, amb la feina d'urbanisme i riscos que la majoria de comprovacions es salten.",
+      "note": "Vuit lectures d'un mateix pis, amb la feina d'urbanisme i riscos que la majoria de comprovacions se salten.",
       "scores": {
         "h4": "5 puntuacions, un veredicte",
-        "p": "Tot el pis resumit en cinc puntuacions clares i una lectura final amb confiança.",
+        "p": "Tot el pis resumit en cinc puntuacions clares i una lectura final clara.",
         "chips": [
           "Preu",
           "Risc",
@@ -158,7 +158,7 @@
     },
     "how": {
       "eyebrow": "Com funciona",
-      "h2": "Tres passos. Sense ser-ne expert.",
+      "h2": "Tres passos. No cal ser-ne expert.",
       "steps": [
         {
           "n": "PAS 01",
@@ -179,7 +179,7 @@
     },
     "indep": {
       "lead": "Per a qui compra un habitatge per viure-hi.",
-      "body": "Ni inversors. Ni pisos turístics. Treballem només per al comprador. <strong>No venem pisos i mai cobrem dels venedors.</strong> Per això et podem dir què falla en un pis, no només què hi queda bé."
+      "body": "Ni inversors. Ni pisos turístics. Treballem només per al comprador. <strong>No venem pisos i mai cobrem dels venedors.</strong> Per això et podem dir què falla en un pis, no només el que es veu bé."
     },
     "ph": {
       "lead": "Mai ens inventem un preu.",
@@ -194,7 +194,7 @@
     "partner": {
       "eyebrow": "Per a professionals",
       "h2": "Treballes amb compradors d'habitatge?",
-      "p": "Agents del comprador, agents hipotecaris, advocats i gestories fan servir PisoWise per donar als clients una claredat de confiança. Informes amb marca compartida, derivacions i accés per API disponibles."
+      "p": "Agents del comprador, agents hipotecaris, advocats i gestories fan servir PisoWise per donar als clients una claredat fiable. Informes amb marca compartida, derivacions i accés per API disponibles."
     },
     "pricing": {
       "eyebrow": "Preus",
@@ -211,7 +211,7 @@
           "a": "Només fonts oficials i obertes: el <strong>Catastro</strong>, el registre d'energia (ICAEN), el Mapa Urbanístic, el sistema nacional de risc d'inundació (SNCZI), l'Ajuntament de Barcelona i els preus de tancament registrats de la Generalitat. Sense rastrejar portals. Cada xifra és verificable i datada."
         },
         {
-          "q": "Què tan fiable és?",
+          "q": "Fins a quin punt és fiable?",
           "a": "Expliquem el que diuen els registres oficials i datem cada xifra. Quan les dades són incompletes o una referència no és fiable, ho diem clarament en comptes d'omplir el buit amb una suposició. És una <strong>eina d'orientació</strong>: et mostra què cal comprovar, no una taxació certificada."
         },
         {
@@ -224,7 +224,7 @@
         },
         {
           "q": "I les meves dades?",
-          "a": "Només necessitem l'adreça o la referència cadastral del pis per fer l'informe. No venem les teves dades i mai cobrem dels venedors, així que res de l'informe no l'orienta ningú més que tu."
+          "a": "Només necessitem l'adreça o la referència cadastral del pis per fer l'informe. No venem les teves dades i mai cobrem dels venedors, així que ningú més que tu no orienta res del que diu l'informe."
         },
         {
           "q": "Quant costa?",
@@ -232,7 +232,7 @@
         },
         {
           "q": "Només Barcelona?",
-          "a": "De moment, sí. Cobrim els barris de Barcelona en profunditat en lloc de tot el país per sobre, i t'avisarem si una adreça queda fora de la zona on podem garantir una referència de barri."
+          "a": "De moment, sí. Cobrim els barris de Barcelona en profunditat en lloc de cobrir tot el país superficialment, i t'avisarem si una adreça queda fora de la zona on podem garantir una referència de barri."
         }
       ]
     },
@@ -264,7 +264,7 @@
     "scoresNote": "0–100 · més alt és millor",
     "snapshot": "Fitxa de l'immoble",
     "price": "Preu i valor",
-    "priceNote": "el principal",
+    "priceNote": "el plat fort",
     "building": "Edifici i estat",
     "risks": "Risc i seguretat",
     "legal": "Legal i documents a sol·licitar",
@@ -273,7 +273,7 @@
     "costs": "Costos i impostos",
     "subsidies": "Deduccions i ajuts",
     "negotiation": "Guia de negociació",
-    "checklist": "Abans d'ofertar, llista de comprovació"
+    "checklist": "Llista de comprovació · abans de fer una oferta"
   },
   "scoreNames": {
     "location": "Ubicació i estil de vida",
@@ -298,15 +298,15 @@
   },
   "price": {
     "benchHeading": "Referències i evidència comparable",
-    "rangeHeading": "Rang de preus per a aquesta mida en aquest barri",
+    "rangeHeading": "Forquilla de preus per a aquesta mida en aquest barri",
     "liveHeading": "Pisos similars, en directe",
-    "liveNote": "L'inventari dels portals canvia cada dia, per això en lloc d'incrustar captures antigues t'enviem a cerques prefiltrades per districte, mida i rang de preu. Afina al barri exacte al portal mateix.",
-    "ladderHeading": "Escala d'oferta suggerida",
+    "liveNote": "L'inventari dels portals canvia cada dia, per això en lloc d'incrustar captures antigues t'enviem a cerques prefiltrades per districte, mida i forquilla de preu. Acota al barri exacte des del portal mateix.",
+    "ladderHeading": "Oferta esglaonada suggerida",
     "referencesHeading": "Comprova el preu tu mateix, fonts de referència",
     "referencesNote": "No assignem un valor en nom teu. Fes servir aquestes fonts oficials i publicades per comparar el preu de sortida amb el mercat i decidir per tu mateix.",
     "refKind": {
       "official": "oficial",
-      "portal": "estadística portal",
+      "portal": "estadística del portal",
       "search": "anuncis"
     },
     "table": {
@@ -327,8 +327,8 @@
       "barriAvg": "Mitjana del barri"
     },
     "barriAvgLabel": "Mitjana barri",
-    "rangeLow": "Rang baix",
-    "rangeHigh": "Rang alt",
+    "rangeLow": "Forquilla baixa",
+    "rangeHigh": "Forquilla alta",
     "barriClosingAvg": "mitjana de tancament",
     "compare": {
       "askingLabel": "Aquest pis · demanat",
@@ -343,18 +343,18 @@
       "title": "referència de preu",
       "sub": "Registrats al notari, no preus d'oferta dels portals.",
       "avgPerM2": "Mitjana €/m² construït",
-      "sales": "Vendes registrades (12 m)",
-      "avgFlat": "Mida mitjana del pis venut",
+      "sales": "Vendes registrades (12 mesos)",
+      "avgFlat": "Mida mitjana dels pisos venuts",
       "period": "Període",
       "sourceLead": "Font:",
       "sourceBody": "Generalitat de Catalunya, Habitatge (escriptures notarials registrades · segona mà)"
     },
     "humility": {
-      "lead": "El rang abasta tot el barri:",
-      "body": "una planta baixa sense reformar a l'extrem baix; un pis reformat amb balcó a l'alt. Contrasta amb comparables concrets de mida, planta i estat similars abans d'ofertar."
+      "lead": "La forquilla abasta tot el barri:",
+      "body": "una planta baixa sense reformar a la part baixa; un pis reformat amb balcó a la part alta. Contrasta amb comparables concrets de mida, planta i estat similars abans d'ofertar."
     },
     "unavailable": {
-      "body": "Aquesta adreça queda fora dels 73 barris de Barcelona dels quals tenim preus de tancament registrats, o s'han venut massa pocs pisos aquí en els últims 12 mesos per publicar una mitjana de què ens fiem. No et mostrarem un rang de preus que no puguem defensar."
+      "body": "Aquesta adreça queda fora dels 73 barris de Barcelona dels quals tenim preus de tancament registrats, o s'han venut massa pocs pisos aquí en els últims 12 mesos per publicar una mitjana fiable. No et mostrarem una forquilla de preus que no puguem defensar."
     },
     "facts": {
       "asking": "Preu demanat",
@@ -363,8 +363,8 @@
     },
     "howTo": {
       "heading": "Com llegir això",
-      "portals": "Mira els preus d'oferta actuals de pisos propers d'una mida semblant en un portal, i recorda que l'oferta queda sistemàticament per sobre del preu al qual realment tanquen.",
-      "askAgent": "Demana al teu agent vendes tancades recents en aquest carrer o illa, el més proper a un comparable real."
+      "portals": "Mira els preus d'oferta actuals de pisos propers d'una mida semblant en un portal, i recorda que l'oferta queda sistemàticament per sobre del preu al qual es tanquen realment.",
+      "askAgent": "Demana al teu agent vendes tancades recents en aquest carrer o illa, com més semblants millor a un comparable real."
     }
   },
   "risk": {
@@ -413,8 +413,8 @@
     "verdictEyebrow": "Conclusió",
     "overallCaption": "Puntuació global",
     "ringOf": "/ 100",
-    "verdictPreviewNote": "Desbloqueja l'informe complet per veure què significa cada troballa i els passos a fer abans de fer una oferta.",
-    "alertLocked": "Desbloqueja per veure què significa i què cal fer abans de fer una oferta.",
+    "verdictPreviewNote": "Desbloqueja l'informe complet per veure què significa cada troballa i els passos a seguir abans de fer una oferta.",
+    "alertLocked": "Desbloqueja per veure què significa i què cal fer abans de presentar l'oferta.",
     "bandGood": "Bona · 70 a 100",
     "bandOk": "Correcta · 50 a 69",
     "bandLow": "Baixa · menys de 50",
@@ -425,15 +425,15 @@
     "scoresLede": "Cada pilar es puntua amb dades oficials. Una troballa greu pot fer baixar la nota global per sota del que indiquen els pilars.",
     "snapshotHead": "El pis segons els registres.",
     "buildingNoteLabel": "Nota de l'edifici",
-    "priceHead": "El preu de sortida davant del que es tanca realment a la zona.",
+    "priceHead": "El preu de sortida davant del que realment es tanca a la zona.",
     "priceLede": "La referència és el preu de tancament registrat de la Generalitat, el que realment es paga pels pisos de la zona. Mostrem on se situa aquest preu de sortida dins d'aquest interval.",
     "planningHead": "Què diu el registre urbanístic d'aquesta parcel·la.",
-    "planningLede": "La part de la diligència que la majoria de comprovacions se salten. Cada línia s'ha consultat contra el pla oficial i té un estat clar.",
+    "planningLede": "La part de la diligència que la majoria de comprovacions se salten. Cada línia s'ha contrastat amb el pla oficial i té un estat clar.",
     "planKeyAffected": "Afectat · actua abans d'oferir",
     "planKeyRestriction": "Restricció · convé saber-ho",
     "planKeyClear": "Net · res a assenyalar",
     "planDisclaimer": "Les dades urbanístiques són indicatives. Verifica sempre l'estat de la parcel·la amb un certificat urbanístic oficial de l'Ajuntament abans de comprometre't.",
-    "buildingHead": "Què impliquen l'any i els registres.",
+    "buildingHead": "Què impliquen l'any de construcció i els registres.",
     "theBuildingLabel": "L'edifici",
     "whatToCheckLabel": "Què cal revisar",
     "deductionsLabel": "Deduccions i ajuts",
@@ -444,16 +444,16 @@
     "subsidiesHead": "Ajuts que pots demanar i el que assumeixes.",
     "negotiationHead": "Arguments per negociar, segons els registres.",
     "tacticLabel": "La tàctica",
-    "beforeHead": "El teu torn, sobre el terreny i sobre el paper.",
+    "beforeHead": "Ara et toca a tu, sobre el terreny i sobre el paper.",
     "onSiteLabel": "Sobre el terreny i tràmits",
     "docsLabel": "Documents a demanar",
-    "docsFuture": "Aviat: puja aquests documents i PisoWise els analitzarà per tu. Aquí és on viurà aquesta funció.",
+    "docsFuture": "Aviat: puja aquests documents i PisoWise els analitzarà per tu. Aquí és on trobaràs aquesta funcionalitat.",
     "footSources": "Fonts i mètode",
     "sourceChips": ["Catastro", "Gencat Habitatge", "PGM · Ajuntament de Barcelona", "Catàleg de patrimoni", "SNCZI", "ICAEN"],
     "gate": {
       "eyebrow": "L'informe complet",
       "head": "Aquí és on comença l'anàlisi a fons.",
-      "sub": "Ja has vist la conclusió, les puntuacions i les dades bàsiques. L'informe complet treballa cada troballa: què significa i què cal fer abans de fer una oferta.",
+      "sub": "Ja has vist la conclusió, les puntuacions i les dades bàsiques. L'informe complet desgrana cada troballa: què significa i què cal fer abans de fer una oferta.",
       "lockedH": "Què inclou l'informe complet",
       "priceSuffix": "pagament únic",
       "cta": "Desbloqueja l'informe complet",

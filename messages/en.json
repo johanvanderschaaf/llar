@@ -25,7 +25,7 @@
     "manualSummary": "Or enter a cadastral reference directly",
     "askingPrice": "Asking price (€)",
     "email": "Email (optional)",
-    "emailHint": "To save your report and tell you when the full analysis is ready.",
+    "emailHint": "To save your report and let you know when the full analysis is ready.",
     "selected": "Selected:",
     "submit": "Generate preview →",
     "genError": "We couldn't generate the report. Please try again in a moment."
@@ -81,7 +81,7 @@
       "eyebrow": "Due diligence for Barcelona buyers",
       "h1": "Know what you're really buying, <em>before you sign.</em>",
       "titlePlain": "Know what you're really buying, before you sign.",
-      "sub": "We pull a flat's official data and explain it in plain language, so you decide on facts, not hunches."
+      "sub": "We gather a flat's official data and explain it in plain language, so you decide on facts, not hunches."
     },
     "trust": {
       "label": "Official, open sources only",
@@ -96,7 +96,7 @@
         {
           "tag": "Urban planning",
           "h3": "An affectation on the building",
-          "p": "A flat can sit on a building the city has earmarked: one day it could expropriate part of it. We read the city council's official affectation verdict and explain what it means for you."
+          "p": "A flat can be in a building the city has earmarked: one day it could expropriate part of it. We read the city council's official affectation verdict and explain what it means for you."
         },
         {
           "tag": "Heritage protection",
@@ -220,7 +220,7 @@
         },
         {
           "q": "Does it replace an architect or lawyer?",
-          "a": "<strong>No.</strong> It's an orientation tool that tells you what's worth a closer look and what questions to ask. It doesn't replace a technical survey, a legal review or a formal valuation. It helps you decide where those are worth paying for."
+          "a": "<strong>No.</strong> It's an orientation tool that tells you what's worth a closer look and what questions to ask. It doesn't replace a technical survey, a legal review or a formal valuation. It helps you decide which of those are worth paying for."
         },
         {
           "q": "What about my data?",
@@ -273,7 +273,7 @@
     "costs": "Costs & taxes",
     "subsidies": "Deductions & grants",
     "negotiation": "Negotiation playbook",
-    "checklist": "Before you offer, checklist"
+    "checklist": "Checklist · before you offer"
   },
   "scoreNames": {
     "location": "Location & Lifestyle",
@@ -344,17 +344,17 @@
       "sub": "Registered at the notary, not portal asking prices.",
       "avgPerM2": "Average €/m² built",
       "sales": "Registered sales (12 mo)",
-      "avgFlat": "Average flat sold",
+      "avgFlat": "Average size of flats sold",
       "period": "Period",
       "sourceLead": "Source:",
       "sourceBody": "Generalitat de Catalunya, Habitatge (registered notarial deeds · second-hand)"
     },
     "humility": {
-      "lead": "The range brackets the whole neighbourhood:",
-      "body": "an unreformed low floor at the bottom, a reformed flat with a balcony at the top. Verify against concrete comparables of similar size, floor and condition before you offer."
+      "lead": "The range spans the whole neighbourhood:",
+      "body": "an unrenovated lower-floor flat at the bottom end, a renovated flat with a balcony at the top end. Verify against concrete comparables of similar size, floor and condition before you offer."
     },
     "unavailable": {
-      "body": "This address falls outside the 73 Barcelona barris we hold registered closing prices for, or too few flats sold here in the last 12 months to publish an average we'd trust. We won't show you a price range we can't stand behind."
+      "body": "This address falls outside the 73 Barcelona barris we hold registered closing prices for, or too few flats have sold here in the last 12 months to publish an average we'd trust. We won't show you a price range we can't stand behind."
     },
     "facts": {
       "asking": "Asking price",
@@ -363,7 +363,7 @@
     },
     "howTo": {
       "heading": "How to read this",
-      "portals": "Check current asking prices for similar-size flats nearby on a live portal, and remember asking sits consistently above what flats actually close at.",
+      "portals": "Check current asking prices for similar-size flats nearby on a live portal, and remember that asking prices consistently sit above what flats actually close at.",
       "askAgent": "Ask your agent for recent closed sales on this street or block, the closest thing to a real comparable."
     }
   },
@@ -433,7 +433,7 @@
     "planKeyRestriction": "Restriction · worth knowing",
     "planKeyClear": "Clear · nothing to flag",
     "planDisclaimer": "Planning data is indicative. Always verify the parcel's status with an official certificat urbanístic (planning certificate) from the Ajuntament before you commit.",
-    "buildingHead": "What the year and the records imply.",
+    "buildingHead": "What the build year and the records imply.",
     "theBuildingLabel": "The building",
     "whatToCheckLabel": "What to check",
     "deductionsLabel": "Deductions & grants",
@@ -447,7 +447,7 @@
     "beforeHead": "Your move, on site and on paper.",
     "onSiteLabel": "On site & process",
     "docsLabel": "Documents to request",
-    "docsFuture": "Coming soon: upload these documents and PisoWise will analyse them for you. This is where that will live.",
+    "docsFuture": "Coming soon: upload these documents and PisoWise will analyse them for you. This is where that feature will appear.",
     "footSources": "Sources & method",
     "sourceChips": ["Catastro", "Gencat Habitatge", "PGM · Ajuntament de Barcelona", "Catàleg de patrimoni", "SNCZI", "ICAEN"],
     "gate": {

@@ -23,7 +23,7 @@
     "selectUnit": "Elige el piso",
     "noRecords": "No hay registros del Catastro en esa calle/número. Revisa el número o introduce la referencia catastral abajo.",
     "manualSummary": "O introduce la referencia catastral directamente",
-    "askingPrice": "Precio de oferta (€)",
+    "askingPrice": "Precio de salida (€)",
     "email": "Email (opcional)",
     "emailHint": "Para guardarte el informe y avisarte cuando esté el análisis completo.",
     "selected": "Seleccionado:",
@@ -101,7 +101,7 @@
         {
           "tag": "Protección patrimonial",
           "h3": "Un edificio protegido",
-          "p": "Una catalogación patrimonial (BCIN / BCIL) limita qué puedes cambiar: la fachada, la distribución, a veces las ventanas. Te lo avisamos antes de que descuadre tu presupuesto de reforma."
+          "p": "Una catalogación patrimonial (BCIN / BCIL) limita qué puedes cambiar: la fachada, la distribución, a veces las ventanas. Te avisamos antes de que descuadre tu presupuesto de la reforma."
         },
         {
           "tag": "Realidad del precio",
@@ -116,7 +116,7 @@
       "note": "Ocho lecturas de un mismo piso, con el trabajo de urbanismo y riesgos que la mayoría de comprobaciones se saltan.",
       "scores": {
         "h4": "5 puntuaciones, un veredicto",
-        "p": "Todo el piso resumido en cinco puntuaciones claras y una lectura final con confianza.",
+        "p": "Todo el piso resumido en cinco puntuaciones claras y una lectura final clara.",
         "chips": [
           "Precio",
           "Riesgo",
@@ -178,7 +178,7 @@
       ]
     },
     "indep": {
-      "lead": "Para quien compra una vivienda para vivir.",
+      "lead": "Para quien compra una vivienda para habitar.",
       "body": "Ni inversores. Ni pisos turísticos. Trabajamos solo para el comprador. <strong>No vendemos pisos y nunca cobramos de los vendedores.</strong> Por eso podemos decirte qué falla en un piso, no solo lo que luce bien."
     },
     "ph": {
@@ -199,7 +199,7 @@
     "pricing": {
       "eyebrow": "Precios",
       "h2": "Un solo precio, sin sorpresas.",
-      "desc": "Vista previa gratis. Informe completo y PDF descargable por {price}.",
+      "desc": "Vista previa gratuita. Informe completo y PDF descargable por {price}.",
       "note": "Pago único. Sin suscripción."
     },
     "faq": {
@@ -224,7 +224,7 @@
         },
         {
           "q": "¿Y mis datos?",
-          "a": "Solo necesitamos la dirección o la referencia catastral del piso para hacer el informe. No vendemos tus datos y nunca cobramos de los vendedores, así que nada del informe lo dirige nadie más que tú."
+          "a": "Solo necesitamos la dirección o la referencia catastral del piso para hacer el informe. No vendemos tus datos y nunca cobramos de los vendedores, así que nadie más que tú influye en lo que dice el informe."
         },
         {
           "q": "¿Cuánto cuesta?",
@@ -232,7 +232,7 @@
         },
         {
           "q": "¿Solo Barcelona?",
-          "a": "De momento, sí. Cubrimos los barrios de Barcelona en profundidad en lugar de todo el país por encima, y te avisaremos si una dirección queda fuera de la zona donde podemos garantizar una referencia de barrio."
+          "a": "De momento, sí. Cubrimos los barrios de Barcelona en profundidad en lugar de cubrir todo el país superficialmente, y te avisaremos si una dirección queda fuera de la zona donde podemos garantizar una referencia de barrio."
         }
       ]
     },
@@ -247,7 +247,7 @@
     "eyebrow": "Diligencia debida independiente · Barcelona"
   },
   "meta": {
-    "asking": "Precio de oferta",
+    "asking": "Precio de salida",
     "pricePerM2": "Precio / m²",
     "size": "Tamaño",
     "built": "Construido",
@@ -264,7 +264,7 @@
     "scoresNote": "0–100 · más alto es mejor",
     "snapshot": "Ficha del inmueble",
     "price": "Precio y valor",
-    "priceNote": "lo principal",
+    "priceNote": "el plato fuerte",
     "building": "Edificio y estado",
     "risks": "Riesgo y seguridad",
     "legal": "Legal y documentos a solicitar",
@@ -273,7 +273,7 @@
     "costs": "Costes e impuestos",
     "subsidies": "Deducciones y ayudas",
     "negotiation": "Guía de negociación",
-    "checklist": "Antes de ofertar, lista de comprobación"
+    "checklist": "Lista de comprobación · antes de ofertar"
   },
   "scoreNames": {
     "location": "Ubicación y estilo de vida",
@@ -298,15 +298,15 @@
   },
   "price": {
     "benchHeading": "Referencias y evidencia comparable",
-    "rangeHeading": "Rango de precios para este tamaño en este barrio",
+    "rangeHeading": "Horquilla de precios para este tamaño en este barrio",
     "liveHeading": "Pisos similares, en directo",
-    "liveNote": "El inventario de los portales cambia a diario, así que en vez de incrustar capturas obsoletas te llevamos a búsquedas prefiltradas por distrito, tamaño y rango de precio. Afina al barrio exacto en el propio portal.",
-    "ladderHeading": "Escalera de oferta sugerida",
+    "liveNote": "El inventario de los portales cambia a diario, así que en vez de incrustar capturas obsoletas te llevamos a búsquedas prefiltradas por distrito, tamaño y horquilla de precio. Afina al barrio exacto en el propio portal.",
+    "ladderHeading": "Oferta escalonada sugerida",
     "referencesHeading": "Comprueba el precio tú mismo, fuentes de referencia",
     "referencesNote": "No asignamos un valor en tu nombre. Usa estas fuentes oficiales y publicadas para comparar el precio de oferta con el mercado y decidir por ti mismo.",
     "refKind": {
       "official": "oficial",
-      "portal": "estadística portal",
+      "portal": "estadística del portal",
       "search": "anuncios"
     },
     "table": {
@@ -323,15 +323,15 @@
     },
     "kicker": "el plato fuerte",
     "pin": {
-      "asking": "Pedido",
+      "asking": "Salida",
       "barriAvg": "Media del barrio"
     },
     "barriAvgLabel": "Media barrio",
-    "rangeLow": "Rango bajo",
-    "rangeHigh": "Rango alto",
+    "rangeLow": "Horquilla baja",
+    "rangeHigh": "Horquilla alta",
     "barriClosingAvg": "media de cierre",
     "compare": {
-      "askingLabel": "Este piso · pedido",
+      "askingLabel": "Este piso · salida",
       "barriLabel": "Media del barrio"
     },
     "delta": {
@@ -341,29 +341,29 @@
     },
     "evidence": {
       "title": "referencia de precio",
-      "sub": "Registrados en notaría, no precios de oferta de los portales.",
+      "sub": "Registrados ante notario, no precios de oferta de los portales.",
       "avgPerM2": "Media €/m² construido",
-      "sales": "Ventas registradas (12 m)",
-      "avgFlat": "Tamaño medio del piso vendido",
+      "sales": "Ventas registradas (12 meses)",
+      "avgFlat": "Tamaño medio de los pisos vendidos",
       "period": "Periodo",
       "sourceLead": "Fuente:",
       "sourceBody": "Generalitat de Catalunya, Habitatge (escrituras notariales registradas · segunda mano)"
     },
     "humility": {
-      "lead": "El rango abarca todo el barrio:",
-      "body": "una planta baja sin reformar en el extremo bajo; un piso reformado con balcón en el alto. Contrasta con comparables concretos de tamaño, planta y estado similares antes de ofertar."
+      "lead": "La horquilla abarca todo el barrio:",
+      "body": "una planta baja sin reformar en la parte baja; un piso reformado con balcón en la parte alta. Contrasta con comparables concretos de tamaño, planta y estado similares antes de ofertar."
     },
     "unavailable": {
-      "body": "Esta dirección queda fuera de los 73 barrios de Barcelona para los que tenemos precios de cierre registrados, o se han vendido demasiado pocos pisos aquí en los últimos 12 meses para publicar una media de la que nos fiemos. No te enseñaremos un rango de precios que no podamos defender."
+      "body": "Esta dirección queda fuera de los 73 barrios de Barcelona para los que tenemos precios de cierre registrados, o se han vendido demasiado pocos pisos aquí en los últimos 12 meses para publicar una media fiable. No te enseñaremos una horquilla de precios que no podamos defender."
     },
     "facts": {
-      "asking": "Precio pedido",
+      "asking": "Precio de salida",
       "builtArea": "Superficie construida · Catastro",
-      "askingPerM2": "€/m² construido pedido"
+      "askingPerM2": "€/m² construido de salida"
     },
     "howTo": {
       "heading": "Cómo leer esto",
-      "portals": "Mira los precios de oferta actuales de pisos cercanos de tamaño parecido en un portal, y recuerda que la oferta queda sistemáticamente por encima del precio al que de verdad cierran.",
+      "portals": "Mira los precios de oferta actuales de pisos cercanos de tamaño parecido en un portal, y recuerda que la oferta queda sistemáticamente por encima del precio al que se cierran realmente.",
       "askAgent": "Pídele a tu agente ventas cerradas recientes en esta calle o manzana, lo más cercano a un comparable real."
     }
   },
@@ -428,12 +428,12 @@
     "priceHead": "El precio de salida frente a lo que realmente se cierra en la zona.",
     "priceLede": "La referencia es el precio de cierre registrado de la Generalitat, lo que realmente se paga por los pisos de la zona. Mostramos dónde se sitúa este precio de salida dentro de ese intervalo.",
     "planningHead": "Qué dice el registro urbanístico de esta parcela.",
-    "planningLede": "La parte de la diligencia que la mayoría de comprobaciones se saltan. Cada línea se ha consultado contra el plan oficial y tiene un estado claro.",
+    "planningLede": "La parte de la diligencia que la mayoría de comprobaciones se saltan. Cada línea se ha contrastado con el plan oficial y tiene un estado claro.",
     "planKeyAffected": "Afectado · actúa antes de ofertar",
     "planKeyRestriction": "Restricción · conviene saberlo",
     "planKeyClear": "Limpio · nada que señalar",
     "planDisclaimer": "Los datos urbanísticos son indicativos. Verifica siempre el estado de la parcela con un certificado urbanístico oficial del Ajuntament antes de comprometerte.",
-    "buildingHead": "Qué implican el año y los registros.",
+    "buildingHead": "Qué implican el año de construcción y los registros.",
     "theBuildingLabel": "El edificio",
     "whatToCheckLabel": "Qué revisar",
     "deductionsLabel": "Deducciones y ayudas",
@@ -444,16 +444,16 @@
     "subsidiesHead": "Ayudas que puedes solicitar y lo que asumes.",
     "negotiationHead": "Argumentos para negociar, según los registros.",
     "tacticLabel": "La táctica",
-    "beforeHead": "Tu turno, sobre el terreno y sobre el papel.",
+    "beforeHead": "Ahora te toca a ti, sobre el terreno y sobre el papel.",
     "onSiteLabel": "Sobre el terreno y trámites",
     "docsLabel": "Documentos a pedir",
-    "docsFuture": "Próximamente: sube estos documentos y PisoWise los analizará por ti. Aquí es donde vivirá esta función.",
+    "docsFuture": "Próximamente: sube estos documentos y PisoWise los analizará por ti. Aquí es donde encontrarás esta funcionalidad.",
     "footSources": "Fuentes y método",
     "sourceChips": ["Catastro", "Gencat Habitatge", "PGM · Ajuntament de Barcelona", "Catàleg de patrimoni", "SNCZI", "ICAEN"],
     "gate": {
       "eyebrow": "El informe completo",
       "head": "Aquí es donde empieza el análisis a fondo.",
-      "sub": "Ya has visto la conclusión, las puntuaciones y los datos básicos. El informe completo trabaja cada hallazgo: qué significa y qué hacer antes de ofertar.",
+      "sub": "Ya has visto la conclusión, las puntuaciones y los datos básicos. El informe completo desgrana cada hallazgo: qué significa y qué hacer antes de ofertar.",
       "lockedH": "Qué incluye el informe completo",
       "priceSuffix": "pago único",
       "cta": "Desbloquea el informe completo",
