@@ -7,7 +7,7 @@ import type { HeritageData, HeritageLevel } from "@/adapters/heritage";
 import type { EnergyData } from "@/adapters/energy";
 import type { FloodData } from "@/adapters/flood";
 import { SEISMIC, RADON, crimeContext, BCN_DISTRICTS } from "@/config/static-risk";
-import { buildCostFacts, buildSubsidyPanels } from "@/config/costs";
+import { buildCostFacts, buildSubsidies } from "@/config/costs";
 import { buildBuilding } from "@/config/building";
 import { buildLegal } from "@/config/legal";
 import { buildFooter } from "@/config/footer";
@@ -44,13 +44,13 @@ export function emptyReport(id: string, cadastralRef: string): Report {
       fairValue: { ...EMPTY },
       ladder: [],
     },
-    building: { panels: [], keyline: { ...EMPTY } },
+    building: { facts: [], checks: [], keyline: { ...EMPTY } },
     risks: [],
     legal: { intro: { ...EMPTY }, items: [] },
     neighbourhood: { lede: { ...EMPTY }, facts: [], note: { ...EMPTY } },
     urbanism: { items: [] },
     costs: { intro: { ...EMPTY }, facts: [], footnote: { ...EMPTY } },
-    subsidies: { panels: [] },
+    subsidies: { deductions: [], takeOn: [] },
     negotiation: { intro: { ...EMPTY }, items: [], tactic: { ...EMPTY } },
     checklist: [],
     footer: { sources: { ...EMPTY }, disclaimer: { ...EMPTY } },
@@ -75,13 +75,18 @@ export function seedFromCatastro(
   // Hero title: street + number from the Catastro address label.
   const street = unit.addressLabel?.split(" Pl:")[0]?.trim();
   if (street) r.hero.title = street;
-  if (unit.floor || unit.door) {
-    r.hero.floorLabel = both(
-      [unit.floor && `Fl. ${unit.floor}`, unit.door && `Dr. ${unit.door}`]
-        .filter(Boolean)
-        .join(" · "),
-    );
-  }
+
+  // Hero floor line: "floor-door · postal Barcelona · district" (matches
+  // the report-page design's mono second-line caption). Each piece is
+  // included only when present; barri sub-name is added later by the
+  // barri-pricing seeder when the lookup succeeds.
+  const floorDoor = [unit.floor, unit.door].filter(Boolean).join("-");
+  const postal = unit.postalCode ? `${unit.postalCode} Barcelona` : null;
+  const district = unit.districtCode
+    ? BCN_DISTRICTS[unit.districtCode]
+    : null;
+  const pieces = [floorDoor || null, postal, district].filter(Boolean);
+  if (pieces.length) r.hero.floorLabel = both(pieces.join(" · "));
 
   // Hero meta strip.
   if (input.askingPriceEur) {
@@ -299,6 +304,23 @@ export function seedBarriPricing(
   const r: Report = structuredClone(report);
   const ppm = barri.pricePerM2;
   const ppmStr = ppm.toLocaleString("en-GB");
+
+  // Enrich the hero floor line with the barri sub-name when we have one.
+  // `seedFromCatastro` set this to "floor-door · postal Barcelona · district";
+  // we swap the trailing district with "barri, district" so the line reads
+  // "3-3 · 08024 Barcelona · la Vila de Gràcia, Gràcia" (matches the design).
+  const currentFloor = r.hero.floorLabel?.en ?? "";
+  if (currentFloor && !currentFloor.includes(`${barri.name},`)) {
+    const parts = currentFloor.split(" · ");
+    if (parts.length) {
+      const tail = parts[parts.length - 1];
+      const isDistrict = Object.values(BCN_DISTRICTS).includes(tail);
+      parts[parts.length - 1] = isDistrict
+        ? `${barri.name}, ${tail}`
+        : `${barri.name}`;
+      r.hero.floorLabel = both(parts.join(" · "));
+    }
+  }
 
   // --- 1. Verdict lede: lead with the asking €/m² vs barri delta ---
   if (opts.askingPriceEur && opts.builtM2) {
@@ -536,16 +558,23 @@ export function buildPricingPayload(
   if (!opts.askingPriceEur || !builtM2) {
     // Marker = barri average → sits at 50% by construction.
     const markerPct = 0.5;
-    const verdict: Localized = range
+    // State 02 split: short qualitative headline + numeric subtext (matches
+    // the report-page design's `.price-verdict` + `.price-sub` slots).
+    const verdict: Localized = {
+      en: `The area's recent closing range for this size.`,
+      es: `El intervalo de cierre reciente en la zona para este tamaño.`,
+      ca: `L'interval de tancament recent a la zona per a aquest tamany.`,
+    };
+    const verdictSub: Localized = range
       ? {
-          en: `Flats around <span class="num">${builtM2 ?? "-"} m²</span> in ${barri.name} closed between <span class="num">${EUR(range.lo)}</span> and <span class="num">${EUR(range.hi)}</span>, based on what nearby flats actually registered at the notary.`,
-          es: `Los pisos de unos <span class="num">${builtM2 ?? "-"} m²</span> en ${barri.name} se cerraron entre <span class="num">${EUR(range.lo)}</span> y <span class="num">${EUR(range.hi)}</span>, según lo que pisos cercanos registraron en notaría.`,
-          ca: `Els pisos d'uns <span class="num">${builtM2 ?? "-"} m²</span> a ${barri.name} es van tancar entre <span class="num">${EUR(range.lo)}</span> i <span class="num">${EUR(range.hi)}</span>, segons el que pisos propers van registrar a notaria.`,
+          en: `Flats around ${builtM2 ?? "-"} m² in ${barri.name} closed between ${EUR(range.lo)} and ${EUR(range.hi)}, registered at the notary.`,
+          es: `Los pisos de unos ${builtM2 ?? "-"} m² en ${barri.name} se cerraron entre ${EUR(range.lo)} y ${EUR(range.hi)}, registrados en notaría.`,
+          ca: `Els pisos d'uns ${builtM2 ?? "-"} m² a ${barri.name} es van tancar entre ${EUR(range.lo)} i ${EUR(range.hi)}, registrats a notaria.`,
         }
       : {
-          en: `In ${barri.name}, registered second-hand flats closed at an average <span class="num">€${ppm.toLocaleString("en-GB")}/m²</span> built. Apply that to this flat's m² once known.`,
-          es: `En ${barri.name}, los pisos de segunda mano registrados se cerraron a una media de <span class="num">€${ppm.toLocaleString("en-GB")}/m²</span> construido. Aplícalo al m² de este piso cuando se conozca.`,
-          ca: `A ${barri.name}, els pisos de segona mà registrats es van tancar a una mitjana de <span class="num">€${ppm.toLocaleString("en-GB")}/m²</span> construït. Aplica'l al m² d'aquest pis quan es conegui.`,
+          en: `In ${barri.name}, registered second-hand flats closed at €${ppm.toLocaleString("en-GB")}/m² built. Apply that to this flat's m² once known.`,
+          es: `En ${barri.name}, los pisos de segunda mano registrados se cerraron a €${ppm.toLocaleString("en-GB")}/m² construido. Aplícalo al m² cuando se conozca.`,
+          ca: `A ${barri.name}, els pisos de segona mà registrats es van tancar a €${ppm.toLocaleString("en-GB")}/m² construït. Aplica-ho al m² quan es conegui.`,
         };
     return {
       state: "asking-unknown",
@@ -559,6 +588,7 @@ export function buildPricingPayload(
         },
       },
       verdict,
+      verdictSub,
       barri: barriPayload,
       range,
       markerPct: range ? markerPct : undefined,
@@ -575,11 +605,20 @@ export function buildPricingPayload(
     ? clamp01((opts.askingPriceEur - range.lo) / (range.hi - range.lo))
     : 0.5;
   const dphrase = deltaPhrase(delta);
-  const positionAfterDash = positionPhrase(markerPct);
+  const positionHeadline = positionHeadlinePhrase(markerPct);
+  // Split: short qualitative verdict (no specific numbers) + numeric subtext
+  // with €/m² and the delta phrase. Matches the report-page design's
+  // `.price-verdict` / `.price-sub` two-line treatment.
   const verdict: Localized = {
-    en: `Asking <span class="num">${EUR(opts.askingPriceEur)}</span> sits <strong class="pct">${dphrase.en}</strong> the neighbourhood's closing average, ${positionAfterDash.en}.`,
-    es: `Precio pedido <span class="num">${EUR(opts.askingPriceEur)}</span> queda <strong class="pct">${dphrase.es}</strong> la media de cierre del barrio, ${positionAfterDash.es}.`,
-    ca: `Preu demanat <span class="num">${EUR(opts.askingPriceEur)}</span> queda <strong class="pct">${dphrase.ca}</strong> la mitjana de tancament del barri, ${positionAfterDash.ca}.`,
+    en: `Asking sits ${positionHeadline.en} of the area's recent closing range.`,
+    es: `El precio pedido se sitúa ${positionHeadline.es} del intervalo de cierre reciente de la zona.`,
+    ca: `El preu demanat se situa ${positionHeadline.ca} de l'interval de tancament recent de la zona.`,
+  };
+  const askPpmStr = Math.round(askPerM2).toLocaleString("en-GB");
+  const verdictSub: Localized = {
+    en: `At €${askPpmStr}/m², this flat is <strong class="pct">${dphrase.en}</strong> the ${barri.name} closing average.`,
+    es: `A €${askPpmStr}/m², este piso está <strong class="pct">${dphrase.es}</strong> la media de cierre de ${barri.name}.`,
+    ca: `A €${askPpmStr}/m², aquest pis està <strong class="pct">${dphrase.ca}</strong> la mitjana de tancament de ${barri.name}.`,
   };
 
   return {
@@ -588,11 +627,46 @@ export function buildPricingPayload(
     asking: { price: opts.askingPriceEur, pricePerM2: Math.round(askPerM2) },
     chip,
     verdict,
+    verdictSub,
     barri: barriPayload,
     range,
     deltaPct: delta,
     markerPct,
     marker: { kind: "asking", value: opts.askingPriceEur },
+  };
+}
+
+/** Short headline-tone position phrase (for the .price-verdict slot).
+ *  Distinct from `positionPhrase`, which produces a longer mid-sentence fragment. */
+function positionHeadlinePhrase(pct: number): { en: string; es: string; ca: string } {
+  if (pct < 0)
+    return {
+      en: "below the lower end",
+      es: "por debajo del extremo bajo",
+      ca: "per sota de l'extrem baix",
+    };
+  if (pct > 1)
+    return {
+      en: "above the upper end",
+      es: "por encima del extremo alto",
+      ca: "per sobre de l'extrem alt",
+    };
+  if (pct < 0.25)
+    return {
+      en: "near the lower end",
+      es: "cerca del extremo bajo",
+      ca: "a prop de l'extrem baix",
+    };
+  if (pct > 0.75)
+    return {
+      en: "near the upper end",
+      es: "cerca del extremo alto",
+      ca: "a prop de l'extrem alt",
+    };
+  return {
+    en: "in the middle",
+    es: "en el centro",
+    ca: "al centre",
   };
 }
 
@@ -656,9 +730,8 @@ export function seedPricingUnavailable(
 
 export function seedBuilding(report: Report, yearBuilt?: number): Report {
   const r: Report = structuredClone(report);
-  const { panels, keyline } = buildBuilding(yearBuilt);
-  r.building.panels = panels;
-  r.building.keyline = keyline;
+  const { facts, checks, keyline } = buildBuilding(yearBuilt);
+  r.building = { facts, checks, keyline };
   return r;
 }
 
@@ -686,7 +759,8 @@ export function seedCostsTaxes(report: Report, askingPriceEur?: number): Report 
   r.costs.intro = intro;
   r.costs.facts = facts;
   r.costs.footnote = footnote;
-  r.subsidies.panels = buildSubsidyPanels();
+  const { deductions, takeOn } = buildSubsidies();
+  r.subsidies = { deductions, takeOn };
   return r;
 }
 
@@ -986,6 +1060,29 @@ export function seedUrbanism(
     : { en: "", es: "", ca: "" };
 
   // 1) Affectation, the headline planning aspect.
+  // Tag mirrors the design's "Affected · Clau 7b" / "Standard" / "Clear" pattern.
+  const affectationTag: Localized =
+    level === "affected"
+      ? codes
+        ? {
+            en: `Affected · Clau ${codes}`,
+            es: `Afectado · Clau ${codes}`,
+            ca: `Afectat · Clau ${codes}`,
+          }
+        : { en: "Affected", es: "Afectado", ca: "Afectat" }
+      : level === "specific"
+        ? {
+            en: "Specific circumstances",
+            es: "Circunstancias específicas",
+            ca: "Circumstàncies específiques",
+          }
+        : unverified
+          ? {
+              en: "Unverified",
+              es: "Sin verificar",
+              ca: "Sense verificar",
+            }
+          : { en: "Clear", es: "Limpio", ca: "Net" };
   items.push({
     key: "affectation",
     tone:
@@ -995,6 +1092,7 @@ export function seedUrbanism(
           ? "check"
           : "clear",
     label: { en: "Planning affectation", es: "Afectación urbanística", ca: "Afectació urbanística" },
+    tag: affectationTag,
     text:
       level === "affected"
         ? {
@@ -1027,6 +1125,13 @@ export function seedUrbanism(
       key: "zoning",
       tone: "clear",
       label: { en: "Zoning", es: "Calificación", ca: "Qualificació" },
+      tag: u.qualCode
+        ? {
+            en: `Standard · Clau ${u.qualCode}`,
+            es: `Estándar · Clau ${u.qualCode}`,
+            ca: `Estàndard · Clau ${u.qualCode}`,
+          }
+        : { en: "Standard", es: "Estándar", ca: "Estàndard" },
       text: {
         en: `Residential, build-ready land, standard for a city flat.${u.qualCode ? ` (zoning code ${u.qualCode})` : ""}`,
         es: `Suelo residencial y consolidado, lo normal para un piso urbano.${u.qualCode ? ` (código ${u.qualCode})` : ""}`,
@@ -1043,6 +1148,11 @@ export function seedUrbanism(
       en: "Low Emission Zone (ZBE)",
       es: "Zona de Bajas Emisiones (ZBE)",
       ca: "Zona de Baixes Emissions (ZBE)",
+    },
+    tag: {
+      en: "Restriction · ZBE Rondes",
+      es: "Restricción · ZBE Rondes",
+      ca: "Restricció · ZBE Rondes",
     },
     text: {
       en: "Like all of central Barcelona, this address is inside the Low Emission Zone. Only relevant if you keep a car without an emissions sticker.",
@@ -1063,6 +1173,11 @@ export function seedUrbanism(
           en: confirmed ? "Planning affectation" : "Possible planning affectation",
           es: confirmed ? "Afectación urbanística" : "Posible afectación urbanística",
           ca: confirmed ? "Afectació urbanística" : "Possible afectació urbanística",
+        },
+        previewDetail: {
+          en: "Official planning records flag an affectation on this parcel that could limit works or its future use.",
+          es: "Los registros urbanísticos oficiales indican una afectación sobre esta parcela que podría limitar obras o su uso futuro.",
+          ca: "Els registres urbanístics oficials marquen una afectació sobre aquesta parcel·la que podria limitar obres o el seu ús futur.",
         },
         detail: {
           en: `${confirmed ? "The city flags this property as affected" : "Part of the plot appears reserved for public use"}, part is reserved for ${plain.en}. It can restrict works, cap the value, or lead to expropriation. Confirm with an official planning certificate (certificat urbanístic) before offering.`,
@@ -1154,6 +1269,11 @@ export function seedHeritage(report: Report, h: HeritageData): Report {
       key: "heritage",
       tone: high ? "caution" : "check",
       label: { en: "Heritage", es: "Patrimonio", ca: "Patrimoni" },
+      tag: {
+        en: `Protected · Nivell ${h.level}`,
+        es: `Protegido · Nivell ${h.level}`,
+        ca: `Protegit · Nivell ${h.level}`,
+      },
       text: {
         en: `This building is heritage-listed, ${name}${lvl.en}${metaClause}. Listing restricts façade and often interior changes; expect special permits and higher, slower renovations. Check the catalog file before offering.`,
         es: `Este edificio está catalogado, ${name}${lvl.es}${metaClause}. La protección limita los cambios en fachada y a menudo en el interior; prevé permisos especiales y reformas más caras y lentas. Consulta la ficha del catálogo antes de ofertar.`,
@@ -1183,6 +1303,7 @@ export function seedHeritage(report: Report, h: HeritageData): Report {
       key: "heritage",
       tone: "info",
       label: { en: "Heritage", es: "Patrimonio", ca: "Patrimoni" },
+      tag: { en: "In protected ensemble", es: "En conjunto protegido", ca: "En conjunt protegit" },
       text: {
         en: `The building is in a protected conservation area (${ens}). Façade changes are regulated, but there's no individual listing on this building.`,
         es: `El edificio está en un conjunto protegido (${ens}). Los cambios en fachada están regulados, pero no hay catalogación específica de este edificio.`,
@@ -1195,31 +1316,82 @@ export function seedHeritage(report: Report, h: HeritageData): Report {
 
 /* ---------- computed scores → score rings ---------- */
 
+/** Buildings built before this year are inside the ITE (technical inspection)
+ *  obligatory window in Catalonia (45+ year age threshold, applied loosely). */
+const ITE_DUE_YEAR = new Date().getFullYear() - 45;
+
 const SCORE_CAPTION: Record<ScoreKey, (ctx: ScoreCtx) => Localized> = {
-  building: ({ year }) => ({
-    en: year ? `${year} · ${new Date().getFullYear() - year} yrs` : "-",
-    es: year ? `${year} · ${new Date().getFullYear() - year} años` : "-",
-    ca: year ? `${year} · ${new Date().getFullYear() - year} anys` : "-",
-  }),
-  energy: ({ energyClass }) => ({
-    en: energyClass ? `Class ${energyClass}` : "-",
-    es: energyClass ? `Clase ${energyClass}` : "-",
-    ca: energyClass ? `Classe ${energyClass}` : "-",
-  }),
+  building: ({ year }) => {
+    if (!year) return { en: "-", es: "-", ca: "-" };
+    const age = new Date().getFullYear() - year;
+    const iteDue = year <= ITE_DUE_YEAR;
+    return {
+      en: iteDue
+        ? `${year} block, ${age} yrs · ITE due`
+        : `${year} block, ${age} yrs`,
+      es: iteDue
+        ? `Bloque de ${year}, ${age} años · ITE pendiente`
+        : `Bloque de ${year}, ${age} años`,
+      ca: iteDue
+        ? `Bloc del ${year}, ${age} anys · ITE pendent`
+        : `Bloc del ${year}, ${age} anys`,
+    };
+  },
+  energy: ({ energyClass }) => {
+    if (!energyClass) return { en: "-", es: "-", ca: "-" };
+    const retrofit = "EFG".includes(energyClass);
+    return {
+      en: retrofit
+        ? `Class ${energyClass}, retrofit likely needed`
+        : `Class ${energyClass}`,
+      es: retrofit
+        ? `Clase ${energyClass}, probable reforma`
+        : `Clase ${energyClass}`,
+      ca: retrofit
+        ? `Classe ${energyClass}, probable reforma`
+        : `Classe ${energyClass}`,
+    };
+  },
   transport: ({ amenities }) => {
     const m = amenities?.metro;
+    const names = m?.names?.slice(0, 2).join(", ");
+    const distM = m?.nearest?.distanceM;
+    if (names && distM != null) {
+      const dist = distM < 1000 ? `${distM} m` : `${(distM / 1000).toFixed(1)} km`;
+      return {
+        en: `Metro ${names} within ${dist}`,
+        es: `Metro ${names} a ${dist}`,
+        ca: `Metro ${names} a ${dist}`,
+      };
+    }
+    if (m?.within800) {
+      return {
+        en: `${m.within800} metro stops within 800 m`,
+        es: `${m.within800} paradas de metro a 800 m`,
+        ca: `${m.within800} parades de metro a 800 m`,
+      };
+    }
     return {
-      en: m?.within800 ? `${m.within800} metro within 800 m` : "Limited metro",
-      es: m?.within800 ? `${m.within800} metros a 800 m` : "Metro limitado",
-      ca: m?.within800 ? `${m.within800} metros a 800 m` : "Metro limitat",
+      en: "Limited metro nearby",
+      es: "Metro limitado cerca",
+      ca: "Metro limitat a prop",
     };
   },
   location: ({ amenities }) => {
-    const g = amenities?.green.nearest;
+    const supers = amenities?.supermarket.nearest?.walkMin;
+    const green = amenities?.green.nearest?.walkMin;
+    const services = [
+      supers != null ? { en: "shops", es: "tiendas", ca: "comerços", mins: supers } : null,
+      green != null ? { en: "green", es: "zona verde", ca: "zona verda", mins: green } : null,
+    ].filter((x): x is { en: string; es: string; ca: string; mins: number } => x != null);
+    if (services.length === 0) {
+      return { en: "Urban setting", es: "Entorno urbano", ca: "Entorn urbà" };
+    }
+    const closest = services.reduce((a, b) => (a.mins <= b.mins ? a : b));
     return {
-      en: g ? `Green ~${g.walkMin} min` : "Urban",
-      es: g ? `Zona verde ~${g.walkMin} min` : "Urbano",
-      ca: g ? `Zona verda ~${g.walkMin} min` : "Urbà",
+      en: `Walkable, ${closest.en} ~${closest.mins} min`,
+      es: `Caminable, ${closest.es} a ~${closest.mins} min`,
+      ca: `Caminable, ${closest.ca} a ~${closest.mins} min`,
     };
   },
   price: ({ deltaPct }) => {

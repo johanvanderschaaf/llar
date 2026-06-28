@@ -4,7 +4,7 @@ import { buildPricingPayload } from "@/pipeline/template";
 import barriPrices from "@/data/bcn-barri-prices.json";
 import { buildFooter } from "@/config/footer";
 import { buildLegal } from "@/config/legal";
-import { buildCostFacts, buildSubsidyPanels } from "@/config/costs";
+import { buildCostFacts, buildSubsidies } from "@/config/costs";
 import { buildBuilding } from "@/config/building";
 
 /**
@@ -46,7 +46,14 @@ export const sampleSors35: Report = {
 
   hero: {
     title: "Carrer de Sors 35",
-    floorLabel: { en: "3rd floor", es: "3.º piso", ca: "3r pis" },
+    // The hero "floor line" carries the full street-second-line: floor+door,
+    // postal+city, and barri+district. Matches the report-page design's
+    // mono caption (e.g. "3-3 · 08024 Barcelona · la Vila de Gràcia, Gràcia").
+    floorLabel: {
+      en: "3-3 · 08024 Barcelona · la Vila de Gràcia, Gràcia",
+      es: "3-3 · 08024 Barcelona · la Vila de Gràcia, Gràcia",
+      ca: "3-3 · 08024 Barcelona · la Vila de Gràcia, Gràcia",
+    },
     sub: {
       en: "A 90 m² flat in upper Vila de Gràcia. An independent check of its price, building, planning and neighbourhood before you offer.",
       es: "Un piso de 90 m² en la parte alta de la Vila de Gràcia. Una revisión independiente de su precio, edificio, urbanismo y entorno antes de que hagas una oferta.",
@@ -83,35 +90,55 @@ export const sampleSors35: Report = {
     {
       key: "location",
       value: 87,
-      caption: { en: "Upper Vila de Gràcia", es: "Parte alta de Gràcia", ca: "Part alta de Gràcia" },
+      caption: {
+        en: "Walkable, shops ~3 min",
+        es: "Caminable, tiendas a ~3 min",
+        ca: "Caminable, comerços a ~3 min",
+      },
     },
     {
       key: "transport",
       value: 84,
-      caption: { en: "3 metro lines near", es: "3 líneas de metro cerca", ca: "3 línies de metro a prop" },
+      caption: {
+        en: "Metro L4, L3 within 300 m",
+        es: "Metro L4, L3 a 300 m",
+        ca: "Metro L4, L3 a 300 m",
+      },
     },
     {
       key: "building",
       value: 60,
-      caption: { en: "1965 · ITE due", es: "1965 · ITE pendiente", ca: "1965 · ITE pendent" },
+      caption: {
+        en: "1965 block, 61 yrs · ITE due",
+        es: "Bloque de 1965, 61 años · ITE pendiente",
+        ca: "Bloc del 1965, 61 anys · ITE pendent",
+      },
     },
     {
       key: "price",
       value: 71,
       caption: {
-        en: "9% below neighbourhood avg",
-        es: "9% bajo la media del barrio",
-        ca: "9% sota la mitjana del barri",
+        en: "~9% below neighbourhood",
+        es: "~9% bajo el barrio",
+        ca: "~9% sota el barri",
       },
     },
     {
       key: "energy",
       value: 45,
-      caption: { en: "Class E (2022)", es: "Clase E (2022)", ca: "Classe E (2022)" },
+      caption: {
+        en: "Class E, retrofit likely needed",
+        es: "Clase E, probable reforma",
+        ca: "Classe E, probable reforma",
+      },
     },
   ],
 
   snapshot: {
+    // Ordered so the wide-cell building note (rendered by ReportView) sits at
+    // the end of the grid, and Built/Usable area share a row: row 1 has the
+    // identifying triplet (address, neighbourhood, year), row 2 the two areas
+    // + cadastral reference.
     facts: [
       {
         labelKey: "snapshot.address",
@@ -121,12 +148,12 @@ export const sampleSors35: Report = {
         labelKey: "snapshot.neighbourhood",
         value: "la Vila de Gràcia · Gràcia",
       },
-      { labelKey: "snapshot.builtArea", value: "90 m²" },
-      { labelKey: "snapshot.usableArea", value: "~80–82 m²" },
       {
         labelKey: "snapshot.yearBuilt",
         value: { en: "1965 (61 years)", es: "1965 (61 años)", ca: "1965 (61 anys)" },
       },
+      { labelKey: "snapshot.builtArea", value: "90 m²" },
+      { labelKey: "snapshot.usableArea", value: "~80–82 m²" },
       { labelKey: "snapshot.cadastralRef", value: "9648812DF2894H0013RQ" },
     ],
     note: {
@@ -247,53 +274,56 @@ export const sampleSors35: Report = {
       es: "Parte alta de la Vila de Gràcia, en el límite con La Salut / Camp d'en Grassot: residencial, bien dotada y a pocos minutos a pie de uno de los parques más famosos de Europa.",
       ca: "Part alta de la Vila de Gràcia, al límit amb La Salut / Camp d'en Grassot: residencial, ben dotada i a pocs minuts a peu d'un dels parcs més famosos d'Europa.",
     },
+    // Values use a "name · distance/time" pattern; ReportView's `splitSubtext`
+    // pulls the tail after " · " into the design's <small> annotation
+    // ("Joanic, L4" + small "· 240 m, 3 min").
     facts: [
       {
         labelKey: "neigh.metro",
         value: {
-          en: "Joanic (L4) ~4 min · Lesseps (L3) · Alfons X (L4)",
-          es: "Joanic (L4) ~4 min · Lesseps (L3) · Alfons X (L4)",
-          ca: "Joanic (L4) ~4 min · Lesseps (L3) · Alfons X (L4)",
+          en: "Joanic, L4 · 240 m, 3 min",
+          es: "Joanic, L4 · 240 m, 3 min",
+          ca: "Joanic, L4 · 240 m, 3 min",
         },
       },
       {
         labelKey: "neigh.health",
         value: {
-          en: "Hospital de l'Esperança ~5 min",
-          es: "Hospital de l'Esperança ~5 min",
-          ca: "Hospital de l'Esperança ~5 min",
+          en: "Hospital de l'Esperança · 5 min",
+          es: "Hospital de l'Esperança · 5 min",
+          ca: "Hospital de l'Esperança · 5 min",
         },
       },
       {
         labelKey: "neigh.green",
         value: {
-          en: "Park Güell ~10 min uphill",
-          es: "Park Güell ~10 min cuesta arriba",
-          ca: "Park Güell ~10 min costa amunt",
+          en: "Park Güell · 10 min uphill",
+          es: "Park Güell · 10 min cuesta arriba",
+          ca: "Park Güell · 10 min costa amunt",
         },
       },
       {
         labelKey: "neigh.shopping",
         value: {
-          en: "Sorli supermarket ~3 min",
-          es: "Supermercado Sorli ~3 min",
-          ca: "Supermercat Sorli ~3 min",
+          en: "Sorli supermarket · 3 min",
+          es: "Supermercado Sorli · 3 min",
+          ca: "Supermercat Sorli · 3 min",
         },
       },
       {
         labelKey: "neigh.market",
         value: {
-          en: "Mercat de l'Abaceria (reopens 2026–27)",
-          es: "Mercat de l'Abaceria (reabre 2026–27)",
-          ca: "Mercat de l'Abaceria (reobre 2026–27)",
+          en: "Mercat de l'Abaceria · reopens 2026–27",
+          es: "Mercat de l'Abaceria · reabre 2026–27",
+          ca: "Mercat de l'Abaceria · reobre 2026–27",
         },
       },
       {
         labelKey: "neigh.schools",
         value: {
-          en: "Several public & concertada options nearby",
-          es: "Varias opciones públicas y concertadas cerca",
-          ca: "Diverses opcions públiques i concertades a prop",
+          en: "Several public & concertada · within walking distance",
+          es: "Varias públicas y concertadas · a poca distancia",
+          ca: "Diverses públiques i concertades · a poca distància",
         },
       },
     ],
@@ -310,6 +340,7 @@ export const sampleSors35: Report = {
         key: "affectation",
         tone: "clear",
         label: { en: "Planning affectation", es: "Afectación urbanística", ca: "Afectació urbanística" },
+        tag: { en: "Clear", es: "Limpio", ca: "Net" },
         text: {
           en: "No planning affectation was found that would limit using this as a home.",
           es: "No se ha encontrado ninguna afectación urbanística que impida usarla como vivienda.",
@@ -317,19 +348,44 @@ export const sampleSors35: Report = {
         },
       },
       {
+        key: "heritage",
+        tone: "info",
+        label: { en: "Heritage", es: "Patrimonio", ca: "Patrimoni" },
+        tag: {
+          en: "Not individually listed",
+          es: "Sin catalogación individual",
+          ca: "Sense catalogació individual",
+        },
+        text: {
+          en: "No individual heritage listing on this building. Façade alterations may still need a permit through the Eixample / Gràcia conservation rules.",
+          es: "No hay catalogación patrimonial individual de este edificio. Las modificaciones de fachada pueden requerir permiso por las normas de conservación del Eixample / Gràcia.",
+          ca: "No hi ha catalogació patrimonial individual d'aquest edifici. Les modificacions de façana poden requerir permís per les normes de conservació de l'Eixample / Gràcia.",
+        },
+      },
+      {
         key: "zoning",
         tone: "clear",
-        label: { en: "Zoning", es: "Calificación", ca: "Qualificació" },
+        label: { en: "Zoning qualification", es: "Calificación urbanística", ca: "Qualificació urbanística" },
+        tag: {
+          en: "Standard · Clau 12",
+          es: "Estándar · Clau 12",
+          ca: "Estàndard · Clau 12",
+        },
         text: {
-          en: "Residential, build-ready land, standard for a mid-block flat in consolidated Gràcia.",
-          es: "Suelo residencial y consolidado, lo normal para un piso a media manzana en la Gràcia consolidada.",
-          ca: "Sòl residencial i consolidat, el que és habitual per a un pis a mitja illa en la Gràcia consolidada.",
+          en: "Residential, build-ready land, standard for a mid-block flat in consolidated Gràcia. No change of use is flagged.",
+          es: "Suelo residencial y consolidado, lo normal para un piso a media manzana en la Gràcia consolidada. No se señala ningún cambio de uso.",
+          ca: "Sòl residencial i consolidat, el que és habitual per a un pis a mitja illa en la Gràcia consolidada. No s'assenyala cap canvi d'ús.",
         },
       },
       {
         key: "lez",
         tone: "info",
         label: { en: "Low Emission Zone (ZBE)", es: "Zona de Bajas Emisiones (ZBE)", ca: "Zona de Baixes Emissions (ZBE)" },
+        tag: {
+          en: "Restriction · ZBE Rondes",
+          es: "Restricción · ZBE Rondes",
+          ca: "Restricció · ZBE Rondes",
+        },
         text: {
           en: "Like all of central Barcelona, this address is inside the Low Emission Zone. Only relevant if you keep a car without an emissions sticker.",
           es: "Como toda Barcelona central, esta dirección está dentro de la Zona de Bajas Emisiones. Solo importa si mantienes un coche sin etiqueta ambiental.",
@@ -344,7 +400,7 @@ export const sampleSors35: Report = {
   // Catalan ITP brackets are maintained, with the caveats kept in the footnote).
   costs: buildCostFacts(455000),
 
-  subsidies: { panels: buildSubsidyPanels() },
+  subsidies: buildSubsidies(),
 
   negotiation: {
     intro: {
@@ -354,14 +410,28 @@ export const sampleSors35: Report = {
     },
     items: [
       {
-        en: "Building age & ITE. A 61-year-old building with inspection obligations and an unknown reserve fund is a basis for trimming the number.",
-        es: "Edad del edificio e ITE. Un edificio de 61 años con obligaciones de inspección y un fondo de reserva desconocido es una base para recortar la cifra.",
-        ca: "Edat de l'edifici i ITE. Un edifici de 61 anys amb obligacions d'inspecció i un fons de reserva desconegut és una base per retallar la xifra.",
+        title: {
+          en: "Building age and ITE",
+          es: "Edad del edificio e ITE",
+          ca: "Edat de l'edifici i ITE",
+        },
+        desc: {
+          en: "A 61-year-old building with inspection obligations and an unknown reserve fund is a basis for trimming the number.",
+          es: "Un edificio de 61 años con obligaciones de inspección y un fondo de reserva desconocido es una base para recortar la cifra.",
+          ca: "Un edifici de 61 anys amb obligacions d'inspecció i un fons de reserva desconegut és una base per retallar la xifra.",
+        },
       },
       {
-        en: "Asking ≠ closing. Listed prices usually settle a little below the asking price, which leaves room for a measured offer.",
-        es: "Oferta ≠ cierre. Los precios anunciados suelen cerrarse algo por debajo del precio pedido, lo que deja margen para una propuesta medida.",
-        ca: "Oferta ≠ tancament. Els preus anunciats solen tancar-se una mica per sota del preu demanat, cosa que deixa marge per a una proposta mesurada.",
+        title: {
+          en: "Asking is not closing",
+          es: "La oferta no es el cierre",
+          ca: "L'oferta no és el tancament",
+        },
+        desc: {
+          en: "Listed prices usually settle a little below the asking price, which leaves room for a measured offer.",
+          es: "Los precios anunciados suelen cerrarse algo por debajo del precio pedido, lo que deja margen para una propuesta medida.",
+          ca: "Els preus anunciats solen tancar-se una mica per sota del preu demanat, cosa que deixa marge per a una proposta mesurada.",
+        },
       },
     ],
     tactic: {

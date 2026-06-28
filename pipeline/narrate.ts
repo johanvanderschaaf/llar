@@ -18,7 +18,7 @@ const NarrativeSchema = z.object({
   neighbourhoodLede: Loc,
   neighbourhoodNote: Loc,
   negotiationIntro: Loc,
-  negotiationItems: z.array(Loc),
+  negotiationItems: z.array(z.object({ title: Loc, desc: Loc })),
   negotiationTactic: Loc,
   priceLede: Loc,
   priceFairValue: Loc,
@@ -85,7 +85,7 @@ STRICT RULES, these are non-negotiable:
 - Keep each field tight: headline ≤ 14 words; body paragraphs 2–4 sentences; list items one sentence each.
 - legalItems: the standard get-before-you-offer DOCUMENTS to request for a Catalonia resale (nota simple, cédula d'habitabilitat, división horizontal, valid ITE, community minutes/actas, pending derrama, updated energy certificate, surface check, up-to-date community-fee certificate). 5–8 items.
 - checklist: 4–6 ON-SITE and PROCESS actions only (e.g. count mailboxes, inspect the roof, visit at different times, check reform permits, line up the mortgage decision-in-principle). Do NOT repeat the documents listed in legalItems; the checklist is what the buyer does, not what they request.
-- negotiationItems: 2–3 legitimate, fact-based reasons to negotiate the price down (e.g. building age/ITE obligations, asking-vs-closing gap).
+- negotiationItems: 2–3 legitimate, fact-based reasons to negotiate the price down (e.g. building age/ITE obligations, asking-vs-closing gap). Each item is an object with two fields: "title" = a short bold label (3–6 words, e.g. "Asking above the area average"); "desc" = one sentence explaining the ground from the record. Do NOT put a € amount or % discount target in either field.
 - negotiationTactic: explain HOW to use those levers (conditions to attach to the offer, what justifies a lower price). NEVER propose a specific opening offer or target € amount, a percentage discount, or a "settle near" figure, we cannot know a sound number from this data; the buyer sets it after a viewing.
 Return ONLY the structured JSON.`;
 

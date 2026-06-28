@@ -87,10 +87,18 @@ export interface Pricing {
   /** Verdict chip — tone + per-state label. */
   chip: { tone: "clear" | "neutral" | "check"; text: Localized };
   /**
-   * Verdict line displayed beneath the chip. May include a `<strong>` span
-   * wrapping the delta phrase ("≈10% below"); the renderer trusts the HTML.
+   * Short qualitative headline rendered as the price card's main verdict
+   * line — no specific numbers (e.g. "Asking sits near the top of the
+   * area's recent closing range."). May include a `<strong>` span; the
+   * renderer trusts the HTML.
    */
   verdict: Localized;
+  /**
+   * Numeric explanation rendered as the sub-line beneath `verdict`
+   * (e.g. "At €4,936/m², ~11% above the area closing average."). Optional —
+   * legacy reports stored a single combined verdict; renderer tolerates absence.
+   */
+  verdictSub?: Localized;
   /** Barri snapshot — present in states 01 + 02. */
   barri?: {
     name: string;
@@ -136,12 +144,28 @@ export interface Panel {
   body: Localized;
 }
 
+/**
+ * A single negotiation ground: a short bold title + a one-line explanation.
+ * Legacy reports stored `items` as a flat `Localized[]`; the renderer tolerates
+ * both shapes (see `ReportView`), so old stored reports keep rendering.
+ */
+export interface NegReason {
+  title: Localized;
+  desc: Localized;
+}
+
 /** A prominent, top-of-report warning. Tone drives the signal colour. */
 export type AlertTone = "caution" | "check";
 export interface ReportAlert {
   tone: AlertTone;
   title: Localized;
   detail: Localized;
+  /** Optional generic severity line shown in the free preview when set.
+   *  Used to keep the unlock motivation intact (e.g. the planning alert says
+   *  "an affectation that could limit works" in preview, then names the
+   *  specific Clau code in `detail` once unlocked). Most alerts don't need
+   *  this — they show the same `detail` in both states. */
+  previewDetail?: Localized;
 }
 
 /** Tone of a planning-section row. `info`/`clear` are neutral/reassuring. */
@@ -153,6 +177,17 @@ export interface UrbanismItem {
   tone: PlanTone;
   label: Localized;
   text: Localized;
+  /** Mono "Affected · Clau 7b" / "Protected · Nivell C" / "Standard" tag
+   *  rendered on the right of the row heading. Optional — older reports
+   *  may not carry it; the renderer falls back to a tone-based default. */
+  tag?: Localized;
+}
+
+/** A definition-list item: bold term + one-line definition. Used by the
+ *  building-condition deflist and the tax-subsidies two-panel section. */
+export interface TermDef {
+  term: Localized;
+  def: Localized;
 }
 
 export interface Report {
@@ -218,7 +253,13 @@ export interface Report {
 
   // --- 04 building & condition ---
   building: {
-    panels: Panel[]; // what's good / what to scrutinise
+    /** New shape: a definition list (Age / Structure era / ITE / Asbestos). */
+    facts?: TermDef[];
+    /** New shape: a what-to-check bullet list (rendered with blue checkmarks). */
+    checks?: Localized[];
+    /** Legacy two-panel prose, kept for stored reports written before the
+     *  Package-3 reshape. Renderer prefers `facts`+`checks` when present. */
+    panels?: Panel[];
     keyline: Localized;
   };
 
@@ -253,13 +294,20 @@ export interface Report {
 
   // --- 10 tax & subsidies ---
   subsidies: {
-    panels: Panel[];
+    /** New shape: two grouped definition lists. */
+    deductions?: TermDef[];
+    takeOn?: TermDef[];
+    /** Legacy three-panel prose, kept for stored reports written before the
+     *  Package-3 reshape. Renderer prefers `deductions`+`takeOn` when present. */
+    panels?: Panel[];
   };
 
   // --- 11 negotiation playbook ---
   negotiation: {
     intro: Localized;
-    items: Localized[];
+    /** Grounds to negotiate. New reports use `NegReason`; legacy stored
+     *  reports may still carry a flat `Localized[]` (handled at render). */
+    items: NegReason[];
     tactic: Localized;
   };
 

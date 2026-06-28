@@ -1,47 +1,149 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { getTranslations } from "next-intl/server";
-import type { Report, Fact, Localized } from "@/types/report";
+import type { Report, Fact, Localized, NegReason, TermDef } from "@/types/report";
 import { bandFor } from "@/config/scoring";
 import { pricing } from "@/config/brand";
 import { L } from "@/lib/localized";
 import { reportPriceEur } from "@/lib/stripe";
 import { brand } from "@/config/brand";
-import { LockedSection } from "./LockedSection";
 import { UnlockButton } from "./UnlockButton";
-import { PrintButton } from "./PrintButton";
 import { PriceSection } from "./PriceSection";
+import { Ring } from "./Ring";
+
+/* ---------- icons (inline 24×24 strokes, no library) ---------- */
+
+const stroke = {
+  fill: "none" as const,
+};
+
+function IcTriangle() {
+  return (
+    <svg viewBox="0 0 24 24" {...stroke}>
+      <path d="M12 3 2 20h20L12 3z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+      <path d="M12 10v4M12 17.5v.2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+function IcInfo() {
+  return (
+    <svg viewBox="0 0 24 24" {...stroke}>
+      <path d="M12 8v5M12 16.5v.2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
+    </svg>
+  );
+}
+function IcCheck() {
+  return (
+    <svg viewBox="0 0 24 24" {...stroke}>
+      <path d="M5 13l4 4 10-11" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+function IcLock() {
+  return (
+    <svg viewBox="0 0 24 24" {...stroke}>
+      <rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" strokeWidth="2" />
+      <path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" strokeWidth="2" />
+    </svg>
+  );
+}
+function IcDisc() {
+  return (
+    <svg viewBox="0 0 24 24" {...stroke}>
+      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
+      <path d="M12 11v5M12 8v.2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+function IcFile() {
+  return (
+    <svg viewBox="0 0 24 24" {...stroke}>
+      <path d="M7 3h7l5 5v13H7z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+      <path d="M14 3v5h5" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+    </svg>
+  );
+}
+function IcUpload() {
+  return (
+    <svg viewBox="0 0 24 24" {...stroke}>
+      <path d="M12 3v12M7 10l5 5 5-5M5 21h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/** Severity-icon kind for a status row / alert. */
+type IconKind = "triangle" | "info" | "check";
+function ToneIcon({ kind }: { kind: IconKind }) {
+  if (kind === "triangle") return <IcTriangle />;
+  if (kind === "check") return <IcCheck />;
+  return <IcInfo />;
+}
+
+// Planning row tone (caution/check/clear/info) → severity order + icon.
+const PLAN_ORDER: Record<string, number> = { caution: 0, check: 1, clear: 2, info: 3 };
+const PLAN_ICON: Record<string, IconKind> = {
+  caution: "triangle",
+  check: "info",
+  clear: "check",
+  info: "info",
+};
+// Risk row tone (good/ok/low) → icon.
+const RISK_ICON: Record<string, IconKind> = { good: "check", ok: "info", low: "triangle" };
+
+const PANEL_BODY: CSSProperties = {
+  fontSize: 14,
+  lineHeight: 1.55,
+  color: "var(--pw-ink-700)",
+  margin: "12px 0 0",
+};
 
 /* ---------- small presentational helpers ---------- */
 
-// Planning-row tone → severity order (caution first) and pill colour class.
-const PLAN_ORDER: Record<string, number> = {
-  caution: 0,
-  check: 1,
-  clear: 2,
-  info: 3,
-};
-const PLAN_PILL: Record<string, string> = {
-  caution: "low",
-  check: "ok",
-  clear: "good",
-  info: "info",
-};
-
 function SectionHead({
-  num,
-  title,
-  note,
+  idx,
+  label,
+  head,
+  lede,
+  children,
 }: {
-  num: string;
-  title: string;
-  note?: string;
+  idx?: string;
+  label: string;
+  head: string;
+  lede?: ReactNode;
+  children?: ReactNode;
 }) {
   return (
     <div className="sec-head">
-      <span className="sec-num">{num}</span>
-      <h2 className="serif">{title}</h2>
-      {note ? <span className="note">{note}</span> : null}
+      <p className="r-eyebrow">
+        {idx ? <span className="idx">{idx}</span> : null}
+        <span className="dot" />
+        <span>{label}</span>
+      </p>
+      <h2>{head}</h2>
+      {lede ? <p className="lede measure">{lede}</p> : null}
+      {children}
     </div>
+  );
+}
+
+/** Render a fact value, optionally splitting on " · " so the tail renders as
+ *  the design's `<small>` annotation (neighbourhood distances, cost subtexts).
+ *  Defensive: if there's no " · " the value renders unchanged. */
+function FactValue({
+  value,
+  splitSubtext,
+}: {
+  value: string;
+  splitSubtext?: boolean;
+}) {
+  if (!splitSubtext) return <>{value}</>;
+  const idx = value.indexOf(" · ");
+  if (idx === -1) return <>{value}</>;
+  return (
+    <>
+      {value.slice(0, idx)}{" "}
+      <small className="fig">· {value.slice(idx + 3)}</small>
+    </>
   );
 }
 
@@ -50,35 +152,126 @@ function FactGrid({
   locale,
   label,
   verifyLabel,
+  splitSubtext,
+  wideNote,
+  wideNoteLabel,
 }: {
   facts: Fact[];
   locale: string;
   label: (key: string) => string;
   verifyLabel: string;
+  /** Split " · ..." tails into `<small>` annotations (neighbourhood, costs). */
+  splitSubtext?: boolean;
+  /** Optional note rendered as a wide `fact--wide` row inside the grid
+   *  (snapshot's building note pattern). */
+  wideNote?: Localized;
+  wideNoteLabel?: string;
 }) {
   return (
-    <div className="facts">
-      {facts.map((f) => (
-        <div className="fact" key={f.labelKey}>
-          <span className="k">{label(f.labelKey)}</span>
-          <span className="v">
-            {L(f.value, locale)}
-            {f.toVerify ? <span className="verify">{verifyLabel}</span> : null}
-          </span>
+    <div className="facts fx">
+      {facts.map((f, i) => (
+        <div
+          className={`fact${f.accent ? " fact--em" : ""}`}
+          key={`${f.labelKey}-${i}`}
+        >
+          <div className="fact__k">
+            {label(f.labelKey)}
+            {f.toVerify ? <span className="toverify">{verifyLabel}</span> : null}
+          </div>
+          <div className="fact__v">
+            <FactValue value={L(f.value, locale)} splitSubtext={splitSubtext} />
+          </div>
+        </div>
+      ))}
+      {wideNote ? (
+        <div className="fact fact--wide">
+          {wideNoteLabel ? (
+            <div className="fact__k">{wideNoteLabel}</div>
+          ) : null}
+          <div
+            className="fact__v"
+            style={{
+              fontSize: 14.5,
+              fontWeight: 600,
+              color: "var(--pw-ink-700)",
+              lineHeight: 1.5,
+              marginTop: wideNoteLabel ? 6 : 0,
+            }}
+          >
+            {L(wideNote, locale)}
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+/** Definition-list rendered inside a `.panel`. Used by the building "The
+ *  building" panel and both subsidies panels. */
+function DefList({ items, locale }: { items: TermDef[]; locale: string }) {
+  return (
+    <dl className="deflist">
+      {items.map((it, i) => (
+        <div key={i}>
+          <dt>{L(it.term, locale)}</dt>
+          <dd>{L(it.def, locale)}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+/** Bulleted check-list with the design's blue checkmarks. */
+function ChecksList({
+  items,
+  locale,
+}: {
+  items: Localized[];
+  locale: string;
+}) {
+  return (
+    <ul className="checklist">
+      {items.map((it, i) => (
+        <li key={i}>
+          <IcCheck />
+          <span>{L(it, locale)}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** Legacy renderer: a pair of prose panels (older stored reports written
+ *  before the Package-3 reshape). Tolerant of `panels` being undefined. */
+function PanelPair({
+  panels,
+  locale,
+}: {
+  panels: Report["building"]["panels"];
+  locale: string;
+}) {
+  if (!panels || panels.length === 0) return null;
+  return (
+    <div className="panels2 fx">
+      {panels.map((p, i) => (
+        <div className="panel" key={i}>
+          <p className="panel__h">
+            <span className="k">{L(p.heading, locale)}</span>
+          </p>
+          <p style={PANEL_BODY}>{L(p.body, locale)}</p>
         </div>
       ))}
     </div>
   );
 }
 
-function Checklist({ items, locale }: { items: Localized[]; locale: string }) {
-  return (
-    <ul className="check">
-      {items.map((it, i) => (
-        <li key={i}>{L(it, locale)}</li>
-      ))}
-    </ul>
-  );
+/** A negotiation ground tolerates both the new `{title,desc}` shape and the
+ *  legacy flat `Localized` shape stored on older reports. */
+function reasonParts(r: NegReason | Localized): { title?: Localized; desc: Localized } {
+  if (r && typeof r === "object" && "desc" in r && "title" in r) {
+    return { title: r.title, desc: r.desc };
+  }
+  return { desc: r as Localized };
 }
 
 /* ---------- main view ---------- */
@@ -96,328 +289,460 @@ export async function ReportView({
 }) {
   const t = await getTranslations();
   const preview = mode === "preview";
+  const overall = report.verdict.overall;
+
   const priceLabel = new Intl.NumberFormat(
     locale === "en" ? "en-IE" : locale === "ca" ? "ca-ES" : "es-ES",
-    { style: "currency", currency: pricing.currency },
+    { style: "currency", currency: pricing.currency, maximumFractionDigits: 0 },
   ).format(reportPriceEur());
-  const overall = report.verdict.overall;
-  const previewTag =
-    overall >= 70
-      ? t("preview.tagGood")
-      : overall >= 50
-        ? t("preview.tagOk")
-        : t("preview.tagLow");
-  // Wrap a premium section behind the paywall teaser in preview mode.
-  const lock = (children: ReactNode) =>
-    preview ? (
-      <LockedSection
-        locked
-        eyebrow={t("preview.free")}
-        title={t("preview.lockTitle")}
-        cta={t("preview.lockCta")}
-      >
-        {children}
-      </LockedSection>
-    ) : (
-      children
-    );
+
   const dateFmt = new Intl.DateTimeFormat(
     locale === "es" ? "es-ES" : locale === "ca" ? "ca-ES" : "en-GB",
-    {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).format(new Date(report.generatedAt));
+    { day: "numeric", month: "long", year: "numeric" },
+  ).format(new Date(report.generatedAt));
+
+  const sourceChips = t.raw("rep.sourceChips") as string[];
 
   return (
-    <div className="wrap">
-      {/* PDF-only brand header */}
+    <div className="rp">
+      {/* print-only brand header (shown only in the PDF) */}
       <div className="print-only print-brand">
         {brand.wordmark.primary}
         <b>{brand.wordmark.accent}</b>
-        <span style={{ fontWeight: 500, color: "var(--muted)" }}>
-          · {brand.market}
+        <span style={{ fontWeight: 500, color: "var(--pw-ink-500)", marginLeft: 6 }}>
+          · {t("report.eyebrow")} · {report.hero.title} · {dateFmt}
         </span>
       </div>
 
-      {/* Download PDF (full report only) */}
-      {!preview ? (
-        <div className="report-actions">
-          <PrintButton label={t("report.downloadPdf")} />
-        </div>
-      ) : null}
+      {/* Save PDF lives in the topbar (route-level), not in the body. */}
 
-      {/* HERO */}
-      <header className="hero fx">
-        <div className="eyebrow">
-          {t("report.eyebrow")} · {dateFmt}
-        </div>
-        <h1 className="serif">
-          {report.hero.title}, {L(report.hero.floorLabel, locale)}
-        </h1>
-        <p className="sub">{L(report.hero.sub, locale)}</p>
-        <div className="meta-row">
-          {report.hero.meta.map((m) => (
-            <div className="meta" key={m.labelKey}>
-              <span className="k">{t(m.labelKey)}</span>
-              <span className={`v${m.accent ? " accent" : ""}`}>
-                {L(m.value, locale)}
-              </span>
-            </div>
-          ))}
-        </div>
-      </header>
-
-      {/* VERDICT */}
-      <div className="verdict fx" style={{ animationDelay: ".05s" }}>
-        <div className="lab">
-          {preview ? t("preview.free") : t("verdict.label")}
-        </div>
-        {preview ? (
-          <p style={{ marginBottom: 4 }}>{t("preview.note")}</p>
-        ) : (
-          <>
-            <h2 className="serif">{L(report.verdict.headline, locale)}</h2>
-            <p>{L(report.verdict.body, locale)}</p>
-          </>
-        )}
-        <div className="vscore">
-          <b>{overall}</b>
-          <span>{t("verdict.overallSuffix")}</span>
-        </div>
-        {preview ? (
-          <div>
-            <span className="vtag">{previewTag}</span>
+      <main className="doc">
+        {/* ===================== HERO ===================== */}
+        <section className="r-main r-hero">
+          <p className="r-hero__eyebrow">
+            <span className="dot" />
+            <span className="full">{t("report.eyebrow")} · {dateFmt}</span>
+            <span className="short">{dateFmt}</span>
+          </p>
+          <h1>{report.hero.title}</h1>
+          <p className="r-hero__floor fig">{L(report.hero.floorLabel, locale)}</p>
+          <p className="r-hero__sub">{L(report.hero.sub, locale)}</p>
+          <div className="metastrip">
+            {report.hero.meta.map((m) => (
+              <div className="metastrip__cell" key={m.labelKey}>
+                <div className="metastrip__k">{t(m.labelKey)}</div>
+                <div className="metastrip__v fig">{L(m.value, locale)}</div>
+              </div>
+            ))}
           </div>
-        ) : null}
-      </div>
+        </section>
 
-      {/* ALERTS — serious issues surfaced above the fold (e.g. affectation) */}
-      {report.alerts && report.alerts.length > 0 ? (
-        <div className="alerts fx">
-          {report.alerts.map((a, i) => (
-            <div className={`alert ${a.tone}`} key={i}>
-              <div className="alert-cap">{t("alerts.label")}</div>
-              <div className="alert-title">{L(a.title, locale)}</div>
-              <div className="alert-body">{L(a.detail, locale)}</div>
-            </div>
-          ))}
-        </div>
-      ) : null}
-
-      {/* PREVIEW — paywall banner (always visible until unlocked) */}
-      {preview && reportId ? (
-        <div className="unlock-banner fx">
-          <div>
-            <div className="unlock-title">{t("preview.unlockTitle")}</div>
-            <div className="unlock-sub">{t("preview.note")}</div>
-          </div>
-          <UnlockButton
-            reportId={reportId}
-            locale={locale}
-            label={t("preview.unlockCta", { price: priceLabel })}
-            pendingLabel="…"
-          />
-        </div>
-      ) : null}
-
-      {/* 01 SCORES */}
-      <section className="fx">
-        <SectionHead
-          num="01"
-          title={t("sections.scores")}
-          note={t("sections.scoresNote")}
-        />
-        <div className="scores">
-          {report.scores.map((s) => {
-            const color = `var(--${bandFor(s.value)})`;
-            return (
-              <div className="score" key={s.key}>
-                <div
-                  className="ring"
-                  style={{
-                    background: `conic-gradient(${color} ${s.value}%, var(--paper-2) 0)`,
-                  }}
-                >
-                  <b>{s.value}</b>
+        {/* ===================== ALERTS (both states) ===================== */}
+        {report.alerts && report.alerts.length > 0 ? (
+          <section className="r-main r-sec r-sec--flush" aria-label={t("alerts.label")}>
+            <div className="alerts fx">
+              {report.alerts.map((a, i) => (
+                <div className={`alert alert--${a.tone}`} key={i}>
+                  <span className="alert__ic">
+                    <ToneIcon kind={a.tone === "caution" ? "triangle" : "info"} />
+                  </span>
+                  <div>
+                    <p className="alert__t">{L(a.title, locale)}</p>
+                    <p className={preview ? "alert__found" : "alert__full"}>
+                      {L(preview && a.previewDetail ? a.previewDetail : a.detail, locale)}
+                    </p>
+                    {preview ? (
+                      <p className="alert__locked">
+                        <IcLock />
+                        {t("rep.alertLocked")}
+                      </p>
+                    ) : null}
+                  </div>
                 </div>
-                <div className="name">{t(`scoreNames.${s.key}`)}</div>
-                <div className="micro">{L(s.caption, locale)}</div>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* 02 SNAPSHOT */}
-      <section className="fx">
-        <SectionHead num="02" title={t("sections.snapshot")} />
-        <FactGrid
-          facts={report.snapshot.facts}
-          locale={locale}
-          label={(k) => t(k)}
-          verifyLabel={t("common.toVerify")}
-        />
-        <p className="body" style={{ marginTop: 22 }}>
-          {L(report.snapshot.note, locale)}
-        </p>
-      </section>
-
-      {/* 03 PRICE & VALUE (premium) — "Number Line" design, driven entirely by
-          the structured `pricing` payload (one of three states). The barri
-          closing-price benchmark is the single price anchor; we do not ingest
-          portal listings, so there is no comparables table. */}
-      {lock(
-      <section className="fx">
-        {report.price.pricing ? (
-          <PriceSection
-            pricing={report.price.pricing}
-            locale={locale}
-            t={t}
-          />
-        ) : (
-          <>
-            <SectionHead
-              num="03"
-              title={t("sections.price")}
-              note={t("sections.priceNote")}
-            />
-            <p className="lede">{L(report.price.lede, locale)}</p>
-          </>
-        )}
-      </section>
-      )}
-
-      {/* 04 BUILDING & CONDITION (premium) */}
-      {lock(
-      <section className="fx">
-        <SectionHead num="04" title={t("sections.building")} />
-        <div className="grid-2">
-          {report.building.panels.map((p, i) => (
-            <div className="panel" key={i}>
-              <h3 className="serif">{L(p.heading, locale)}</h3>
-              <p>{L(p.body, locale)}</p>
+              ))}
             </div>
-          ))}
-        </div>
-        <div className="keyline" style={{ marginTop: 22 }}>
-          {L(report.building.keyline, locale)}
-        </div>
-      </section>
-      )}
+          </section>
+        ) : null}
 
-      {/* 05 RISK & SAFETY */}
-      <section className="fx">
-        <SectionHead num="05" title={t("sections.risks")} />
-        {report.risks.map((r) => (
-          <div className="risk" key={r.labelKey}>
-            <span className="rk">{t(r.labelKey)}</span>
-            <span className={`pill ${r.tone}`}>{t(`riskPill.${r.tone}`)}</span>
-            <span className="rt">{L(r.detail, locale)}</span>
+        {/* ===================== BOTTOM LINE ===================== */}
+        <section className="r-main r-sec">
+          <div className="verdict fx">
+            <div className="verdict__body measure">
+              <p className="r-eyebrow">
+                <span className="dot" />
+                <span>{t("rep.verdictEyebrow")}</span>
+              </p>
+              <h2>{L(report.verdict.headline, locale)}</h2>
+              <p>{L(report.verdict.body, locale)}</p>
+              {preview ? (
+                <p className="verdict-note">{t("rep.verdictPreviewNote")}</p>
+              ) : null}
+            </div>
+            <div className="verdict__ring">
+              <Ring value={overall} size="lg" suffix={t("rep.ringOf")} />
+              <p className="verdict__caption">{t("rep.overallCaption")}</p>
+            </div>
           </div>
-        ))}
-      </section>
+        </section>
 
-      {/* 06 LEGAL (premium) */}
-      {lock(
-      <section className="fx">
-        <SectionHead num="06" title={t("sections.legal")} />
-        <p className="body">{L(report.legal.intro, locale)}</p>
-        <Checklist items={report.legal.items} locale={locale} />
-      </section>
-      )}
+        {/* ===================== 01 SCORES ===================== */}
+        <section className="r-main r-sec">
+          <SectionHead
+            idx="01"
+            label={t("sections.scores")}
+            head={t("rep.scoresHead")}
+            lede={t("rep.scoresLede")}
+          />
+          <div className="scores fx">
+            {report.scores.map((s) => {
+              const band = bandFor(s.value);
+              const cap = band === "good" ? "Good" : band === "ok" ? "Ok" : "Low";
+              return (
+                <div className="scorecard" key={s.key}>
+                  <Ring value={s.value} size="sm" />
+                  <div className="scorecard__label">{t(`scoreNames.${s.key}`)}</div>
+                  <span className={`scoreband scoreband--${band}`}>
+                    <span className="pip" />
+                    {t(`rep.bandShort${cap}`)}
+                  </span>
+                  {preview ? null : (
+                    <p className="scorecard__cap">{L(s.caption, locale)}</p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          <div className="bandlegend fx">
+            <span>
+              <span className="pip" style={{ background: "var(--pw-clear)" }} />
+              {t("rep.bandGood")}
+            </span>
+            <span>
+              <span className="pip" style={{ background: "var(--pw-check)" }} />
+              {t("rep.bandOk")}
+            </span>
+            <span>
+              <span className="pip" style={{ background: "var(--pw-caution)" }} />
+              {t("rep.bandLow")}
+            </span>
+          </div>
+        </section>
 
-      {/* 07 NEIGHBOURHOOD */}
-      <section className="fx">
-        <SectionHead num="07" title={t("sections.neighbourhood")} />
-        <p className="lede">{L(report.neighbourhood.lede, locale)}</p>
-        <FactGrid
-          facts={report.neighbourhood.facts}
-          locale={locale}
-          label={(k) => t(k)}
-          verifyLabel={t("common.toVerify")}
-        />
-        <p className="body" style={{ marginTop: 20 }}>
-          {L(report.neighbourhood.note, locale)}
-        </p>
-      </section>
+        {/* ===================== 02 SNAPSHOT ===================== */}
+        <section className="r-main r-sec">
+          <SectionHead idx="02" label={t("sections.snapshot")} head={t("rep.snapshotHead")} />
+          <FactGrid
+            facts={report.snapshot.facts}
+            locale={locale}
+            label={(k) => t(k)}
+            verifyLabel={t("common.toVerify")}
+            wideNote={report.snapshot.note}
+            wideNoteLabel={t("rep.buildingNoteLabel")}
+          />
+        </section>
 
-      {/* 08 URBANISM */}
-      <section className="fx">
-        <SectionHead num="08" title={t("sections.urbanism")} />
-        {[...report.urbanism.items]
-          .sort((a, b) => PLAN_ORDER[a.tone] - PLAN_ORDER[b.tone])
-          .map((it) => (
-            <div className="plan-item" key={it.key}>
-              <span className={`pill ${PLAN_PILL[it.tone]}`}>
-                {t(`planTone.${it.tone}`)}
+        {/* ===================== GATE (preview only) ===================== */}
+        {preview ? (
+          <section className="r-main r-sec gate" aria-label={t("rep.gate.head")}>
+            <div className="gate__card">
+              <span className="gate__lock">
+                <IcLock />
               </span>
-              <div className="plan-body">
-                <div className="plan-label">{L(it.label, locale)}</div>
-                <div className="plan-text">{L(it.text, locale)}</div>
+              <p className="gate__eyebrow">{t("rep.gate.eyebrow")}</p>
+              <h2>{t("rep.gate.head")}</h2>
+              <p className="gate__sub">{t("rep.gate.sub")}</p>
+              <div className="gate__locked">
+                <p className="gate__locked-h">{t("rep.gate.lockedH")}</p>
+                <ul className="gate__list">
+                  {(t.raw("rep.gate.items") as string[]).map((it, i) => (
+                    <li key={i}>
+                      <IcCheck />
+                      {it}
+                    </li>
+                  ))}
+                </ul>
               </div>
+              <div className="gate__buy">
+                <div className="gate__price fig">
+                  {priceLabel} <small>{t("rep.gate.priceSuffix")}</small>
+                </div>
+                {reportId ? (
+                  <UnlockButton
+                    reportId={reportId}
+                    locale={locale}
+                    label={t("rep.gate.cta")}
+                    pendingLabel="…"
+                  />
+                ) : null}
+              </div>
+              <p className="gate__note">{t("rep.gate.note")}</p>
             </div>
-          ))}
-      </section>
+          </section>
+        ) : null}
 
-      {/* 09 COSTS */}
-      <section className="fx">
-        <SectionHead num="09" title={t("sections.costs")} />
-        <p className="body">{L(report.costs.intro, locale)}</p>
-        <FactGrid
-          facts={report.costs.facts}
-          locale={locale}
-          label={(k) => t(k)}
-          verifyLabel={t("common.toVerify")}
-        />
-        <p
-          className="body"
-          style={{ marginTop: 18, fontSize: 14, color: "var(--muted)" }}
-        >
-          {L(report.costs.footnote, locale)}
-        </p>
-      </section>
+        {/* ===================== FULL REPORT (below the gate) ===================== */}
+        {!preview ? (
+          <>
+            {/* 03 PRICE & VALUE */}
+            <section className="r-main r-sec fx">
+              {report.price.pricing ? (
+                <PriceSection pricing={report.price.pricing} locale={locale} t={t} />
+              ) : (
+                <>
+                  <SectionHead idx="03" label={t("sections.price")} head={t("rep.priceHead")} />
+                  <p className="lede measure">{L(report.price.lede, locale)}</p>
+                </>
+              )}
+            </section>
 
-      {/* 10 SUBSIDIES */}
-      <section className="fx">
-        <SectionHead num="10" title={t("sections.subsidies")} />
-        <div className="grid-2">
-          {report.subsidies.panels.map((p, i) => (
-            <div className="panel" key={i}>
-              <h3 className="serif">{L(p.heading, locale)}</h3>
-              <p>{L(p.body, locale)}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+            {/* 04 PLANNING & RESTRICTIONS */}
+            <section className="r-main r-sec fx">
+              <SectionHead
+                idx="04"
+                label={t("sections.urbanism")}
+                head={t("rep.planningHead")}
+                lede={t("rep.planningLede")}
+              >
+                <div className="bandlegend" style={{ marginTop: 18 }}>
+                  <span>
+                    <span className="pip" style={{ background: "var(--pw-caution)" }} />
+                    {t("rep.planKeyAffected")}
+                  </span>
+                  <span>
+                    <span className="pip" style={{ background: "var(--pw-check)" }} />
+                    {t("rep.planKeyRestriction")}
+                  </span>
+                  <span>
+                    <span className="pip" style={{ background: "var(--pw-clear)" }} />
+                    {t("rep.planKeyClear")}
+                  </span>
+                </div>
+              </SectionHead>
+              <div className="statuslist">
+                {[...report.urbanism.items]
+                  .sort((a, b) => PLAN_ORDER[a.tone] - PLAN_ORDER[b.tone])
+                  .map((it) => (
+                    <div className={`srow srow--${it.tone}`} key={it.key}>
+                      <span className="srow__ic">
+                        <ToneIcon kind={PLAN_ICON[it.tone]} />
+                      </span>
+                      <div className="srow__main">
+                        <div className="srow__top">
+                          <p className="srow__t">{L(it.label, locale)}</p>
+                          <span className="srow__tag">
+                            {it.tag ? L(it.tag, locale) : t(`planTone.${it.tone}`)}
+                          </span>
+                        </div>
+                        <p className="srow__d">{L(it.text, locale)}</p>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+              <p className="disclaimer">
+                <IcDisc />
+                <span>{t("rep.planDisclaimer")}</span>
+              </p>
+            </section>
 
-      {/* 11 NEGOTIATION (premium) */}
-      {lock(
-      <section className="fx">
-        <SectionHead num="11" title={t("sections.negotiation")} />
-        <p className="body">{L(report.negotiation.intro, locale)}</p>
-        <Checklist items={report.negotiation.items} locale={locale} />
-        <div className="keyline" style={{ marginTop: 20 }}>
-          {L(report.negotiation.tactic, locale)}
-        </div>
-      </section>
-      )}
+            {/* 05 BUILDING & CONDITION */}
+            <section className="r-main r-sec fx">
+              <SectionHead idx="05" label={t("sections.building")} head={t("rep.buildingHead")} />
+              {report.building.facts && report.building.checks ? (
+                <div className="panels2 fx">
+                  <div className="panel">
+                    <p className="panel__h">
+                      <span className="k">{t("rep.theBuildingLabel")}</span>
+                    </p>
+                    <DefList items={report.building.facts} locale={locale} />
+                  </div>
+                  <div className="panel">
+                    <p className="panel__h">
+                      <span className="k">{t("rep.whatToCheckLabel")}</span>
+                    </p>
+                    <ChecksList items={report.building.checks} locale={locale} />
+                  </div>
+                </div>
+              ) : (
+                <PanelPair panels={report.building.panels} locale={locale} />
+              )}
+              <p className="keyline measure">{L(report.building.keyline, locale)}</p>
+            </section>
 
-      {/* 12 CHECKLIST (premium) */}
-      {lock(
-      <section className="fx">
-        <SectionHead num="12" title={t("sections.checklist")} />
-        <Checklist items={report.checklist} locale={locale} />
-      </section>
-      )}
+            {/* 06 RISK & SAFETY */}
+            <section className="r-main r-sec fx">
+              <SectionHead idx="06" label={t("sections.risks")} head={t("rep.riskHead")} />
+              <div className="statuslist">
+                {report.risks.map((r) => (
+                  <div className={`srow srow--${r.tone}`} key={r.labelKey}>
+                    <span className="srow__ic">
+                      <ToneIcon kind={RISK_ICON[r.tone]} />
+                    </span>
+                    <div className="srow__main">
+                      <div className="srow__top">
+                        <p className="srow__t">{t(r.labelKey)}</p>
+                        <span className="srow__tag">{t(`riskPill.${r.tone}`)}</span>
+                      </div>
+                      <p className="srow__d">{L(r.detail, locale)}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
 
-      {/* FOOTER */}
-      <footer className="fx">
-        <div className="src">{L(report.footer.sources, locale)}</div>
-        <div>
-          {L(report.footer.disclaimer, locale)} · {t("footer.generated", { date: dateFmt })}
-        </div>
-      </footer>
+            {/* 07 NEIGHBOURHOOD */}
+            <section className="r-main r-sec fx">
+              <SectionHead
+                idx="07"
+                label={t("sections.neighbourhood")}
+                head={t("rep.neighbourhoodHead")}
+                lede={L(report.neighbourhood.lede, locale)}
+              />
+              <FactGrid
+                facts={report.neighbourhood.facts}
+                locale={locale}
+                label={(k) => t(k)}
+                verifyLabel={t("common.toVerify")}
+                splitSubtext
+              />
+              <p className="note measure" style={{ marginTop: 16 }}>
+                {L(report.neighbourhood.note, locale)}
+              </p>
+            </section>
+
+            {/* 08 COSTS & TAXES */}
+            <section className="r-main r-sec fx">
+              <SectionHead
+                idx="08"
+                label={t("sections.costs")}
+                head={t("rep.costsHead")}
+                lede={L(report.costs.intro, locale)}
+              />
+              <FactGrid
+                facts={report.costs.facts}
+                locale={locale}
+                label={(k) => t(k)}
+                verifyLabel={t("common.toVerify")}
+                splitSubtext
+              />
+              <p className="note measure" style={{ marginTop: 16 }}>
+                {L(report.costs.footnote, locale)}
+              </p>
+            </section>
+
+            {/* 09 TAX & SUBSIDIES */}
+            <section className="r-main r-sec fx">
+              <SectionHead idx="09" label={t("sections.subsidies")} head={t("rep.subsidiesHead")} />
+              {report.subsidies.deductions && report.subsidies.takeOn ? (
+                <div className="panels2 fx">
+                  <div className="panel">
+                    <p className="panel__h">
+                      <span className="k">{t("rep.deductionsLabel")}</span>
+                    </p>
+                    <DefList items={report.subsidies.deductions} locale={locale} />
+                  </div>
+                  <div className="panel">
+                    <p className="panel__h">
+                      <span className="k">{t("rep.takeOnLabel")}</span>
+                    </p>
+                    <DefList items={report.subsidies.takeOn} locale={locale} />
+                  </div>
+                </div>
+              ) : (
+                <PanelPair panels={report.subsidies.panels} locale={locale} />
+              )}
+            </section>
+
+            {/* 10 NEGOTIATION PLAYBOOK */}
+            <section className="r-main r-sec fx">
+              <SectionHead
+                idx="10"
+                label={t("sections.negotiation")}
+                head={t("rep.negotiationHead")}
+                lede={L(report.negotiation.intro, locale)}
+              />
+              <div className="reasons">
+                {(report.negotiation.items as (NegReason | Localized)[]).map((raw, i) => {
+                  const { title, desc } = reasonParts(raw);
+                  return (
+                    <div className="reason" key={i}>
+                      <span className="reason__n fig" />
+                      <div>
+                        {title ? <p className="reason__t">{L(title, locale)}</p> : null}
+                        <p className="reason__d">{L(desc, locale)}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="tactic">
+                <p className="tactic__k">{t("rep.tacticLabel")}</p>
+                <p>{L(report.negotiation.tactic, locale)}</p>
+              </div>
+            </section>
+
+            {/* 11 BEFORE YOU OFFER (hub) */}
+            <section className="r-main r-sec fx">
+              <SectionHead idx="11" label={t("sections.checklist")} head={t("rep.beforeHead")} />
+              <div className="hub">
+                <div className="panel">
+                  <p className="panel__h">
+                    <span className="k">{t("rep.onSiteLabel")}</span>
+                  </p>
+                  <ul className="actions">
+                    {report.checklist.map((item, i) => (
+                      <li key={i}>
+                        <span className="n fig">{i + 1}</span>
+                        <span>{L(item, locale)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="panel docs">
+                  <p className="panel__h">
+                    <span className="k">{t("rep.docsLabel")}</span>
+                  </p>
+                  <ul className="doclist">
+                    {(t.raw("rep.docs") as { term: string; gloss: string }[]).map((d, i) => (
+                      <li key={i}>
+                        <IcFile />
+                        <span>
+                          <span className="dl-term term">{d.term}</span>{" "}
+                          <span className="dl-gloss">{d.gloss}</span>
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="docs__future">
+                    <IcUpload />
+                    <span>{t("rep.docsFuture")}</span>
+                  </p>
+                </div>
+              </div>
+            </section>
+          </>
+        ) : null}
+
+        {/* ===================== FOOTER (both states) ===================== */}
+        <footer className="r-main r-foot">
+          <p className="r-eyebrow">
+            <span className="dot" />
+            <span>{t("rep.footSources")}</span>
+          </p>
+          <div className="r-foot__sources">
+            {sourceChips.map((c, i) => (
+              <span key={i}>{c}</span>
+            ))}
+          </div>
+          <p className="r-foot__disc">{L(report.footer.disclaimer, locale)}</p>
+          <div className="r-foot__meta">
+            <span style={{ fontWeight: 800, letterSpacing: "-0.02em" }}>
+              {brand.wordmark.primary}
+              <span style={{ color: "var(--pw-blue)" }}>{brand.wordmark.accent}</span>
+            </span>
+            <span className="fig">{t("footer.generated", { date: dateFmt })}</span>
+          </div>
+        </footer>
+      </main>
     </div>
   );
 }
