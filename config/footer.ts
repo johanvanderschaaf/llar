@@ -41,7 +41,7 @@ export function buildFooter(): {
         "MITECO–SNCZI (zones inundables fluvials); IGN / NCSE-02 (perillositat sísmica); CTE DB-HS6 (radó); " +
         "dades obertes de l'Ajuntament de Barcelona (context de delinqüència per districte, ZBE); " +
         "OpenStreetMap (serveis del barri); " +
-        "Generalitat de Catalunya, Habitatge (preus de tancament notarials registrats per barri, la referència de preu única). " +
+        "Generalitat de Catalunya, Habitatge (preus de tancament notarials registrats per barri, la referència única de preu). " +
         "Les xifres de preu són orientatives, no preus d'oferta de portals. " +
         "Les puntuacions són una valoració editorial independent.",
     },

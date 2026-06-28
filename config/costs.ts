@@ -170,7 +170,7 @@ export function buildSubsidies(): { deductions: TermDef[]; takeOn: TermDef[] } {
         def: {
           en: "Grants of 40–80% on qualifying works (up to ~€21k/home), largely exhausted or waitlisted in Catalonia. Funds must be justified by 30 June 2026, so don't count on them for a future reform.",
           es: "Ayudas del 40–80% sobre obras (hasta ~21.000 €/vivienda), en gran parte agotadas o en lista de espera en Cataluña. Los fondos deben justificarse antes del 30 de junio de 2026: no cuentes con ellos para una reforma futura.",
-          ca: "Ajuts del 40–80% sobre obres (fins a ~21.000 €/habitatge), en gran part exhaurits o en llista d'espera a Catalunya. Els fons s'han de justificar abans del 30 de juny de 2026: no comptis amb ells per a una reforma futura.",
+          ca: "Ajuts del 40–80% sobre obres (fins a ~21.000 €/habitatge), en gran part exhaurits o en llista d'espera a Catalunya. Els fons s'han de justificar abans del 30 de juny de 2026: no hi comptis per a una reforma futura.",
         },
       },
       {
@@ -181,8 +181,8 @@ export function buildSubsidies(): { deductions: TermDef[]; takeOn: TermDef[] } {
         },
         def: {
           en: "Public guarantee schemes can help cover part of the deposit on a first habitual home; bracket-reduced ITP may also apply for buyers aged 35 or under.",
-          es: "Los avales públicos pueden cubrir parte de la entrada de una primera vivienda habitual; también puede aplicar el ITP reducido por tramo para compradores de hasta 35 años.",
-          ca: "Els avals públics poden cobrir part de l'entrada d'un primer habitatge habitual; també pot aplicar l'ITP reduït per tram per a compradors de fins a 35 anys.",
+          es: "Los avales públicos pueden cubrir parte de la entrada de una primera vivienda habitual; también puede aplicarse el ITP reducido por tramo para compradores de hasta 35 años.",
+          ca: "Els avals públics poden cobrir part de l'entrada d'un primer habitatge habitual; també pot aplicar-se l'ITP reduït per tram per a compradors de fins a 35 anys.",
         },
       },
     ],

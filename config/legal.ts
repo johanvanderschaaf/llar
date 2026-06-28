@@ -50,7 +50,7 @@ export function buildLegal(): { intro: Localized; items: Localized[] } {
       {
         en: "Surface check, confirm the useful m² against the cadastral and registry records.",
         es: "Comprobación de superficie, confirma los m² útiles frente al Catastro y el Registro.",
-        ca: "Comprovació de superfície, confirma els m² útils contra el Cadastre i el Registre.",
+        ca: "Comprovació de superfície, confirma els m² útils amb el Cadastre i el Registre.",
       },
       {
         en: "Up-to-date community-fee certificate, proof there are no outstanding community debts.",
