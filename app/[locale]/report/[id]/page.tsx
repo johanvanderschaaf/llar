@@ -1,8 +1,9 @@
 import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { TopBar } from "@/components/TopBar";
 import { ReportView } from "@/components/report/ReportView";
+import { PrintButton } from "@/components/report/PrintButton";
 import { sampleSors35 } from "@/data/sample-sors35";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -13,32 +14,58 @@ import type { ReportRow } from "@/types/db";
 
 export const dynamic = "force-dynamic";
 
+type Resolved =
+  | { kind: "full"; report: ReportRow["data"]; reportId: string }
+  | { kind: "preview"; report: ReportRow["data"]; reportId: string }
+  | { kind: "preparing"; id: string }
+  | { kind: "notfound" };
+
 /**
  * Public report route. Serves the demo sample, plus reports from the database:
  * - published → full report (public).
  * - unpublished → free PREVIEW for anyone with the link (premium sections
  *   locked); the operator sees the full report.
+ *
+ * The Save-PDF affordance lives in the topbar, so we resolve the report's
+ * mode BEFORE rendering the topbar — and pass `<PrintButton>` to it only when
+ * the buyer is actually looking at a full report.
  */
 export default async function ReportPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string; id: string }>;
+  searchParams: Promise<{ preview?: string }>;
 }) {
   const { locale, id } = await params;
+  const { preview } = await searchParams;
   setRequestLocale(locale);
 
-  const content = await reportContent(locale, id);
+  const resolved = await resolveReport(id, preview != null);
+  if (resolved.kind === "notfound") notFound();
+
+  const t = await getTranslations();
+  const topbarActions =
+    resolved.kind === "full" ? (
+      <PrintButton label={t("report.downloadPdf")} />
+    ) : null;
+
   return (
     <>
-      <TopBar />
-      {content}
+      <TopBar actions={topbarActions} />
+      {renderResolved(resolved, locale)}
     </>
   );
 }
 
-async function reportContent(locale: string, id: string): Promise<ReactNode> {
+async function resolveReport(
+  id: string,
+  forcePreview: boolean,
+): Promise<Resolved> {
   if (id === sampleSors35.id) {
-    return <ReportView report={sampleSors35} locale={locale} />;
+    return forcePreview
+      ? { kind: "preview", report: sampleSors35, reportId: sampleSors35.id }
+      : { kind: "full", report: sampleSors35, reportId: sampleSors35.id };
   }
 
   const db = createAdminClient();
@@ -47,7 +74,7 @@ async function reportContent(locale: string, id: string): Promise<ReactNode> {
     .select("*")
     .eq("id", id)
     .maybeSingle();
-  if (!row) notFound();
+  if (!row) return { kind: "notfound" };
   const report = row as ReportRow;
 
   // Full access for the operator or anyone who has paid; everyone else gets the
@@ -62,15 +89,23 @@ async function reportContent(locale: string, id: string): Promise<ReactNode> {
   // Full + AI not generated yet → show the progress screen, which generates the
   // narrative and refreshes into the complete report (no blocking 90s render).
   if (full && hasAnthropicKey() && !report.data.verdict?.headline?.en) {
-    return <PreparingFullReport id={id} />;
+    return { kind: "preparing", id };
   }
 
+  return full
+    ? { kind: "full", report: report.data, reportId: id }
+    : { kind: "preview", report: report.data, reportId: id };
+}
+
+function renderResolved(r: Resolved, locale: string): ReactNode {
+  if (r.kind === "preparing") return <PreparingFullReport id={r.id} />;
+  if (r.kind === "notfound") return null;
   return (
     <ReportView
-      report={report.data}
+      report={r.report}
       locale={locale}
-      mode={full ? "full" : "preview"}
-      reportId={id}
+      mode={r.kind}
+      reportId={r.reportId}
     />
   );
 }

@@ -28,6 +28,7 @@ Ajuntament de Barcelona sources (see below).
 | AI narrative (Anthropic) | 🟡 wired; opt-in per report once unlocked |
 | Stripe checkout + PDF unlock | 🟡 scaffolded; needs production Stripe keys |
 | Marketing homepage ("Field & Air" redesign) | ✅ live — trilingual, ported from `design_handoff_pisowise_brand/design_handoff_homepage` |
+| Report-page redesign port | 🟡 in progress on `feature/samplereport` — desktop port + four mobile rules from `design_handoff_pisowise_brand/design_handoff_samplereport` (gutter-preserving padding, ≤560px number-line collapse, mobile overflow guard, hanging-indent lists). Uncommitted, not on `main` yet. |
 | SEO / legal polish | 🟡 partial |
 
 ## Roadmap (next iterations)
