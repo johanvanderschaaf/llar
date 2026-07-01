@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { getTranslations } from "next-intl/server";
-import { Link } from "@/i18n/navigation";
+import { Link, PRIMARY_CTA_HREF } from "@/i18n/navigation";
 import { Logo } from "./Brand";
 import { LocaleSwitcher } from "./LocaleSwitcher";
 
@@ -22,7 +22,7 @@ export async function TopBar({ actions }: { actions?: ReactNode } = {}) {
         <div className="topbar-right">
           {actions}
           <LocaleSwitcher />
-          <Link href="/start" className="nav-cta">
+          <Link href={PRIMARY_CTA_HREF} className="nav-cta">
             {t("nav.cta")}
           </Link>
         </div>
