@@ -469,5 +469,31 @@
       { "term": "justificant de derrames", "gloss": "proof of special levies" },
       { "term": "rebut de l'IBI", "gloss": "latest property-tax receipt" }
     ]
+  },
+  "earlyAccess": {
+    "navSample": "See a sample report",
+    "eyebrow": "Early access · Barcelona",
+    "h1": "We're almost ready to check <em>your flat.</em>",
+    "sub": "PisoWise turns a flat's scattered official records into one clear read: planning, price reality, building, risk. We're getting the last sources locked in. Be first in line when it goes live.",
+    "labelEmail": "Email",
+    "labelFlat": "Which flat?",
+    "optional": "optional",
+    "phFlat": "Street and number",
+    "phFloor": "Floor (e.g. 3)",
+    "phDoor": "Door (e.g. 2)",
+    "hintFlat": "Add the floor and door too, so we run the exact flat first when we open. A cadastral reference works instead.",
+    "err": "Please enter a valid email address.",
+    "errServer": "Something went wrong on our end. Please try again in a moment.",
+    "cta": "Notify me when it's ready",
+    "reassure": "One email when it opens. No spam, and no payment now.",
+    "okTitle": "You're on the list.",
+    "okBodyPre": "We'll send a single email to",
+    "okBodyPost": "the moment PisoWise opens in Barcelona.",
+    "okQueueLabel": "First in your queue",
+    "okQueueNone": "No flat added yet, you can add one anytime.",
+    "okQueueNoneLabel": "Notified addresses go first",
+    "sampleLink": "While you wait, see a sample report",
+    "echoFloor": "floor",
+    "echoDoor": "door"
   }
 }

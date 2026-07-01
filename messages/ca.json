@@ -469,5 +469,31 @@
       { "term": "justificant de derrames", "gloss": "justificant de quotes extraordinàries" },
       { "term": "rebut de l'IBI", "gloss": "darrer rebut de l'IBI" }
     ]
+  },
+  "earlyAccess": {
+    "navSample": "Veure un informe d'exemple",
+    "eyebrow": "Accés anticipat · Barcelona",
+    "h1": "Gairebé estem a punt per analitzar <em>el teu pis.</em>",
+    "sub": "PisoWise converteix els registres oficials dispersos d'un pis en una lectura clara: urbanisme, preu real, edifici i riscos. Estem enllestint les últimes fonts. Sé dels primers de la llista quan obrim.",
+    "labelEmail": "Correu electrònic",
+    "labelFlat": "Quin pis?",
+    "optional": "opcional",
+    "phFlat": "Carrer i número",
+    "phFloor": "Planta (p. ex. 3)",
+    "phDoor": "Porta (p. ex. 2)",
+    "hintFlat": "Afegeix la planta i la porta perquè analitzem el pis exacte primer quan obrim. També val una referència cadastral.",
+    "err": "Introdueix una adreça de correu vàlida.",
+    "errServer": "Hi ha hagut un problema per la nostra banda. Torna-ho a provar d'aquí a un moment.",
+    "cta": "Avisa'm quan estigui a punt",
+    "reassure": "Un sol correu quan obrim. Sense spam ni cap pagament ara.",
+    "okTitle": "Ja ets a la llista.",
+    "okBodyPre": "Enviarem un únic correu a",
+    "okBodyPost": "tan bon punt PisoWise obri a Barcelona.",
+    "okQueueLabel": "Primer de la teva cua",
+    "okQueueNone": "Encara no has afegit cap pis, pots fer-ho quan vulguis.",
+    "okQueueNoneLabel": "Les adreces avisades tenen prioritat",
+    "sampleLink": "Mentre esperes, mira un informe d'exemple",
+    "echoFloor": "planta",
+    "echoDoor": "porta"
   }
 }

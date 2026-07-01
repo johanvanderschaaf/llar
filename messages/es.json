@@ -469,5 +469,31 @@
       { "term": "justificante de derramas", "gloss": "justificante de cuotas extraordinarias" },
       { "term": "recibo del IBI", "gloss": "último recibo del IBI" }
     ]
+  },
+  "earlyAccess": {
+    "navSample": "Ver un informe de ejemplo",
+    "eyebrow": "Acceso anticipado · Barcelona",
+    "h1": "Casi listos para analizar <em>tu piso.</em>",
+    "sub": "PisoWise convierte los registros oficiales dispersos de un piso en una lectura clara: urbanismo, precio real, edificio y riesgos. Estamos cerrando las últimas fuentes. Sé de los primeros de la lista cuando abramos.",
+    "labelEmail": "Correo electrónico",
+    "labelFlat": "¿Qué piso?",
+    "optional": "opcional",
+    "phFlat": "Calle y número",
+    "phFloor": "Planta (p. ej. 3)",
+    "phDoor": "Puerta (p. ej. 2)",
+    "hintFlat": "Añade la planta y la puerta para que analicemos el piso exacto primero cuando abramos. También sirve una referencia catastral.",
+    "err": "Introduce una dirección de correo válida.",
+    "errServer": "Algo ha fallado por nuestra parte. Inténtalo de nuevo en un momento.",
+    "cta": "Avísame cuando esté listo",
+    "reassure": "Un solo correo cuando abramos. Sin spam y sin ningún pago ahora.",
+    "okTitle": "Ya estás en la lista.",
+    "okBodyPre": "Enviaremos un único correo a",
+    "okBodyPost": "en cuanto PisoWise abra en Barcelona.",
+    "okQueueLabel": "Primero de tu cola",
+    "okQueueNone": "Aún no has añadido ningún piso, puedes hacerlo cuando quieras.",
+    "okQueueNoneLabel": "Las direcciones avisadas van primero",
+    "sampleLink": "Mientras esperas, mira un informe de ejemplo",
+    "echoFloor": "planta",
+    "echoDoor": "puerta"
   }
 }
