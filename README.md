@@ -8,9 +8,11 @@ The product is deliberately aimed at residents buying a home to live in — not
 at foreign investors and explicitly **not** at the tourist-home / short-let
 market. Features, copy, and data sources should reinforce that focus.
 
-> **Brand & price are placeholders.** Everything brand-related (name, wordmark,
-> tagline, glyph) and the report price live in **`config/brand.ts`** — change them
-> there to rebrand or reprice in one place.
+> **Brand lives in one place; price lives in two.** Everything brand-related (name,
+> wordmark, tagline, glyph) and the report price default live in **`config/brand.ts`**.
+> To **reprice** you must also update the `REPORT_PRICE_EUR` env var in **Vercel
+> Production** — it overrides the config at runtime (`lib/stripe.ts`) — and redeploy.
+> The price is currently **€49**.
 
 ## Status
 
@@ -102,7 +104,7 @@ top-of-report banner above the paywall, so they're visible in the free preview.
 ## Project layout
 
 ```
-app/[locale]/            localized routes (layout, home, /start, /report/[id])
+app/[locale]/            localized routes (layout, home, /start, /early-access, /report/[id])
 app/admin/               operator dashboard (auth-gated)
 app/api/catastro/        catastro search proxies
 app/api/stripe/webhook   stripe webhook handler
@@ -111,7 +113,7 @@ components/landing/       marketing homepage (Landing + LandingNav + RevealScrip
 components/report/       ReportView + LockedSection (premium teaser)
 adapters/                external data adapters (one file per source)
 pipeline/                generate.ts, narrate.ts, template.ts (seeders)
-config/brand.ts          brand + price (single rebrand surface)
+config/brand.ts          brand (single rebrand surface) + price default (also Vercel REPORT_PRICE_EUR)
 config/scoring.ts        score pillars/weights + risk modifier + overall
 data/sample-sors35.ts    the Sors 35 sample report (EN + ES) — UI fixture
 types/db.ts              ReportInput / ReportRow (the row contract)
@@ -138,6 +140,7 @@ Open:
 - http://localhost:3000/en — English landing
 - http://localhost:3000/es — Spanish landing
 - http://localhost:3000/en/start — buyer flow (street → unit → preview)
+- http://localhost:3000/en/early-access — early-access waitlist (current "Check my flat" destination while the report flow is gated)
 
 ```bash
 npm run build   # production build + type-check

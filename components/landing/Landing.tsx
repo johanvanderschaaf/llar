@@ -65,7 +65,7 @@ interface Faq {
 
 /**
  * Split the localized price into currency symbol + number in the locale's
- * own order (EN → €35, CA/ES → 35 €), plus the full formatted string for
+ * own order (EN → €49, CA/ES → 49 €), plus the full formatted string for
  * interpolation. Keeps `config/brand.ts` the single source of price truth.
  */
 function priceInfo(locale: string) {

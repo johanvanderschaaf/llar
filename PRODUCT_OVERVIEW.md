@@ -3,7 +3,7 @@
 > **Purpose of this document.** A self-contained briefing on what PisoWise is, what
 > it can do today, where it can go, and where it is weak — written to bring an
 > advisory context (e.g. a Claude Chat project) fully up to speed. It is grounded in
-> the actual codebase as of **2026-06-12**, not aspirations. Where something is an
+> the actual codebase as of **2026-07-01**, not aspirations. Where something is an
 > inference rather than a documented fact, it is marked *(inference)*.
 
 ---
@@ -17,7 +17,15 @@ urban-planning qualification and affectations, heritage protection, natural risk
 neighbourhood amenities, and barri-level closing prices — cross-checks them, scores
 the flat on five dimensions, and writes the whole thing up in language a non-expert
 can act on. There is a **free preview** and a **paid full report + PDF** (currently
-**€35**, set in `config/brand.ts`). It is trilingual: **Catalan, Spanish, English**.
+**€49**, set in `config/brand.ts` and overridable via the `REPORT_PRICE_EUR` env
+var). It is trilingual: **Catalan, Spanish, English**.
+
+> **Pre-launch gate (as of 2026-07-01).** While the live report-generation flow is
+> being finalised, the primary **"Check my flat" CTA routes to an early-access
+> waitlist** (`/[locale]/early-access`), not to `/start`. It captures an email plus
+> (optionally) the specific flat into a Supabase `waitlist` table. The real `/start`
+> flow still works and is reachable by URL. Flip the single `PRIMARY_CTA_HREF`
+> constant in `i18n/navigation.ts` back to `/start` when the flow ships.
 
 **Who it is for (and deliberately not for).** Local **first-time buyers buying a home
 to live in**. It is explicitly **not** for foreign investors and **not** for the
@@ -48,6 +56,9 @@ beats precise-looking.*
 ## 3. What the product does today (capabilities, in detail)
 
 ### 3.1 The buyer flow
+*(Currently gated — see the pre-launch note in §1. The "Check my flat" CTA sends
+buyers to the early-access waitlist; the flow below is live at `/start` by URL and
+is the destination the CTA reverts to at launch.)*
 1. **Find the flat** — street search or cadastral reference, with a unit picker
    (address → cadastral ref → specific unit). Backed by Catastro search proxies.
 2. **Generate** — a deterministic pipeline fans out to ~13 data sources, seeds a
@@ -149,9 +160,9 @@ and says so.
   printing a confident "all clear."
 
 **Where the UX/output is still thin (see §6 for the full list):**
-- The **landing/SEO/legal polish is partial**; pricing copy still has legacy
-  inconsistencies (some strings say €14.90; the canonical price is €35 in
-  `config/brand.ts`).
+- The **landing/SEO/legal polish is partial**. (The old €14.90/€35 price split is
+  now resolved — the price is **€49** in `config/brand.ts` and the `REPORT_PRICE_EUR`
+  env var, kept in sync.)
 - **Comparable listings are usually empty** (Idealista API not provisioned), so
   Section 03 leans entirely on the barri benchmark.
 - The **paid unlock isn't live** (Stripe scaffolded, needs production keys), so the
@@ -221,10 +232,12 @@ report.
 ### Monetization & go-to-market
 - **Paywall isn't live.** Stripe is scaffolded but needs production keys; the
   pay → unlock → PDF loop is unproven in production.
-- **Pricing is unsettled.** €35 in config, but legacy copy shows €14.90 — the price
-  point and its anchoring aren't resolved.
-- **No demand engine yet** beyond the founder's manual Reddit presence (see §9). No
-  paid acquisition, SEO depth, or partner pipeline live.
+- **Pricing is settled at €49** (`config/brand.ts` + `REPORT_PRICE_EUR`, in sync).
+  Anchoring is decided; what's unproven is willingness-to-pay at that point, since
+  the paywall hasn't run live yet.
+- **Demand is being pre-collected via the early-access waitlist** (see §1), plus the
+  founder's manual Reddit presence (§9). No paid acquisition, SEO depth, or partner
+  pipeline live yet.
 - **Landing/SEO/legal polish is partial** — a conversion and credibility drag.
 
 ### Strategic
@@ -270,8 +283,10 @@ report.
 - **Pipeline contract:** adapters **never throw** (`AdapterResult` with
   ok/unavailable/error + `toVerify`); seeders are pure; provenance tracked in
   `report_sources`. Three **non-interchangeable** Supabase clients (admin/server/client).
-- **Single rebrand/reprice surface:** `config/brand.ts`. Scoring lives in
-  `config/scoring.ts`.
+- **Rebrand/reprice surface:** `config/brand.ts` (price default `reportPriceEur`).
+  **Reprice = two places:** update `config/brand.ts` *and* the `REPORT_PRICE_EUR`
+  env var in **Vercel Production** (it overrides the config at runtime via
+  `lib/stripe.ts`); a redeploy is required. Scoring lives in `config/scoring.ts`.
 - **In-repo knowledge base:** `README.md`, `AGENTS.md`, and `.claude/skills/onboard/`
   (DATA_SCHEMA, INTEGRATIONS, PIPELINE_FLOW, SCORING, REFRESH_SCRIPTS).
 
