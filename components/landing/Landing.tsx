@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { Link } from "@/i18n/navigation";
+import { Link, PRIMARY_CTA_HREF } from "@/i18n/navigation";
 import { brand, pricing } from "@/config/brand";
 import { Mark, Wordmark } from "@/components/Brand";
 import { LandingNav } from "./LandingNav";
@@ -113,7 +113,7 @@ export async function Landing({ locale }: { locale: string }) {
               <h1>{t.rich("hero.h1", { em: (c) => <em>{c}</em> })}</h1>
               <p className="hero__sub">{t("hero.sub")}</p>
               <div className="hero__cta">
-                <Link href="/start" className="btn btn-primary">
+                <Link href={PRIMARY_CTA_HREF} className="btn btn-primary">
                   {t("cta.check")}
                   <ArrowIcon />
                 </Link>
@@ -318,7 +318,7 @@ export async function Landing({ locale }: { locale: string }) {
                   )}
                 </div>
                 <p className="desc">{t("pricing.desc", { price })}</p>
-                <Link href="/start" className="btn btn-primary">
+                <Link href={PRIMARY_CTA_HREF} className="btn btn-primary">
                   {t("cta.check")}
                   <ArrowIcon />
                 </Link>
