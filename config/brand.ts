@@ -20,9 +20,9 @@ export const brand = {
 export const pricing = {
   /**
    * One-off price to unlock the full report + PDF, in EUR.
-   * Kept trivially changeable per the brief (e.g. 14.90, 16.90, 17.90).
-   * In later phases this can be sourced from process.env.REPORT_PRICE_EUR.
+   * Kept trivially changeable per the brief. Can be overridden at runtime via
+   * the REPORT_PRICE_EUR env var (see lib/stripe.ts) — keep that in sync.
    */
-  reportPriceEur: 35,
+  reportPriceEur: 49,
   currency: "EUR" as const,
 } as const;

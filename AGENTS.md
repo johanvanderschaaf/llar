@@ -113,7 +113,9 @@ reliable; trust it (and the built CSS) over the dev server when verifying.
 
 - **Vercel auto-deploys on push to `main`** (production). The `feat/*` branches get Preview deploys.
 - **Env vars are set in Vercel Production only**, not Preview. PR previews currently can't generate reports until Preview-scope vars are added.
-- **Schema lives in `supabase/migrations/`.** Apply via the Supabase SQL editor or `supabase db push`.
+- **Pre-launch CTA gate.** The primary "Check my flat" CTA points at `PRIMARY_CTA_HREF` in `i18n/navigation.ts` (currently `/early-access`, the waitlist) while the report flow is gated. Don't hardcode `/start` back into the CTAs — flip the one constant when the flow ships. `/start` still works by URL. Waitlist leads land in the `waitlist` table via `joinWaitlistAction`.
+- **Reprice = two places, or they drift.** The price lives in `config/brand.ts` (`reportPriceEur`, currently **49**) AND the `REPORT_PRICE_EUR` env var in Vercel Production, which overrides it at runtime (`lib/stripe.ts`). Change both and redeploy. The homepage reads the config; the report/unlock reads the env-overridden value — that split once caused a €35-vs-€14.90 mismatch.
+- **Schema lives in `supabase/migrations/`.** Apply via the Supabase SQL editor or `supabase db push`. The `waitlist` table is migration `0002_waitlist.sql`.
 - **All keys are read at request time** via `process.env` — no module-level reads, so feature-flag adapters (`hasAnthropicKey()`, `hasStripe()`) work.
 
 ## Don't
