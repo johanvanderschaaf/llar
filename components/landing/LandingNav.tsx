@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
+import { Link, PRIMARY_CTA_HREF } from "@/i18n/navigation";
 import { Logo } from "@/components/Brand";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { ArrowIcon } from "./icons";
@@ -50,7 +50,7 @@ export function LandingNav() {
           <Link href={SAMPLE} className="btn btn-ghost">
             {t("cta.sample")}
           </Link>
-          <Link href="/start" className="btn btn-primary">
+          <Link href={PRIMARY_CTA_HREF} className="btn btn-primary">
             {t("cta.check")}
             <ArrowIcon />
           </Link>
