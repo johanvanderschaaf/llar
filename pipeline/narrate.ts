@@ -111,6 +111,12 @@ export async function generateNarrative(
       },
     ],
     output_config: { format: zodOutputFormat(NarrativeSchema) },
+  }, {
+    // No SDK retries: one retry would double the buyer's wait past the
+    // function time limit. A failed narrative falls back to the report
+    // without AI prose, and is tried again on the next visit.
+    timeout: aiConfig.timeoutMs,
+    maxRetries: 0,
   });
 
   const n = message.parsed_output;

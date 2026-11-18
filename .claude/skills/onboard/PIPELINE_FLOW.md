@@ -5,13 +5,14 @@
 ## Sequence
 
 ```
-1. cachedCatastro(ref)                         ← only blocking call before parallel fan-out
-2. INSERT into reports (status='in_review')   ← report id is fixed here
+1. cachedCatastro(ref, budget)                 ← only blocking call; up to 3 attempts by 24s;
+                                                  throws if not ok (nothing is saved)
+2. id = crypto.randomUUID()                     ← no DB row yet
 3. seedFromCatastro / seedPriceRefs / seedCostsTaxes / seedBuilding / seedLegal
-4. Promise.all([ fetchEnergy(ref), fetchIpv() ])
+4. start fetchEnergy, fetchIpv, fetchAffectation, geocodeWithRetry together
 5. seedEnergy if energy.ok, else seedEnergyMissing ("Not certified")
-6. if cat.ok:
-     Promise.all([ geocodeWithRetry(ref), fetchAffectation(parcelRef) ])
+6. (Catastro is always ok here)
+     await [ geocodeWithRetry (2 attempts, by 34s), fetchAffectation ]
      if geo.ok:
          Promise.all([
            fetchAmenities,
@@ -32,11 +33,15 @@
 7. seedRisks (flood + static seismic/radon + district crime)
 8. seedFooter
 9. computeScores (5 pillars + risk modifier) → seedScores   ← see SCORING.md
-10. UPDATE reports SET data
-11. UPSERT into report_sources (one row per attempted source)
+10. INSERT into reports (status='in_review', full data)   ← the only write; throws on error
+11. UPSERT into report_sources (one row per attempted source; failure is logged, not thrown)
 ```
 
-Steps 4 and 6's `Promise.all`s run their adapters concurrently — they share no inputs.
+Steps 4 and 6 run their adapters concurrently — they share no inputs. Every
+source after Catastro is wrapped in `withDeadline` (`pipeline/budget.ts`): if it
+hasn't answered by 45s it is recorded as an `error` ("Timed out … (report time
+budget)") and the report treats it as unavailable. Each source's duration is
+appended to its `note` in `report_sources`, e.g. `[3.2s]`.
 
 ## Section 03 state decision
 
@@ -84,15 +89,19 @@ To invalidate after a parser change:
 const CATASTRO_CACHE_VERSION = "v3";  // was "v2" — bumping invalidates all rows
 ```
 
-## Serverless time budget (don't let it write an empty report)
+## Serverless time budget
 
-`generateReport` inserts the row with `data: {}` and only writes the real report
-via the final `UPDATE` (step 10). It runs as a **Server Action**, so its timeout
-is governed by the **page's** `maxDuration` — set to `60` on
-`app/[locale]/start/page.tsx` (buyer) and `app/admin/new/page.tsx` (admin).
-Without it, Vercel's ~10s default kills the action mid-pipeline and the row stays
-`data: {}` ("almost no data"). Keep slow sources bounded (e.g. the Overpass race
-in `adapters/amenities.ts`) so the fan-out never approaches the budget.
+`generateReport` runs as a **Server Action**, so its timeout is governed by the
+**page's** `maxDuration` — set to `60` on `app/[locale]/start/page.tsx` (buyer)
+and `app/admin/new/page.tsx` (admin). The pipeline keeps itself inside that with
+fixed deadlines measured from the start of the run (constants at the top of
+`pipeline/generate.ts`): Catastro by 24s, geocoding by 34s, every other source
+by 45s, leaving ~15s for cold start, the database writes and the redirect. If
+you raise `maxDuration`, you can raise these too.
+
+The report row is written **once, at the end, with its full data**. If Vercel
+kills the run anyway, nothing is saved — an empty `data: {}` report can no
+longer exist. Covered by `pipeline/generate.test.ts`.
 
 ## Provenance
 

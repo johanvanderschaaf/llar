@@ -14,6 +14,12 @@ import type { ReportRow } from "@/types/db";
 
 export const dynamic = "force-dynamic";
 
+// ensureNarrativeAction (the AI narrative, ~90s) runs as a Server Action on this
+// page, so its time limit is this page's maxDuration. Kept above
+// aiConfig.timeoutMs (120s) so the call times out cleanly before Vercel kills
+// the function. Needs Fluid compute on Vercel (on); without it Hobby caps at 60s.
+export const maxDuration = 150;
+
 type Resolved =
   | { kind: "full"; report: ReportRow["data"]; reportId: string }
   | { kind: "preview"; report: ReportRow["data"]; reportId: string }
@@ -35,13 +41,13 @@ export default async function ReportPage({
   searchParams,
 }: {
   params: Promise<{ locale: string; id: string }>;
-  searchParams: Promise<{ preview?: string }>;
+  searchParams: Promise<{ preview?: string; narrative?: string }>;
 }) {
   const { locale, id } = await params;
-  const { preview } = await searchParams;
+  const { preview, narrative } = await searchParams;
   setRequestLocale(locale);
 
-  const resolved = await resolveReport(id, preview != null);
+  const resolved = await resolveReport(id, preview != null, narrative === "skip");
   if (resolved.kind === "notfound") notFound();
 
   const t = await getTranslations();
@@ -61,6 +67,7 @@ export default async function ReportPage({
 async function resolveReport(
   id: string,
   forcePreview: boolean,
+  skipNarrative = false,
 ): Promise<Resolved> {
   if (id === sampleSors35.id) {
     return forcePreview
@@ -88,7 +95,14 @@ async function resolveReport(
 
   // Full + AI not generated yet → show the progress screen, which generates the
   // narrative and refreshes into the complete report (no blocking 90s render).
-  if (full && hasAnthropicKey() && !report.data.verdict?.headline?.en) {
+  // `skipNarrative` is set by that screen when generation failed, so the buyer
+  // gets the report without AI prose instead of the progress screen again.
+  if (
+    full &&
+    !skipNarrative &&
+    hasAnthropicKey() &&
+    !report.data.verdict?.headline?.en
+  ) {
     return { kind: "preparing", id };
   }
 

@@ -97,9 +97,13 @@ function buildLabel(loint?: Record<string, unknown>): {
   };
 }
 
-async function callOVC(rc: string): Promise<Record<string, unknown>> {
+async function callOVC(
+  rc: string,
+  timeoutMs?: number,
+): Promise<Record<string, unknown>> {
   const res = await fetchWithTimeout(
     `${OVC}?Provincia=&Municipio=&RC=${encodeURIComponent(rc)}`,
+    timeoutMs,
   );
   if (!res.ok) throw new Error(`Catastro HTTP ${res.status}`);
   const xml = await res.text();
@@ -180,6 +184,7 @@ function parseParcel(
 
 export async function fetchCatastro(
   rawRef: string,
+  opts: { timeoutMs?: number } = {},
 ): Promise<AdapterResult<CatastroData>> {
   const ref = normaliseRef(rawRef);
   if (ref.length < 14) {
@@ -192,8 +197,8 @@ export async function fetchCatastro(
 
   try {
     const [unitRoot, parcelRoot] = await Promise.all([
-      callOVC(ref),
-      callOVC(parcelRef),
+      callOVC(ref, opts.timeoutMs),
+      callOVC(parcelRef, opts.timeoutMs),
     ]);
 
     const unitErr = readError(unitRoot);

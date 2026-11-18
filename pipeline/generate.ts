@@ -5,7 +5,8 @@ import {
   normaliseRef,
   type CatastroData,
 } from "@/adapters/catastro";
-import type { AdapterResult } from "@/adapters/types";
+import type { AdapterResult, SourceKey } from "@/adapters/types";
+import { createBudget, timed, withDeadline, type Budget } from "./budget";
 import { geocodeRef } from "@/adapters/geo";
 import { fetchAmenities, type AmenityData } from "@/adapters/amenities";
 import { fetchUrbanism, type UrbanismData } from "@/adapters/urbanism";
@@ -49,18 +50,51 @@ const EMPTY_URBANISM: UrbanismData = {
   mapUrl: "https://ajuntament.barcelona.cat/informaciourbanistica/cerca/ca/",
 };
 
+/*
+ * Time budget (ms from the start of the run). /start runs this inside a Server
+ * Action with maxDuration = 60s. Every stage has a deadline so the run always
+ * finishes inside the limit, leaving ~15s for cold start, the database writes
+ * and the redirect. Before this, chained retries could take 100s+ and Vercel
+ * killed the function mid-run.
+ */
+/** Catastro (the spine) must be resolved by now, retries included. */
+const CATASTRO_DEADLINE_MS = 24_000;
+/** Geocoding (coordinates for the geo-dependent sources) must be resolved by now. */
+const GEO_DEADLINE_MS = 34_000;
+/** Every remaining source must be resolved by now, or it is marked unavailable. */
+const SOURCES_DEADLINE_MS = 45_000;
+/** Longest single Catastro / geocode attempt, so a hung request leaves room to retry. */
+const ATTEMPT_TIMEOUT_MS = 10_000;
+/** Don't start another attempt with less time than this left. */
+const MIN_ATTEMPT_MS = 3_000;
+/** Most geocode attempts (1 try + retries), if the time budget allows. */
+const GEOCODE_ATTEMPTS = 2;
+
 /**
  * Geocoding (Catastro CPMRC) is the spine of all geo-dependent adapters
  * (amenities, urbanism, flood, heritage, barri pricing). It fails transiently
- * often enough to leave reports with thin scores, so retry once before giving up.
+ * often enough to leave reports with thin scores, so retry while the time
+ * budget allows.
  */
 async function geocodeWithRetry(
   ref: string,
-  attempts = 2,
+  budget: Budget,
 ): Promise<Awaited<ReturnType<typeof geocodeRef>>> {
-  let last = await geocodeRef(ref);
-  for (let i = 1; i < attempts && last.status !== "ok"; i++) {
-    last = await geocodeRef(ref);
+  let last = await geocodeRef(
+    ref,
+    Math.min(ATTEMPT_TIMEOUT_MS, budget.until(GEO_DEADLINE_MS)),
+  );
+  for (
+    let i = 1;
+    i < GEOCODE_ATTEMPTS &&
+    last.status !== "ok" &&
+    budget.until(GEO_DEADLINE_MS) >= MIN_ATTEMPT_MS;
+    i++
+  ) {
+    last = await geocodeRef(
+      ref,
+      Math.min(ATTEMPT_TIMEOUT_MS, budget.until(GEO_DEADLINE_MS)),
+    );
   }
   return last;
 }
@@ -68,12 +102,13 @@ async function geocodeWithRetry(
 const CACHE_TTL_MS = 1000 * 60 * 60 * 24 * 30; // 30 days
 // Bump when the parsed CatastroData shape changes, to auto-invalidate old rows.
 const CATASTRO_CACHE_VERSION = "v2";
-// Total Catastro fetch attempts (1 try + retries) before treating it as down.
+// Most Catastro fetch attempts (1 try + retries), if the time budget allows.
 const CATASTRO_ATTEMPTS = 3;
 
 /** Catastro lookup with a 30-day cache keyed by cadastral ref (cost control). */
 async function cachedCatastro(
   ref: string,
+  budget: Budget,
 ): Promise<AdapterResult<CatastroData>> {
   const db = createAdminClient();
   const cacheKey = `${ref}#${CATASTRO_CACHE_VERSION}`;
@@ -104,11 +139,21 @@ async function cachedCatastro(
   // couple of times before giving up (same rationale as geocodeWithRetry).
   // Only retry the transient `error` status; `unavailable` means the ref has no
   // cadastral record, which retrying won't fix.
-  let result = await fetchCatastro(ref);
-  for (let i = 1; i < CATASTRO_ATTEMPTS && result.status === "error"; i++) {
-    result = await fetchCatastro(ref);
+  // Each attempt is capped so one hung request can't eat the whole budget.
+  const attemptMs = () =>
+    Math.min(ATTEMPT_TIMEOUT_MS, budget.until(CATASTRO_DEADLINE_MS));
+  let result = await fetchCatastro(ref, { timeoutMs: attemptMs() });
+  for (
+    let i = 1;
+    i < CATASTRO_ATTEMPTS &&
+    result.status === "error" &&
+    budget.until(CATASTRO_DEADLINE_MS) >= MIN_ATTEMPT_MS;
+    i++
+  ) {
+    result = await fetchCatastro(ref, { timeoutMs: attemptMs() });
   }
   if (result.status === "ok" && result.data) {
+    // Caching is an optimisation: a failed write must not fail the report.
     await db.from("source_cache").upsert(
       {
         source: "catastro",
@@ -123,20 +168,24 @@ async function cachedCatastro(
 }
 
 /**
- * Generate a new report from operator input. Runs the (Catastro-only, for now)
- * pipeline, seeds a draft Report, persists it as `in_review`, and logs source
+ * Generate a new report from operator input. Runs the pipeline within a fixed
+ * time budget, seeds the Report, persists it as `in_review`, and logs source
  * provenance. Degrades gracefully on any *secondary* source failure (manual
  * entry), but **throws if Catastro itself is unavailable** — without the
  * cadastral spine the report is an empty "key data missing" shell, and with no
  * operator gate at MVP it would ship straight to the buyer. The caller catches
  * this and shows a retry prompt instead. Returns the new report id.
+ *
+ * The report row is written once, at the end, with its full data. If the run
+ * is killed part-way nothing is saved, so an empty report can never exist.
  */
 export async function generateReport(input: ReportInput): Promise<string> {
   const db = createAdminClient();
+  const budget = createBudget();
   const rawRef = (input.cadastralRef || input.addressOrRef || "").trim();
   const ref = normaliseRef(rawRef);
 
-  const cat = await cachedCatastro(ref);
+  const cat = await timed(() => cachedCatastro(ref, budget));
   // Spine check: never persist (and bill for) a report with no cadastral data.
   if (cat.status !== "ok" || !cat.data) {
     throw new Error(
@@ -144,21 +193,7 @@ export async function generateReport(input: ReportInput): Promise<string> {
     );
   }
   const resolvedRef = cat.data.unit.cadastralRef;
-
-  const { data: row, error } = await db
-    .from("reports")
-    .insert({
-      cadastral_ref: resolvedRef,
-      status: "in_review",
-      input,
-      data: {},
-    })
-    .select("id")
-    .single();
-  if (error || !row) {
-    throw new Error(`Could not create report: ${error?.message}`);
-  }
-  const id = row.id as string;
+  const id = crypto.randomUUID();
 
   let report = emptyReport(id, resolvedRef);
   if (cat.status === "ok" && cat.data) {
@@ -169,9 +204,23 @@ export async function generateReport(input: ReportInput): Promise<string> {
   report = seedBuilding(report, cat.data?.unit.yearBuilt);
   report = seedLegal(report);
 
-  // Energy certificate (ICAEN) + INE IPV (Catalan housing market context).
-  // Independent of geocoding so they run in parallel with the cadastral step.
-  const [energy, ipv] = await Promise.all([fetchEnergy(resolvedRef), fetchIpv()]);
+  // Every source after Catastro must resolve by SOURCES_DEADLINE_MS, or it is
+  // recorded as timed out and the report says the data is unavailable.
+  const bounded = <T,>(source: SourceKey, run: () => Promise<AdapterResult<T>>) =>
+    timed(() => withDeadline(source, run(), budget.until(SOURCES_DEADLINE_MS)));
+
+  // Energy certificate (ICAEN) + INE IPV (Catalan housing market context) need
+  // neither coordinates nor each other: start them now, together with
+  // affectation and geocoding below, so they run alongside instead of before.
+  const energyP = bounded("energy", () => fetchEnergy(resolvedRef));
+  const ipvP = bounded("ipv", () => fetchIpv());
+  // Official affectation (AFH) needs only the parcel ref; geocoding has its own
+  // retry loop and earlier deadline, since the geo-dependent sources wait on it.
+  const parcelRef = cat.data.parcel.parcelRef ?? resolvedRef;
+  const affP = bounded("affectation", () => fetchAffectation(parcelRef));
+  const geoP = timed(() => geocodeWithRetry(resolvedRef, budget));
+
+  const [energy, ipv] = await Promise.all([energyP, ipvP]);
   if (energy.status === "ok" && energy.data) {
     report = seedEnergy(report, energy.data);
   } else {
@@ -198,24 +247,23 @@ export async function generateReport(input: ReportInput): Promise<string> {
   // coordinates from geocoding; degrades to `unavailable` otherwise.
   let barri: AdapterResult<GencatBarriData> | null = null;
   const builtM2 = input.builtM2 ?? cat.data?.unit.builtAreaM2;
-  if (cat.status === "ok") {
-    const parcelRef = cat.data?.parcel.parcelRef ?? resolvedRef;
-    const [geo, aff] = await Promise.all([
-      geocodeWithRetry(resolvedRef),
-      fetchAffectation(parcelRef),
-    ]);
+  {
+    const [geo, aff] = await Promise.all([geoP, affP]);
     affectation = aff;
     const affData = aff.status === "ok" ? aff.data : undefined;
     if (geo.status === "ok" && geo.data) {
+      const coords = geo.data;
       [amenities, urbanism, comps, flood, heritage] = await Promise.all([
-        fetchAmenities(geo.data),
-        fetchUrbanism(geo.data, { parcelRef }),
-        fetchComps(geo.data, {
-          minSize: builtM2 ? Math.round(builtM2 * 0.6) : undefined,
-          maxSize: builtM2 ? Math.round(builtM2 * 1.6) : undefined,
-        }),
-        fetchFlood(geo.data),
-        fetchHeritage(geo.data),
+        bounded("amenities", () => fetchAmenities(coords)),
+        bounded("urbanism", () => fetchUrbanism(coords, { parcelRef })),
+        bounded("market", () =>
+          fetchComps(coords, {
+            minSize: builtM2 ? Math.round(builtM2 * 0.6) : undefined,
+            maxSize: builtM2 ? Math.round(builtM2 * 1.6) : undefined,
+          }),
+        ),
+        bounded("flood", () => fetchFlood(coords)),
+        bounded("heritage", () => fetchHeritage(coords)),
       ]);
       if (amenities.status === "ok" && amenities.data) {
         report = seedAmenities(report, amenities.data);
@@ -305,7 +353,18 @@ export async function generateReport(input: ReportInput): Promise<string> {
     { year: yearBuilt, energyClass, amenities: amenities?.data, deltaPct },
   );
 
-  await db.from("reports").update({ data: report }).eq("id", id);
+  // Single write, with the complete data. Checked: a silent failure here used to
+  // leave the buyer on a report page with nothing in it.
+  const { error: insertError } = await db.from("reports").insert({
+    id,
+    cadastral_ref: resolvedRef,
+    status: "in_review",
+    input,
+    data: report,
+  });
+  if (insertError) {
+    throw new Error(`Could not save report: ${insertError.message}`);
+  }
 
   const sources: Array<{
     report_id: string;
@@ -442,9 +501,16 @@ export async function generateReport(input: ReportInput): Promise<string> {
     note: `District-level context, as of ${STATIC_RISK_AS_OF}`,
     fetched_at: new Date().toISOString(),
   });
-  await db
+  // Provenance is for the operator, not the buyer: a failed write is reported
+  // but doesn't fail a report that has already been saved.
+  const { error: sourcesError } = await db
     .from("report_sources")
     .upsert(sources, { onConflict: "report_id,source" });
+  if (sourcesError) {
+    console.error(
+      `[generateReport] report ${id} saved, but its source log failed: ${sourcesError.message}`,
+    );
+  }
 
   return id;
 }

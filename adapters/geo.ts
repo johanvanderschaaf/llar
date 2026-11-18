@@ -99,11 +99,13 @@ export async function fetchParcelPolygon(
 
 export async function geocodeRef(
   cadastralRef: string,
+  timeoutMs?: number,
 ): Promise<AdapterResult<Coordinates>> {
   const parcelRef = cadastralRef.replace(/\s+/g, "").toUpperCase().slice(0, 14);
   try {
     const res = await fetchWithTimeout(
       `${OVC}?Provincia=&Municipio=&SRS=EPSG:4326&RC=${encodeURIComponent(parcelRef)}`,
+      timeoutMs,
     );
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const root = (parser.parse(await res.text()) as Record<string, unknown>)

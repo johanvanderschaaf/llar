@@ -11,4 +11,11 @@ export const aiConfig = {
   model: "claude-sonnet-4-6",
   /** Generous ceiling — bilingual JSON output is sizeable. */
   maxTokens: 8000,
+  /**
+   * Hard cap on one narrative call. A trilingual narrative normally takes
+   * about 90s; without a cap a hung call left the paid buyer on the
+   * "preparing" screen indefinitely. Must stay below the report page's
+   * function time limit on Vercel.
+   */
+  timeoutMs: 120_000,
 } as const;

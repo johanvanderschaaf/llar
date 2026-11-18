@@ -55,19 +55,22 @@ export async function startAnalysisAction(formData: FormData) {
 /**
  * Generate the AI narrative for an unlocked report (operator or paid), if not
  * already present. Access-checked server-side. Returns when done so the client
- * can refresh into the complete report.
+ * can refresh into the complete report; `ok: false` means narration failed and
+ * the client should show the report without AI prose instead of waiting.
  */
-export async function ensureNarrativeAction(reportId: string): Promise<void> {
-  if (!hasAnthropicKey()) return;
+export async function ensureNarrativeAction(
+  reportId: string,
+): Promise<{ ok: boolean }> {
+  if (!hasAnthropicKey()) return { ok: true };
   const db = createAdminClient();
   const { data: row } = await db
     .from("reports")
     .select("*")
     .eq("id", reportId)
     .maybeSingle();
-  if (!row) return;
+  if (!row) return { ok: false };
   const report = row as ReportRow;
-  if (report.data?.verdict?.headline?.en) return; // already generated
+  if (report.data?.verdict?.headline?.en) return { ok: true }; // already generated
 
   // Access gate: operator or a paid order.
   const supabase = await createClient();
@@ -75,13 +78,22 @@ export async function ensureNarrativeAction(reportId: string): Promise<void> {
     data: { user },
   } = await supabase.auth.getUser();
   const paid = await hasPaidOrder(reportId);
-  if (!user && !paid) return;
+  if (!user && !paid) return { ok: false };
 
   try {
     const next = await generateNarrative(report.data, report.input);
-    await db.from("reports").update({ data: next }).eq("id", reportId);
-  } catch {
-    // Leave deterministic data if narration fails.
+    const { error } = await db
+      .from("reports")
+      .update({ data: next })
+      .eq("id", reportId);
+    if (error) throw new Error(`could not save narrative: ${error.message}`);
+    return { ok: true };
+  } catch (e) {
+    // Keep the deterministic report; the buyer sees it without AI prose.
+    console.error(
+      `[ensureNarrative] report ${reportId}: ${(e as Error)?.message ?? e}`,
+    );
+    return { ok: false };
   }
 }
 
