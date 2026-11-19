@@ -30,6 +30,15 @@
     "submit": "Generate preview →",
     "genError": "We couldn't generate the report. Please try again in a moment."
   },
+  "registryDown": {
+    "title": "The land registry is temporarily down",
+    "body": "Every report starts from Spain's land registry (Catastro), which isn't answering right now. This usually lasts a few hours. Leave your email and we'll send your report as soon as it's back.",
+    "emailPlaceholder": "Your email",
+    "cta": "Email me my report",
+    "ok": "Done. We'll email you as soon as the registry is back.",
+    "errEmail": "Please enter a valid email address.",
+    "errServer": "Something went wrong saving your email. Please try again."
+  },
   "analyzing": {
     "title": "Analysing your flat",
     "fullTitle": "Preparing your full report",
@@ -413,7 +422,6 @@
     "verdictEyebrow": "Bottom line",
     "overallCaption": "Overall score",
     "ringOf": "/ 100",
-    "verdictPreviewNote": "Unlock the full report to see what each finding means and the steps to take before you make an offer.",
     "alertLocked": "Unlock to see what this means and what to do before making an offer.",
     "bandGood": "Good · 70 to 100",
     "bandOk": "OK · 50 to 69",
@@ -450,10 +458,20 @@
     "docsFuture": "Coming soon: upload these documents and PisoWise will analyse them for you. This is where that feature will appear.",
     "footSources": "Sources & method",
     "sourceChips": ["Catastro", "Gencat Habitatge", "PGM · Ajuntament de Barcelona", "Catàleg de patrimoni", "SNCZI", "ICAEN"],
+    "teaser": {
+      "locked": "Where the asking sits against those sales, the realistic price range and how much room you have to negotiate.",
+      "lockedNoAsking": "What flats this size close at, the realistic range, and how to position your offer.",
+      "lockedGeneric": "What each finding means for this flat and what to do before you offer.",
+      "countsHead": "Also in the full report",
+      "negotiation": "{n, plural, one {# negotiation point for this flat} other {# negotiation points for this flat}}",
+      "documents": "{n, plural, one {# document to request from the seller} other {# documents to request from the seller}}",
+      "checks": "{n, plural, one {# check before you offer} other {# checks before you offer}}",
+      "priceLocked": "In the full report"
+    },
     "gate": {
       "eyebrow": "The full report",
       "head": "This is where the deeper analysis begins.",
-      "sub": "You've seen the verdict, the scores and the basics. The full report works through every finding: what it means and what to do before you offer.",
+      "sub": "You've seen the serious findings, the scores and the basics. The full report works through every finding: what it means and what to do before you offer.",
       "lockedH": "What the full report covers",
       "priceSuffix": "one-off",
       "cta": "Unlock the full report",

@@ -1,3 +1,5 @@
+import type { BuildingYears } from "@/lib/building-years";
+import { cap, fewSalesNote, inPlace, money, ofPlace, pct as pctL, perM2 } from "@/lib/phrasing";
 import type { Report, Localized, Score, UrbanismItem } from "@/types/report";
 import type { CatastroData } from "@/adapters/catastro";
 import type { AmenityData, NearestPlace } from "@/adapters/amenities";
@@ -14,7 +16,6 @@ import { buildFooter } from "@/config/footer";
 import type { CompListing } from "@/adapters/idealista";
 import type { IpvData } from "@/adapters/ine-ipv";
 import type { GencatBarriData } from "@/adapters/gencat-barri";
-import { buildLiveSearches } from "@/adapters/live-listings";
 import type { Pricing } from "@/types/report";
 import type { CompRow } from "@/types/report";
 import type { ReportInput } from "@/types/db";
@@ -128,11 +129,26 @@ export function seedFromCatastro(
   facts.push({ labelKey: "snapshot.cadastralRef", value: unit.cadastralRef });
 
   // The signature "how many flats in the building" note.
-  r.snapshot.note = {
-    en: `The cadastral parcel contains ${parcel.unitCount} units in total, so this is a multi-unit building, not a single home. Confirm the true count on-site (count the mailboxes) and via the building's división horizontal.`,
-    es: `La parcela catastral contiene ${parcel.unitCount} unidades en total, así que es un edificio de varias viviendas, no una casa única. Confirma el número real in situ (cuenta los buzones) y mediante la división horizontal del edificio.`,
-    ca: `La parcel·la cadastral conté ${parcel.unitCount} unitats en total, per tant és un edifici de diversos habitatges, no una casa única. Confirma el nombre real in situ (compta les bústies) i mitjançant la divisió horitzontal de l'edifici.`,
-  };
+  const n = parcel.unitCount;
+  if (n != null && n > 1) {
+    r.snapshot.note = {
+      en: `The cadastral parcel contains ${n} units in total, so this is a multi-unit building, not a single home. Confirm the true count on-site (count the mailboxes) and via the building's división horizontal.`,
+      es: `La parcela catastral contiene ${n} unidades en total, así que es un edificio de varias viviendas, no una casa única. Confirma el número real in situ (cuenta los buzones) y mediante la división horizontal del edificio.`,
+      ca: `La parcel·la cadastral conté ${n} unitats en total, per tant és un edifici de diversos habitatges, no una casa única. Confirma el nombre real in situ (compta les bústies) i mitjançant la divisió horitzontal de l'edifici.`,
+    };
+  } else if (n === 1) {
+    r.snapshot.note = {
+      en: "The cadastral parcel holds a single property: this is a whole building or house, not a flat in a community of owners. Check on-site that this matches what is for sale.",
+      es: "La parcela catastral contiene una sola propiedad: es un edificio o casa entero, no un piso en una comunidad de propietarios. Comprueba in situ que coincide con lo que se vende.",
+      ca: "La parcel·la cadastral conté una sola propietat: és un edifici o casa sencer, no un pis en una comunitat de propietaris. Comprova in situ que coincideix amb el que es ven.",
+    };
+  } else {
+    r.snapshot.note = {
+      en: "The official count of units in this building wasn't available. Check it on-site (count the mailboxes) and via the building's división horizontal.",
+      es: "No se ha podido obtener el número oficial de unidades del edificio. Compruébalo in situ (cuenta los buzones) y mediante la división horizontal del edificio.",
+      ca: "No s'ha pogut obtenir el nombre oficial d'unitats de l'edifici. Comprova-ho in situ (compta les bústies) i mitjançant la divisió horitzontal de l'edifici.",
+    };
+  }
 
   return r;
 }
@@ -303,7 +319,6 @@ export function seedBarriPricing(
 ): Report {
   const r: Report = structuredClone(report);
   const ppm = barri.pricePerM2;
-  const ppmStr = ppm.toLocaleString("en-GB");
 
   // Enrich the hero floor line with the barri sub-name when we have one.
   // `seedFromCatastro` set this to "floor-door · postal Barcelona · district";
@@ -326,25 +341,27 @@ export function seedBarriPricing(
   if (opts.askingPriceEur && opts.builtM2) {
     const askPerM2 = opts.askingPriceEur / opts.builtM2;
     const delta = ((askPerM2 - ppm) / ppm) * 100;
-    const absDelta = Math.abs(delta).toFixed(1);
-    const askStr = Math.round(askPerM2).toLocaleString("en-GB");
-    const dir =
+    const ask = perM2(askPerM2);
+    const avg = perM2(ppm);
+    const p = pctL(delta);
+    const at = inPlace(barri.name);
+    const rel =
       delta > 1
-        ? { en: "above", es: "por encima de", ca: "per sobre de" }
+        ? { en: `${p.en} above`, es: `un ${p.es} por encima de`, ca: `un ${p.ca} per sobre de` }
         : delta < -1
-          ? { en: "below", es: "por debajo de", ca: "per sota de" }
+          ? { en: `${p.en} below`, es: `un ${p.es} por debajo de`, ca: `un ${p.ca} per sota de` }
           : { en: "in line with", es: "en línea con", ca: "en línia amb" };
     r.price.lede = {
-      en: `Asking €${askStr}/m² in ${barri.name}, ${absDelta}% ${dir.en} the neighbourhood's €${ppmStr}/m² closing-price average (${barri.asOf}, registered second-hand sales).`,
-      es: `Precio de salida €${askStr}/m² en ${barri.name}, ${absDelta}% ${dir.es} la media de cierre del barrio €${ppmStr}/m² (${barri.asOf}, ventas registradas de segunda mano).`,
-      ca: `Preu demanat €${askStr}/m² a ${barri.name}, ${absDelta}% ${dir.ca} la mitjana de tancament del barri €${ppmStr}/m² (${barri.asOf}, vendes registrades de segona mà).`,
+      en: `Asking ${ask.en} ${at.en}, ${rel.en} the neighbourhood's ${avg.en} closing-price average (${barri.asOf}, registered second-hand sales).`,
+      es: `Precio de salida de ${ask.es} ${at.es}, ${rel.es} la media de cierre del barrio, ${avg.es} (${barri.asOf}, ventas registradas de segunda mano).`,
+      ca: `Preu demanat de ${ask.ca} ${at.ca}, ${rel.ca} la mitjana de tancament del barri, ${avg.ca} (${barri.asOf}, vendes registrades de segona mà).`,
     };
   } else {
     // Asking unknown, verdict-less version centred on the barri figure.
     r.price.lede = {
-      en: `${barri.name}: €${ppmStr}/m² closing-price average across registered second-hand sales (${barri.asOf}). The range below is what flats this size actually close at, position the asking price within it.`,
-      es: `${barri.name}: €${ppmStr}/m² de media de cierre en ventas registradas de segunda mano (${barri.asOf}). La horquilla siguiente refleja a qué precio se cierran realmente los pisos de este tamaño, sitúa el precio de salida dentro de ella.`,
-      ca: `${barri.name}: €${ppmStr}/m² de mitjana de tancament en vendes registrades de segona mà (${barri.asOf}). El rang següent reflecteix a quin preu es tanquen realment els pisos d'aquesta mida, situa el preu demanat dins d'aquest rang.`,
+      en: `${cap(barri.name)}: ${perM2(ppm).en} closing-price average across registered second-hand sales (${barri.asOf}). The range below is what flats this size actually close at; position the asking price within it.`,
+      es: `${cap(barri.name)}: ${perM2(ppm).es} de media de cierre en ventas registradas de segunda mano (${barri.asOf}). La horquilla siguiente refleja a qué precio se cierran realmente los pisos de este tamaño; sitúa el precio de salida dentro de ella.`,
+      ca: `${cap(barri.name)}: ${perM2(ppm).ca} de mitjana de tancament en vendes registrades de segona mà (${barri.asOf}). El rang següent reflecteix a quin preu es tanquen realment els pisos d'aquesta mida; situa el preu demanat dins d'aquest rang.`,
     };
   }
 
@@ -359,9 +376,9 @@ export function seedBarriPricing(
   r.price.panels = [
     {
       heading: {
-        en: `Where the €${ppmStr}/m² figure comes from`,
-        es: `De dónde sale el €${ppmStr}/m²`,
-        ca: `D'on surt el €${ppmStr}/m²`,
+        en: `Where the ${perM2(ppm).en} figure comes from`,
+        es: `De dónde sale la cifra de ${perM2(ppm).es}`,
+        ca: `D'on surt la xifra de ${perM2(ppm).ca}`,
       },
       body: {
         en: `${barri.asOf}, ${tx}.${surf} The figure is the arithmetic average €/m² built area at closing, not asking. Source: Generalitat de Catalunya, Habitatge (notarial deeds).`,
@@ -371,13 +388,9 @@ export function seedBarriPricing(
     },
   ];
 
-  // --- 4. Live listings deep links (no data ingested, buyer clicks out) ---
-  r.price.liveSearches = buildLiveSearches({
-    districtCode: barri.districtCode,
-    barriName: barri.name,
-    builtM2: opts.builtM2,
-    askingPriceEur: opts.askingPriceEur,
-  });
+  // Portal deep links (adapters/live-listings.ts) are no longer stored: nothing
+  // renders them since the single-price-anchor decision, and their labels
+  // carried portal copy into every report. See docs/report-review-tracker.md.
 
   // Hero "vs market" pill when we can compute the delta.
   if (opts.askingPriceEur && opts.builtM2) {
@@ -401,13 +414,14 @@ export function seedBarriPricing(
   if (opts.builtM2) {
     const lo = Math.round(ppm * 0.85 * opts.builtM2);
     const hi = Math.round(ppm * 1.15 * opts.builtM2);
-    const loStr = lo.toLocaleString("en-GB");
-    const hiStr = hi.toLocaleString("en-GB");
+    const loM = money(lo);
+    const hiM = money(hi);
+    const at = inPlace(barri.name);
     r.price.range = { lo, hi };
     r.price.fairValue = {
-      en: `Most flats this size in ${barri.name} close between €${loStr} and €${hiStr} (neighbourhood €/m² ±15% × ${opts.builtM2} m²). The lower end is older / unreformed / low floor; the upper end is reformed / high floor / outdoor space. Position the offer relative to this flat's specific features, then verify with concrete comparables.`,
-      es: `La mayoría de los pisos de este tamaño en ${barri.name} se cierran entre €${loStr} y €${hiStr} (€/m² del barrio ±15% × ${opts.builtM2} m²). El extremo inferior corresponde a pisos antiguos / sin reformar / planta baja; el superior, a reformados / planta alta / con espacio exterior. Sitúa la oferta según las características concretas de este piso y contrástala con comparables.`,
-      ca: `La majoria dels pisos d'aquesta mida a ${barri.name} es tanquen entre €${loStr} i €${hiStr} (€/m² del barri ±15% × ${opts.builtM2} m²). L'extrem inferior correspon a pisos antics / sense reformar / planta baixa; el superior, a reformats / planta alta / amb espai exterior. Situa l'oferta segons les característiques concretes d'aquest pis i contrasta-la amb comparables.`,
+      en: `Most flats this size ${at.en} close between ${loM.en} and ${hiM.en} (neighbourhood €/m² ±15% × ${opts.builtM2} m²). The lower end is older / unreformed / low floor; the upper end is reformed / high floor / outdoor space. Position the offer relative to this flat's specific features, then verify with concrete comparables.`,
+      es: `La mayoría de los pisos de este tamaño ${at.es} se cierran entre ${loM.es} y ${hiM.es} (€/m² del barrio ±15% × ${opts.builtM2} m²). El extremo inferior corresponde a pisos antiguos / sin reformar / planta baja; el superior, a reformados / planta alta / con espacio exterior. Sitúa la oferta según las características concretas de este piso y contrástala con comparables.`,
+      ca: `La majoria dels pisos d'aquesta mida ${at.ca} es tanquen entre ${loM.ca} i ${hiM.ca} (€/m² del barri ±15% × ${opts.builtM2} m²). L'extrem inferior correspon a pisos antics / sense reformar / planta baixa; el superior, a reformats / planta alta / amb espai exterior. Situa l'oferta segons les característiques concretes d'aquest pis i contrasta-la amb comparables.`,
     };
   }
 
@@ -432,7 +446,6 @@ export function seedBarriPricing(
 
 /* ---------- structured Pricing payload (drives the new Section 03) ---------- */
 
-const EUR = (n: number) => `€${Math.round(n).toLocaleString("en-GB")}`;
 
 function clamp01(x: number) {
   return Math.max(0, Math.min(1, x));
@@ -510,8 +523,8 @@ function chipForDelta(
 }
 
 function deltaPhrase(delta: number): Localized {
-  const sign = delta > 0 ? "+" : ""; // bare for negative, we'll spell it
-  const txt = `${Math.abs(delta).toFixed(0)}%`;
+  // Unsigned: the words say the direction ("≈12% above", not "≈+12% above").
+  const p = pctL(delta);
   if (Math.abs(delta) < 1)
     return {
       en: "in line with",
@@ -519,8 +532,8 @@ function deltaPhrase(delta: number): Localized {
       ca: "en línia amb",
     };
   return delta < 0
-    ? { en: `≈${txt} below`, es: `≈${txt} por debajo de`, ca: `≈${txt} per sota de` }
-    : { en: `≈${sign}${txt} above`, es: `≈${sign}${txt} por encima de`, ca: `≈${sign}${txt} per sobre de` };
+    ? { en: `≈${p.en} below`, es: `≈${p.es} por debajo de`, ca: `≈${p.ca} per sota de` }
+    : { en: `≈${p.en} above`, es: `≈${p.es} por encima de`, ca: `≈${p.ca} per sobre de` };
 }
 
 /**
@@ -567,14 +580,14 @@ export function buildPricingPayload(
     };
     const verdictSub: Localized = range
       ? {
-          en: `Flats around ${builtM2 ?? "-"} m² in ${barri.name} closed between ${EUR(range.lo)} and ${EUR(range.hi)}, registered at the notary.`,
-          es: `Los pisos de unos ${builtM2 ?? "-"} m² en ${barri.name} se cerraron entre ${EUR(range.lo)} y ${EUR(range.hi)}, registrados en notaría.`,
-          ca: `Els pisos d'uns ${builtM2 ?? "-"} m² a ${barri.name} es van tancar entre ${EUR(range.lo)} i ${EUR(range.hi)}, registrats a notaria.`,
+          en: `Flats around ${builtM2} m² ${inPlace(barri.name).en} closed between ${money(range.lo).en} and ${money(range.hi).en}, registered at the notary.${fewSalesNote(barri.transactions).en}`,
+          es: `Los pisos de unos ${builtM2} m² ${inPlace(barri.name).es} se cerraron entre ${money(range.lo).es} y ${money(range.hi).es}, registrados ante notario.${fewSalesNote(barri.transactions).es}`,
+          ca: `Els pisos d'uns ${builtM2} m² ${inPlace(barri.name).ca} es van tancar entre ${money(range.lo).ca} i ${money(range.hi).ca}, registrats a la notaria.${fewSalesNote(barri.transactions).ca}`,
         }
       : {
-          en: `In ${barri.name}, registered second-hand flats closed at €${ppm.toLocaleString("en-GB")}/m² built. Apply that to this flat's m² once known.`,
-          es: `En ${barri.name}, los pisos de segunda mano registrados se cerraron a €${ppm.toLocaleString("en-GB")}/m² construido. Aplícalo al m² cuando se conozca.`,
-          ca: `A ${barri.name}, els pisos de segona mà registrats es van tancar a €${ppm.toLocaleString("en-GB")}/m² construït. Aplica-ho al m² quan es conegui.`,
+          en: `${cap(inPlace(barri.name).en)}, registered second-hand flats closed at ${perM2(ppm).en} built. Apply that to this flat's m² once known.`,
+          es: `${cap(inPlace(barri.name).es)}, los pisos de segunda mano registrados se cerraron a ${perM2(ppm).es} construido. Aplícalo a los m² del piso cuando se conozcan.`,
+          ca: `${cap(inPlace(barri.name).ca)}, els pisos de segona mà registrats es van tancar a ${perM2(ppm).ca} construït. Aplica-ho als m² del pis quan es coneguin.`,
         };
     return {
       state: "asking-unknown",
@@ -614,12 +627,17 @@ export function buildPricingPayload(
     es: `El precio de salida se sitúa ${positionHeadline.es} del intervalo de cierre reciente de la zona.`,
     ca: `El preu demanat se situa ${positionHeadline.ca} de l'interval de tancament recent de la zona.`,
   };
-  const askPpmStr = Math.round(askPerM2).toLocaleString("en-GB");
+  const askPpm = perM2(askPerM2);
+  const of = ofPlace(barri.name);
   const verdictSub: Localized = {
-    en: `At €${askPpmStr}/m², this flat is <strong class="pct">${dphrase.en}</strong> the ${barri.name} closing average.`,
-    es: `A €${askPpmStr}/m², este piso está <strong class="pct">${dphrase.es}</strong> la media de cierre de ${barri.name}.`,
-    ca: `A €${askPpmStr}/m², aquest pis està <strong class="pct">${dphrase.ca}</strong> la mitjana de tancament de ${barri.name}.`,
+    en: `At ${askPpm.en}, this flat is <strong class="pct">${dphrase.en}</strong> the closing average ${of.en}.`,
+    es: `A ${askPpm.es}, este piso está <strong class="pct">${dphrase.es}</strong> la media de cierre ${of.es}.`,
+    ca: `A ${askPpm.ca}, aquest pis està <strong class="pct">${dphrase.ca}</strong> la mitjana de tancament ${of.ca}.`,
   };
+  const few = fewSalesNote(barri.transactions);
+  verdictSub.en += few.en;
+  verdictSub.es += few.es;
+  if (verdictSub.ca != null) verdictSub.ca += few.ca;
 
   return {
     state: "asking-known",
@@ -728,10 +746,21 @@ export function seedPricingUnavailable(
 
 /* ---------- building & condition + legal (deterministic) ---------- */
 
-export function seedBuilding(report: Report, yearBuilt?: number): Report {
+export function seedBuilding(report: Report, years: BuildingYears = {}): Report {
   const r: Report = structuredClone(report);
-  const { facts, checks, keyline } = buildBuilding(yearBuilt);
+  const { facts, checks, keyline } = buildBuilding(years);
   r.building = { facts, checks, keyline };
+  // A listed building renovated later: show both dates in the snapshot, so
+  // "2017" isn't read as the build year (see lib/building-years.ts).
+  if (years.original) {
+    const f = r.snapshot.facts.find((x) => x.labelKey === "snapshot.yearBuilt");
+    if (f)
+      f.value = {
+        en: `${years.originalLabel}, renovated ${years.effective}`,
+        es: `${years.originalLabel}, reformado en ${years.effective}`,
+        ca: `${years.originalLabel}, reformat el ${years.effective}`,
+      };
+  }
   return r;
 }
 
@@ -913,9 +942,28 @@ export function seedEnergyMissing(report: Report): Report {
 
 export function seedRisks(
   report: Report,
-  opts: { flood?: FloodData; districtCode?: number; yearBuilt?: number },
+  opts: {
+    flood?: FloodData;
+    /** True when the flood lookup failed: say so instead of omitting the row. */
+    floodUnchecked?: boolean;
+    districtCode?: number;
+    yearBuilt?: number;
+  },
 ): Report {
   const r: Report = structuredClone(report);
+
+  if (!opts.flood && opts.floodUnchecked) {
+    // No operator review at MVP: an unchecked risk must be visible to the buyer.
+    r.risks.push({
+      labelKey: "risk.flood",
+      tone: "ok",
+      detail: {
+        en: "The national flood-zone map (SNCZI) couldn't be checked when this report was made. Check this address on the SNCZI viewer before you commit.",
+        es: "No se ha podido consultar el mapa nacional de zonas inundables (SNCZI) al generar este informe. Consulta esta dirección en el visor del SNCZI antes de comprometerte.",
+        ca: "No s'ha pogut consultar el mapa estatal de zones inundables (SNCZI) en generar aquest informe. Consulta aquesta adreça al visor del SNCZI abans de comprometre't.",
+      },
+    });
+  }
 
   if (opts.flood) {
     const lvl = opts.flood.level;
@@ -940,13 +988,45 @@ export function seedRisks(
               ca: "Dins de la zona inundable T10 (alta freqüència), risc d'inundació significatiu; busca assessorament especialitzat.",
             };
     r.risks.push({ labelKey: "risk.flood", tone, detail });
+
+    // A flood zone is serious enough to show above the paywall: the buyer sees
+    // that the address is in one, the paid report says which and what to do.
+    if (lvl !== "low") {
+      const high = lvl === "high";
+      r.alerts = [
+        ...(r.alerts ?? []),
+        {
+          tone: high ? "caution" : "check",
+          title: high
+            ? { en: "High-frequency flood zone", es: "Zona inundable de alta frecuencia", ca: "Zona inundable d'alta freqüència" }
+            : { en: "Flood zone", es: "Zona inundable", ca: "Zona inundable" },
+          previewDetail: {
+            en: "The national flood map places this address in a flood zone, which can affect insurance and the building.",
+            es: "El mapa nacional de zonas inundables sitúa esta dirección en una zona inundable, lo que puede afectar al seguro y al edificio.",
+            ca: "El mapa estatal de zones inundables situa aquesta adreça en una zona inundable, cosa que pot afectar l'assegurança i l'edifici.",
+          },
+          detail: high
+            ? {
+                en: "This address is in the T10 zone of the national flood map (SNCZI): areas with about a 1 in 10 chance of flooding in any year. Get a home-insurance quote before you offer, ask the seller and neighbours about past flooding, and get specialist advice.",
+                es: "Esta dirección está en la zona T10 del mapa nacional de zonas inundables (SNCZI): zonas con alrededor de un 10% de probabilidad de inundarse cada año. Pide un presupuesto de seguro de hogar antes de ofertar, pregunta al vendedor y a los vecinos por inundaciones anteriores y busca asesoramiento especializado.",
+                ca: "Aquesta adreça és a la zona T10 del mapa estatal de zones inundables (SNCZI): zones amb al voltant d'un 10% de probabilitat d'inundar-se cada any. Demana un pressupost d'assegurança de la llar abans d'ofertar, pregunta al venedor i als veïns per inundacions anteriors i busca assessorament especialitzat.",
+              }
+            : {
+                en: "This address is in the T100 zone of the national flood map (SNCZI): areas with about a 1 in 100 chance of flooding in any year. Get a home-insurance quote before you offer and ask the seller about past flooding.",
+                es: "Esta dirección está en la zona T100 del mapa nacional de zonas inundables (SNCZI): zonas con alrededor de un 1% de probabilidad de inundarse cada año. Pide un presupuesto de seguro de hogar antes de ofertar y pregunta al vendedor por inundaciones anteriores.",
+                ca: "Aquesta adreça és a la zona T100 del mapa estatal de zones inundables (SNCZI): zones amb al voltant d'un 1% de probabilitat d'inundar-se cada any. Demana un pressupost d'assegurança de la llar abans d'ofertar i pregunta al venedor per inundacions anteriors.",
+              },
+        },
+      ];
+    }
   }
 
   // Static (Barcelona-wide) seismic + radon.
   r.risks.push({ labelKey: "risk.seismic", tone: SEISMIC.tone, detail: SEISMIC.detail });
   r.risks.push({ labelKey: "risk.radon", tone: RADON.tone, detail: RADON.detail });
 
-  // Building-age flags derived from the Catastro year.
+  // Building-age flags: callers pass the original build year when the heritage
+  // catalogue has one (BuildingYears.ageYear), since Catastro's can be a renovation.
   if (opts.yearBuilt) {
     const age = new Date().getFullYear() - opts.yearBuilt;
     if (age >= 45) {
@@ -1290,6 +1370,12 @@ export function seedHeritage(report: Report, h: HeritageData): Report {
           es: high ? "Edificio protegido (patrimonio)" : "Edificio catalogado",
           ca: high ? "Edifici protegit (patrimoni)" : "Edifici catalogat",
         },
+        // Free preview: that it is listed, not the level or what it covers.
+        previewDetail: {
+          en: "The building is on Barcelona's heritage catalogue, which limits the works you can do to it.",
+          es: "El edificio figura en el catálogo de patrimonio de Barcelona, lo que limita las obras que se pueden hacer.",
+          ca: "L'edifici figura al catàleg de patrimoni de Barcelona, cosa que limita les obres que s'hi poden fer.",
+        },
         detail: {
           en: `${h.name ? `${h.name}. ` : ""}This building is ${lvl.en}. Heritage protection restricts works (façade/interior), needs special permits, and raises renovation cost and time. Check the catalog file before offering.`,
           es: `${h.name ? `${h.name}. ` : ""}Este edificio es ${lvl.es}. La protección patrimonial limita las obras (fachada/interior), exige permisos especiales y aumenta el coste y el plazo de reforma. Consulta la ficha del catálogo antes de ofertar.`,
@@ -1310,7 +1396,45 @@ export function seedHeritage(report: Report, h: HeritageData): Report {
         ca: `L'edifici està dins un conjunt protegit (${ens}). Els canvis a la façana estan regulats, però no hi ha catalogació específica d'aquest edifici.`,
       },
     });
+  } else {
+    // Checked and not catalogued: say so. Leaving the row out made "clear"
+    // look the same as "never checked".
+    r.urbanism.items.push({
+      key: "heritage",
+      tone: "info",
+      label: { en: "Heritage", es: "Patrimonio", ca: "Patrimoni" },
+      tag: {
+        en: "Not individually listed",
+        es: "Sin catalogación individual",
+        ca: "Sense catalogació individual",
+      },
+      text: {
+        en: "No individual heritage listing on this building, and it is not in a protected area of the Ajuntament's heritage catalogue. Façade works still need the usual city permit.",
+        es: "El catálogo de patrimonio del Ajuntament no recoge ninguna catalogación individual de este edificio ni lo sitúa en un conjunto protegido. Las obras de fachada necesitan igualmente la licencia municipal habitual.",
+        ca: "El catàleg de patrimoni de l'Ajuntament no recull cap catalogació individual d'aquest edifici ni el situa en un conjunt protegit. Les obres de façana necessiten igualment la llicència municipal habitual.",
+      },
+    });
   }
+  return r;
+}
+
+/**
+ * The heritage catalogue couldn't be queried (source down, or no coordinates).
+ * No operator review at MVP, so the buyer is told rather than shown nothing.
+ */
+export function seedHeritageUnchecked(report: Report): Report {
+  const r: Report = structuredClone(report);
+  r.urbanism.items.push({
+    key: "heritage",
+    tone: "check",
+    label: { en: "Heritage", es: "Patrimonio", ca: "Patrimoni" },
+    tag: { en: "Not checked", es: "Sin comprobar", ca: "Sense comprovar" },
+    text: {
+      en: "The Ajuntament's heritage catalogue couldn't be checked when this report was made. Before offering, ask the Ajuntament (or check the catalogue online) whether the building is listed, since a listing restricts works.",
+      es: "No se ha podido consultar el catálogo de patrimonio del Ajuntament al generar este informe. Antes de ofertar, pregunta al Ajuntament (o consulta el catálogo en línea) si el edificio está catalogado, ya que la catalogación limita las obras.",
+      ca: "No s'ha pogut consultar el catàleg de patrimoni de l'Ajuntament en generar aquest informe. Abans d'ofertar, pregunta a l'Ajuntament (o consulta el catàleg en línia) si l'edifici està catalogat, ja que la catalogació limita les obres.",
+    },
+  });
   return r;
 }
 

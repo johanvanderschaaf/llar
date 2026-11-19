@@ -1,0 +1,89 @@
+# Monthly refresh of the data files the reports read locally:
+#   data/bcn-barri-prices.json + data/bcn-barris.json  (scripts/refresh-bcn-pricing.py)
+#   data/bcn-amenities.json                             (scripts/refresh-bcn-amenities.py)
+#
+# It never deploys anything by itself. When the data changed, it opens (or
+# updates) one pull request with a summary; merging it deploys via Vercel.
+# Safety nets, in order:
+#   1. each refresh script refuses to write data that looks broken;
+#   2. the test suite runs on the new data (landmark checks for amenities);
+#   3. a person reads the summary and merges.
+# The job fails, and GitHub emails the repo owner, when a script refuses, the
+# tests fail, or the barri prices are more than 7 months old.
+#
+# Run it by hand: GitHub → Actions → "Refresh data" → Run workflow.
+# Needs: Settings → Actions → General → "Allow GitHub Actions to create and
+# approve pull requests".
+
+name: Refresh data
+
+on:
+  schedule:
+    - cron: "0 6 1 * *" # 06:00 UTC on the 1st of every month
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: refresh-data
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install the price script's dependencies
+        run: pip install pandas openpyxl pyproj
+
+      # Each refresh may refuse on its own; the other still runs, and the
+      # job is failed at the end so the refusal isn't missed.
+      - name: Refresh barri prices
+        id: prices
+        continue-on-error: true
+        run: python scripts/refresh-bcn-pricing.py
+
+      - name: Refresh amenities
+        id: amenities
+        continue-on-error: true
+        run: python scripts/refresh-bcn-amenities.py
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Test the app against the new data
+        run: npm test
+
+      - name: Summarise the changes
+        id: summary
+        run: python scripts/data-summary.py > "$RUNNER_TEMP/summary.md"
+
+      - name: Open or update the pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: data/monthly-refresh
+          add-paths: data/
+          commit-message: "Refresh data files (monthly)"
+          title: "Monthly data refresh"
+          body-path: ${{ runner.temp }}/summary.md
+          delete-branch: true
+
+      - name: Fail if a refresh refused or the prices are stale
+        if: steps.prices.outcome == 'failure' || steps.amenities.outcome == 'failure' || steps.summary.outputs.stale == 'true'
+        run: |
+          [ "${{ steps.prices.outcome }}" = "failure" ] && echo "::error::Barri price refresh refused or failed; see its step log."
+          [ "${{ steps.amenities.outcome }}" = "failure" ] && echo "::error::Amenities refresh refused or failed; see its step log."
+          [ "${{ steps.summary.outputs.stale }}" = "true" ] && echo "::error::Barri closing prices are more than 7 months old; the Gencat source may have moved."
+          exit 1

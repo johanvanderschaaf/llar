@@ -50,17 +50,26 @@ Catastro returns SOAP/XML — adapters parse it with a tiny regex helper, no SOA
 | Official affectation verdict (A/B/C/D) | `adapters/affectation.ts` | PIU AFH service `AfectacionsHabitatge`. **Keyed by parcel ref, not coordinates** — runs in parallel with the geo step. |
 | BCN barri polygons | (built-time, in `scripts/refresh-bcn-pricing.py`) | Open Data BCN resource `cd800462-…`. ZIP containing `POLIGONS.json`; reprojected EPSG:25831 → 4326. |
 
+**Heritage catalogue traps (all three once gave buyers false "national monument" alerts):**
+- The level is the feature's `NIVELL` attribute. The sublayer names (`…__A_`, `…__B_`, `…__C_`) are not the level: the service returns every listed building on all three.
+- `Fitxa 0 de <district>` is a district-wide sheet (Ciutat Vella), not a building listing. It is read as area context ("in a protected area").
+- Probe points must stay inside the flat's own parcel (the outline from `fetchParcelPolygon`); a fixed ring around the centre picked up the listed building next door.
+
+**Catastro's year is "built or last fully renovated"** (the `ant` field): Casa Calvet (1898–1900) reads 2017. `lib/building-years.ts` uses the heritage catalogue's epoch, when clearly older, as the build date: age checks (ITE, asbestos, structure era) use the original date, and the building score uses Catastro's year. Report text never says "completed in" Catastro's year.
+
+**Catastro parcel listing:** the second Catastro query lists every unit in the parcel just to count them, and is slow for big blocks (517 units: 23 s). It has its own 6 s timeout in `adapters/catastro.ts`; when it runs out the report goes ahead without the count instead of failing as "Catastro down".
+
 ## ACA — Flood
 
 - **Adapter:** `adapters/flood.ts`
 - Endpoint: SNCZI / IDEE INSPIRE WMS at `servicios.idee.es/wms-inspire/riesgos-naturales/inundaciones`.
 - Point-queries fluvial flood-zone rasters T10 / T100 / T500. `GRAY_INDEX = 999` means outside the zone; any other value means in.
 
-## OSM / Overpass — Amenities & transport
+## Amenities & transport — local Ajuntament open data
 
-- **Adapter:** `adapters/amenities.ts`
-- 500 m radius around the parcel coords. No key. Be mindful of Overpass instance load if extending.
-- Public Overpass mirrors are flaky/rate-limited. The adapter **races all three mirrors with `Promise.any` at an 8s timeout** (fastest healthy one wins) rather than trying them sequentially — a slow Overpass otherwise eats the report's serverless time budget (see [PIPELINE_FLOW.md](./PIPELINE_FLOW.md) → maxDuration).
+- **Adapter:** `adapters/amenities.ts`, a synchronous lookup in `data/bcn-amenities.json` (built by `scripts/refresh-bcn-amenities.py`, see [REFRESH_SCRIPTS.md](./REFRESH_SCRIPTS.md)). No network at report time, so it can't fail or slow a report.
+- Until Nov 2026 this queried OpenStreetMap's Overpass API live. That failed in ~1 in 5 reports, then in every one (main instance HTTP 406, mirrors timing out), which dropped the location and transport scores. Don't go back to a live call without a fallback.
+- Barcelona only: outside the city's bounding box it returns `unavailable`.
 
 ## Idealista — Comparable listings
 

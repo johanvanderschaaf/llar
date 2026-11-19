@@ -195,7 +195,7 @@ export const sampleSors35: Report = {
   // Catastro), so the demo derives it from the same builder. It states what's
   // verifiable from the build year (ITE obligation, possible asbestos) and what
   // to check, never the interior condition, which we don't have a source for.
-  building: buildBuilding(1965),
+  building: buildBuilding({ effective: 1965, ageYear: 1965 }),
 
   risks: [
     {

@@ -17,8 +17,7 @@ export function buildFooter(): {
         "ICAEN (registered energy certificate); " +
         "Mapa Urbanístic de Catalunya / Generalitat (planning qualification and classification); " +
         "MITECO–SNCZI (fluvial flood zones); IGN / NCSE-02 (seismic hazard); CTE DB-HS6 (radon); " +
-        "Ajuntament de Barcelona open data (district crime context, ZBE); " +
-        "OpenStreetMap (neighbourhood amenities); " +
+        "Ajuntament de Barcelona open data (district crime context, ZBE, neighbourhood amenities); " +
         "Generalitat de Catalunya, Habitatge (registered notarial closing prices by neighbourhood, the single price benchmark). " +
         "Price figures are orientation only, not portal asking prices. " +
         "Scores are an independent, documented editorial assessment.",
@@ -28,8 +27,7 @@ export function buildFooter(): {
         "ICAEN (certificado energético registrado); " +
         "Mapa Urbanístic de Catalunya / Generalitat (calificación y clasificación urbanística); " +
         "MITECO–SNCZI (zonas inundables fluviales); IGN / NCSE-02 (peligrosidad sísmica); CTE DB-HS6 (radón); " +
-        "datos abiertos del Ajuntament de Barcelona (contexto de delincuencia por distrito, ZBE); " +
-        "OpenStreetMap (servicios del barrio); " +
+        "datos abiertos del Ajuntament de Barcelona (contexto de delincuencia por distrito, ZBE, servicios del barrio); " +
         "Generalitat de Catalunya, Habitatge (precios de cierre notariales registrados por barrio, la referencia de precio única). " +
         "Las cifras de precio son orientativas, no precios de oferta de portales. " +
         "Las puntuaciones son una valoración editorial independiente.",
@@ -39,8 +37,7 @@ export function buildFooter(): {
         "ICAEN (certificat energètic registrat); " +
         "Mapa Urbanístic de Catalunya / Generalitat (qualificació i classificació urbanística); " +
         "MITECO–SNCZI (zones inundables fluvials); IGN / NCSE-02 (perillositat sísmica); CTE DB-HS6 (radó); " +
-        "dades obertes de l'Ajuntament de Barcelona (context de delinqüència per districte, ZBE); " +
-        "OpenStreetMap (serveis del barri); " +
+        "dades obertes de l'Ajuntament de Barcelona (context de delinqüència per districte, ZBE, serveis del barri); " +
         "Generalitat de Catalunya, Habitatge (preus de tancament notarials registrats per barri, la referència única de preu). " +
         "Les xifres de preu són orientatives, no preus d'oferta de portals. " +
         "Les puntuacions són una valoració editorial independent.",

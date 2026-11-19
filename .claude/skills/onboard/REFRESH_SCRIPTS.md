@@ -51,6 +51,49 @@ Wrote:
 
 Polygons are published in EPSG:25831 (UTM 31N, Spain). The script reprojects to EPSG:4326 (WGS84) with pyproj so the runtime adapter can do a plain lat/lon point-in-polygon. Don't change this — `adapters/geo.ts` returns WGS84 too.
 
+### Safety check
+
+Before writing, `check()` refuses data that looks broken (not 73 barris, fewer
+than 50 priced, implausible €/m², or 10+ fewer priced barris than the current
+file) and exits 1.
+
+## `scripts/refresh-bcn-amenities.py`
+
+Builds `data/bcn-amenities.json`, the local dataset behind `adapters/amenities.ts`
+(it replaced the live OpenStreetMap/Overpass lookup in Nov 2026, which failed on
+every request by then). Standard library only. Sources, all Ajuntament de
+Barcelona Open Data (CC BY 4.0), resolved through the CKAN API by dataset id:
+
+| Category | Dataset | Notes |
+|---|---|---|
+| metro | `transports` | Metro + urban FGC **entrances**; the adapter takes each station's nearest entrance |
+| health | `equipament-sanitat` | Hospitals/clinics, CAPs, CUAPs (pharmacies excluded) |
+| schools | `equipament-educacio` | Infant 3–6, primary, secondary |
+| market | `equipament-mercats-i-centres-comercials` | Municipal markets only |
+| supermarket | `cens-locals-planta-baixa-act-economica` | Newest yearly shop census; **chains only** (`CHAINS` list), since the census files corner shops as supermarkets too |
+| green | `espais-verds-publics` | Public parks > 0.5 ha, as outlines (distance to the edge) |
+
+Refresh: quarterly is plenty (the shop census is yearly; the rest rarely change).
+The script refuses to write if a category falls below its floor or shrinks by
+more than 25% versus the current file. `adapters/amenities.test.ts` checks real
+landmarks (Catalunya station at Plaça de Catalunya, Ciutadella park), so a
+broken refresh fails the tests.
+
+## Monthly automation: `.github/workflows/refresh-data.yml`
+
+On the 1st of every month (or by hand: Actions → Refresh data → Run workflow)
+GitHub runs both scripts, runs the test suite on the new data, and — if any
+`data/` file changed — opens or updates one pull request (branch
+`data/monthly-refresh`) whose description is `scripts/data-summary.py`'s
+before/after summary. **Nothing deploys until someone merges it.** The job fails
+(and GitHub emails the owner) when a script refuses, the tests fail, or the
+barri prices cover a period that ended more than 7 months ago — the last one
+catches Gencat renaming or moving its file, which the price script can't detect
+on its own.
+
+Requires the repo setting *Settings → Actions → General → Allow GitHub Actions
+to create and approve pull requests*.
+
 ## Adding a new refresh script
 
 Conventions, so a future agent can find them:

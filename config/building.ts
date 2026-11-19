@@ -1,4 +1,5 @@
 import type { Localized, TermDef } from "@/types/report";
+import type { BuildingYears } from "@/lib/building-years";
 
 /**
  * Deterministic Building & condition content derived from the Catastro year.
@@ -10,11 +11,14 @@ import type { Localized, TermDef } from "@/types/report";
  * a bullet checklist ("What to check") + a keyline. The renderer turns
  * `facts` into a `<dl>` and `checks` into a checkmark list.
  */
-export function buildBuilding(yearBuilt?: number): {
+export function buildBuilding(years: BuildingYears = {}): {
   facts: TermDef[];
   checks: Localized[];
   keyline: Localized;
 } {
+  // Age-based checks use the original build year when the catalogue has one
+  // (see lib/building-years.ts); Catastro's year can be a renovation.
+  const yearBuilt = years.ageYear;
   const age = yearBuilt ? new Date().getFullYear() - yearBuilt : undefined;
   const iteDue = age != null && age >= 45;
   const asbestos = yearBuilt != null && yearBuilt < 2002;
@@ -27,15 +31,27 @@ export function buildBuilding(yearBuilt?: number): {
   // Age
   facts.push({
     term: { en: "Age", es: "Antigüedad", ca: "Antiguitat" },
-    def: yearBuilt
+    def: years.original
       ? {
-          en: `Completed ${yearBuilt}, so ${age} years old.${
+          en: `Built ${years.originalLabel} (heritage catalogue), so about ${age} years old. Catastro records a full renovation in ${years.effective}.${
+            iteDue ? " Within the age window where the ITE is required." : ""
+          }`,
+          es: `Construido en ${years.originalLabel} (catálogo de patrimonio), unos ${age} años. El Catastro registra una reforma integral en ${years.effective}.${
+            iteDue ? " Dentro del periodo en que la ITE es obligatoria." : ""
+          }`,
+          ca: `Construït el ${years.originalLabel} (catàleg de patrimoni), uns ${age} anys. El Cadastre registra una reforma integral el ${years.effective}.${
+            iteDue ? " Dins del període en què la ITE és obligatòria." : ""
+          }`,
+        }
+      : yearBuilt
+      ? {
+          en: `Catastro gives ${yearBuilt}, the year it was built or last fully renovated, so ${age} years.${
             iteDue ? " Within the age window where the ITE is required." : " Not yet within the ITE-obligatory age window."
           }`,
-          es: `Terminado en ${yearBuilt}, ${age} años.${
+          es: `El Catastro indica ${yearBuilt}, el año de construcción o de la última reforma integral, ${age} años.${
             iteDue ? " Dentro del periodo en que la ITE es obligatoria." : " Aún fuera del periodo de ITE obligatoria por antigüedad."
           }`,
-          ca: `Acabat el ${yearBuilt}, ${age} anys.${
+          ca: `El Cadastre indica ${yearBuilt}, l'any de construcció o de l'última reforma integral, ${age} anys.${
             iteDue ? " Dins del període en què la ITE és obligatòria." : " Encara fora del període d'ITE obligatòria per antiguitat."
           }`,
         }
@@ -63,7 +79,7 @@ export function buildBuilding(yearBuilt?: number): {
     term: { en: "ITE", es: "ITE", ca: "ITE" },
     def: iteDue
       ? {
-          en: "No passed inspecció tècnica on record. Pending works are possible — ask for the certificate.",
+          en: "No passed inspecció tècnica on record. Pending works are possible, so ask for the certificate.",
           es: "No consta ninguna inspección técnica favorable. Puede haber obras pendientes; pide el certificado.",
           ca: "No consta cap inspecció tècnica favorable. Hi pot haver obres pendents; demana el certificat.",
         }

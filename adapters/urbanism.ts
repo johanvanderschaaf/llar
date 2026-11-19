@@ -5,7 +5,7 @@ import {
   ok,
 } from "./types";
 import type { Coordinates, ParcelPolygon } from "./geo";
-import { fetchParcelPolygon } from "./geo";
+import { fetchParcelPolygon, pointInRing } from "./geo";
 
 /**
  * Planning qualification + affectations for a Barcelona flat, from the
@@ -112,21 +112,7 @@ function parseQuals(xml: string): RawQual[] {
   return out;
 }
 
-/** Ray-casting point-in-polygon test (ring in the same CRS as the point). */
-function inside(pt: [number, number], ring: Array<[number, number]>): boolean {
-  let c = false;
-  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
-    const [xi, yi] = ring[i];
-    const [xj, yj] = ring[j];
-    if (
-      yi > pt[1] !== yj > pt[1] &&
-      pt[0] < ((xj - xi) * (pt[1] - yi)) / (yj - yi) + xi
-    ) {
-      c = !c;
-    }
-  }
-  return c;
-}
+const inside = pointInRing;
 
 /** Sample points strictly inside the parcel: centroid first, then a grid. */
 function samplePoints(poly: ParcelPolygon): Array<[number, number]> {
@@ -211,7 +197,15 @@ function classificationOf(quals: RawQual[]): string | undefined {
 
 export async function fetchUrbanism(
   coords: Coordinates,
-  opts: { parcelRef?: string } = {},
+  opts: {
+    parcelRef?: string;
+    /**
+     * Parcel outline already looked up by the caller (the pipeline caches it).
+     * `null` = no outline available, check the single point; `undefined` =
+     * fetch it here.
+     */
+    polygon?: ParcelPolygon | null;
+  } = {},
 ): Promise<AdapterResult<UrbanismData>> {
   // Ajuntament de Barcelona's Portal d'Informació Urbanística — the same source
   // as our data. It has no public coordinate deep-link, so we link the search
@@ -229,8 +223,11 @@ export async function fetchUrbanism(
   let method: UrbanismData["method"] = "bcn-point";
   let points: Array<[number, number]> = [[cx, cy]];
 
-  if (opts.parcelRef) {
-    const poly = await fetchParcelPolygon(opts.parcelRef);
+  if (opts.parcelRef || opts.polygon) {
+    const poly =
+      opts.polygon !== undefined
+        ? opts.polygon
+        : await fetchParcelPolygon(opts.parcelRef!);
     if (poly) {
       const sampled = samplePoints(poly);
       if (sampled.length) {

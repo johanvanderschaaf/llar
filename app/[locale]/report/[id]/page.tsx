@@ -9,6 +9,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { hasPaidOrder } from "@/lib/orders";
 import { hasAnthropicKey } from "@/lib/anthropic";
+import { needsAiNarrative } from "@/lib/narrative";
 import { PreparingFullReport } from "@/components/report/PreparingFullReport";
 import type { ReportRow } from "@/types/db";
 
@@ -101,7 +102,7 @@ async function resolveReport(
     full &&
     !skipNarrative &&
     hasAnthropicKey() &&
-    !report.data.verdict?.headline?.en
+    needsAiNarrative(report.data)
   ) {
     return { kind: "preparing", id };
   }

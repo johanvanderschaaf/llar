@@ -30,6 +30,15 @@
     "submit": "Generar vista prèvia →",
     "genError": "No hem pogut generar l'informe. Torna-ho a provar d'aquí a un moment."
   },
+  "registryDown": {
+    "title": "El Cadastre no està disponible en aquest moment",
+    "body": "Cada informe parteix de les dades del Cadastre, que ara mateix no respon. Sol durar unes hores. Deixa'ns el teu correu i t'enviarem l'informe tan bon punt torni a funcionar.",
+    "emailPlaceholder": "El teu correu",
+    "cta": "Envia'm l'informe",
+    "ok": "Fet. T'escriurem tan bon punt el Cadastre torni a funcionar.",
+    "errEmail": "Introdueix un correu vàlid.",
+    "errServer": "No hem pogut desar el teu correu. Torna-ho a provar."
+  },
   "analyzing": {
     "title": "Analitzant el teu pis",
     "fullTitle": "Preparant el teu informe complet",
@@ -413,7 +422,6 @@
     "verdictEyebrow": "Conclusió",
     "overallCaption": "Puntuació global",
     "ringOf": "/ 100",
-    "verdictPreviewNote": "Desbloqueja l'informe complet per veure què significa cada troballa i els passos a seguir abans de fer una oferta.",
     "alertLocked": "Desbloqueja per veure què significa i què cal fer abans de presentar l'oferta.",
     "bandGood": "Bona · 70 a 100",
     "bandOk": "Correcta · 50 a 69",
@@ -450,10 +458,20 @@
     "docsFuture": "Aviat: puja aquests documents i PisoWise els analitzarà per tu. Aquí és on trobaràs aquesta funcionalitat.",
     "footSources": "Fonts i mètode",
     "sourceChips": ["Catastro", "Gencat Habitatge", "PGM · Ajuntament de Barcelona", "Catàleg de patrimoni", "SNCZI", "ICAEN"],
+    "teaser": {
+      "locked": "On se situa el preu demanat davant d'aquestes vendes, el rang realista i quant marge tens per negociar.",
+      "lockedNoAsking": "A quin preu es tanquen els pisos d'aquesta mida, el rang realista i com plantejar la teva oferta.",
+      "lockedGeneric": "Què significa cada troballa per a aquest pis i què cal fer abans de fer una oferta.",
+      "countsHead": "També a l'informe complet",
+      "negotiation": "{n, plural, one {# argument de negociació per a aquest pis} other {# arguments de negociació per a aquest pis}}",
+      "documents": "{n, plural, one {# document que cal demanar al venedor} other {# documents que cal demanar al venedor}}",
+      "checks": "{n, plural, one {# comprovació abans de fer una oferta} other {# comprovacions abans de fer una oferta}}",
+      "priceLocked": "A l'informe complet"
+    },
     "gate": {
       "eyebrow": "L'informe complet",
       "head": "Aquí és on comença l'anàlisi a fons.",
-      "sub": "Ja has vist la conclusió, les puntuacions i les dades bàsiques. L'informe complet desgrana cada troballa: què significa i què cal fer abans de fer una oferta.",
+      "sub": "Ja has vist les troballes importants, les puntuacions i les dades bàsiques. L'informe complet desgrana cada troballa: què significa i què cal fer abans de fer una oferta.",
       "lockedH": "Què inclou l'informe complet",
       "priceSuffix": "pagament únic",
       "cta": "Desbloqueja l'informe complet",

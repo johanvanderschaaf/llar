@@ -80,7 +80,26 @@ The legacy text fields are kept because `pipeline/narrate.ts` and the PDF genera
 
 ## Caching
 
-Only Catastro is cached (`source_cache` row, 30 days). Everything else is fetched fresh per request — they're either fast or have their own free-tier limits.
+Catastro data is cached in `source_cache` for **1 year**, under three sources:
+`catastro` (the flat's facts, keyed by full ref), `geocode` (coordinates, keyed
+by the 14-char parcel ref) and `parcel-polygon` (the parcel outline used by the
+whole-parcel planning check). Cadastral data almost never changes.
+
+**Outage fallback.** When the live lookup fails with status `error` (network
+failure, HTTP error, or Catastro's maintenance answer — see
+`adapters/catastro-outage.ts`), a cached copy of **any age** is used instead,
+with a "from cache saved YYYY-MM-DD; live lookup failed" note (and
+`toVerify: true` once it is past the TTL). This only covers flats looked up
+before. With nothing cached, `generateReport` throws `CatastroDownError` and
+the buyer flow shows the "registry temporarily down — email me my report"
+notice (`components/RegistryDownNotice.tsx`), stored in `waitlist` with
+`reason = 'registry_down'` (migration 0003). `scripts/process-pending.mts`
+generates those reports once Catastro is back.
+
+A Catastro answer of "no such record" is `unavailable`, not `error`: it is not
+retried, never falls back to the cache, and throws a plain `Error`.
+
+Everything else is fetched fresh per request — they're either fast or have their own free-tier limits.
 
 To invalidate after a parser change:
 

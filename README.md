@@ -77,7 +77,7 @@ The pipeline never throws on a missing source — each adapter degrades to
 | Address search → cadastral ref | `adapters/catastro-search.ts` | Catastro OVC `ConsultaVia` / `Consulta_DNPLOC` |
 | Parcel coordinates + polygon (whole-finca queries) | `adapters/geo.ts` | Catastro `Consulta_CPMRC` + INSPIRE WFS |
 | Energy certificate (ICAEN) | `adapters/energy.ts` | Generalitat ICAEN |
-| Amenities, transport, services | `adapters/amenities.ts` | OSM / Overpass |
+| Amenities, transport, services | `adapters/amenities.ts` | Local file `data/bcn-amenities.json` (Ajuntament BCN open data, refreshed monthly by `.github/workflows/refresh-data.yml`) |
 | Flood risk | `adapters/flood.ts` | ACA (Agència Catalana de l'Aigua) |
 | Comparable listings | `adapters/idealista.ts` | Idealista (official API, optional) |
 | **Planning qualification (whole parcel)** | `adapters/urbanism.ts` | Ajuntament BCN `WMSURBANISME` |

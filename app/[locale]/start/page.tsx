@@ -1,9 +1,10 @@
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { BuyerForm } from "@/components/BuyerForm";
 import { TopBar } from "@/components/TopBar";
+import { RegistryDownNotice } from "@/components/RegistryDownNotice";
 
 // startAnalysisAction runs generateReport, which fans out to several external
-// sources (Catastro, OSM/Overpass, ICAEN, Ajuntament BCN). Per the Next docs,
+// sources (Catastro, ICAEN, Ajuntament BCN, Gencat). Per the Next docs,
 // a Server Action's timeout is governed by the *page's* maxDuration — without
 // this, Vercel's ~10s default kills the action mid-pipeline and the report is
 // saved nearly empty. See .claude/skills/onboard/PIPELINE_FLOW.md.
@@ -14,10 +15,10 @@ export default async function StartPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; ref?: string; label?: string; ask?: string }>;
 }) {
   const { locale } = await params;
-  const { error } = await searchParams;
+  const { error, ref, label, ask } = await searchParams;
   setRequestLocale(locale);
   const t = await getTranslations("form");
 
@@ -51,6 +52,15 @@ export default async function StartPage({
           }}
         >
           {t("genError")}
+        </div>
+      ) : null}
+      {error === "registry_down" ? (
+        <div style={{ marginBottom: 24 }}>
+          <RegistryDownNotice
+            address={label}
+            cadastralRef={ref}
+            askingPriceEur={ask ? Number(ask) : undefined}
+          />
         </div>
       ) : null}
       <BuyerForm />

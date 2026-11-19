@@ -21,9 +21,9 @@ modifier applied to the overall so a serious finding can override the weighting.
 | Pillar | Weight | Source | Notes |
 |---|---|---|---|
 | price | 0.25 | `Pricing.deltaPct` (asking vs barri €/m²) | Only present in Section-03 state `asking-known`. Asking price is **optional**, so this pillar is often absent. |
-| location | 0.18 | OSM amenities | mean of green / supermarket / market / schools / health bands |
+| location | 0.18 | Ajuntament amenities | mean of green / supermarket / market / schools / health bands |
 | building | 0.15 | Catastro year built | softened age curve (see below) |
-| transport | 0.12 | OSM metro | nearest-distance band + density bonus |
+| transport | 0.12 | Ajuntament metro entrances | nearest-distance band + density bonus |
 | energy | 0.10 | ICAEN class A–G | fixed letter map. ICAEN coverage is sparse, so often absent. |
 
 Weights sum to 0.80; the missing 0.20 of "buyer concern" is expressed through

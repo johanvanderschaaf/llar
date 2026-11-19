@@ -349,7 +349,7 @@
       "name": "Baró de Viver",
       "transactions": 23,
       "avgSurfaceM2": 71.9,
-      "pricePerM2": 0
+      "pricePerM2": null
     },
     "59": {
       "name": "el Bon Pastor",

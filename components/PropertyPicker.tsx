@@ -61,6 +61,7 @@ export function PropertyPicker({
   showExtras = false,
   extraHidden = {},
   loadingScreen,
+  registryDownNotice,
 }: {
   action: (formData: FormData) => void | Promise<void>;
   labels: PickerLabels;
@@ -69,6 +70,12 @@ export function PropertyPicker({
   extraHidden?: Record<string, string>;
   /** Shown full-screen while the form submits + the report generates. */
   loadingScreen?: ReactNode;
+  /**
+   * Shown when Catastro is down (the search API says `registryDown`), given
+   * what the buyer has typed so far. Without it a plain English line is shown
+   * (operator flow).
+   */
+  registryDownNotice?: (ctx: { address: string }) => ReactNode;
 }) {
   const [query, setQuery] = useState("");
   const [streets, setStreets] = useState<Street[]>([]);
@@ -80,6 +87,7 @@ export function PropertyPicker({
   const [resolved, setResolved] = useState<Unit | null>(null);
   const [manualRef, setManualRef] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [registryDown, setRegistryDown] = useState(false);
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -94,6 +102,7 @@ export function PropertyPicker({
         `/api/catastro/streets?q=${encodeURIComponent(query.trim())}`,
       );
       const data = await res.json();
+      setRegistryDown(Boolean(data.registryDown));
       setStreets(data.streets ?? []);
       setShowList(true);
     }, 300);
@@ -121,7 +130,8 @@ export function PropertyPicker({
       )}&num=${encodeURIComponent(number.trim())}`,
     );
     const data = await res.json();
-    setUnits(data.units ?? []);
+    setRegistryDown(Boolean(data.registryDown));
+    setUnits(data.registryDown ? null : (data.units ?? []));
     setLoadingUnits(false);
   }
 
@@ -267,6 +277,17 @@ export function PropertyPicker({
       {units && units.length === 0 && (
         <p style={{ fontSize: 14, color: "var(--low)" }}>{labels.noRecords}</p>
       )}
+      {registryDown &&
+        (registryDownNotice ? (
+          registryDownNotice({
+            address: [query.trim(), number.trim()].filter(Boolean).join(" "),
+          })
+        ) : (
+          <p style={{ fontSize: 14, color: "var(--low)" }}>
+            Catastro is temporarily down, so addresses can&apos;t be looked up. Try
+            again later.
+          </p>
+        ))}
 
       {/* Manual fallback */}
       <details>

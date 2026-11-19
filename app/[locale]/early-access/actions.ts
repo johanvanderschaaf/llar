@@ -51,3 +51,46 @@ export async function joinWaitlistAction(input: {
 
   return { ok: true };
 }
+
+/**
+ * "Email me my report when the registry is back": stored when Catastro is down
+ * and the buyer can't get a report now. Same table as the early-access list,
+ * marked `reason = 'registry_down'` and with the flat's reference when the
+ * buyer had already picked one. scripts/process-pending.mts generates these
+ * once Catastro is back. Needs migration 0003.
+ */
+export async function notifyWhenBackAction(input: {
+  email: string;
+  address?: string;
+  cadastralRef?: string;
+  askingPriceEur?: number;
+  locale?: string;
+}): Promise<JoinWaitlistResult> {
+  const email = (input.email ?? "").trim();
+  if (!EMAIL_RE.test(email)) return { ok: false, error: "email" };
+
+  const locale = (routing.locales as readonly string[]).includes(
+    input.locale ?? "",
+  )
+    ? input.locale
+    : undefined;
+  const asking = Number(input.askingPriceEur);
+
+  try {
+    const db = createAdminClient();
+    const { error } = await db.from("waitlist").insert({
+      email,
+      address: input.address?.trim() || null,
+      locale: locale ?? null,
+      reason: "registry_down",
+      cadastral_ref: input.cadastralRef?.trim() || null,
+      asking_price_eur: Number.isFinite(asking) && asking > 0 ? asking : null,
+    });
+    if (error) throw new Error(error.message);
+  } catch (e) {
+    console.error("[notifyWhenBack] insert failed:", (e as Error)?.message);
+    return { ok: false, error: "server" };
+  }
+
+  return { ok: true };
+}

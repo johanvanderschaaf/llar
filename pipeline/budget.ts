@@ -17,7 +17,12 @@ export interface Budget {
   until(atMs: number): number;
 }
 
-export function createBudget(now: () => number = Date.now): Budget {
+/**
+ * Uses the monotonic clock (performance.now), the same clock setTimeout runs
+ * on. With the wall clock, a laptop that slept mid-run (seen in a local test
+ * run) jumped the budget forward while the timeouts hadn't fired yet.
+ */
+export function createBudget(now: () => number = () => performance.now()): Budget {
   const start = now();
   return {
     elapsed: () => now() - start,
@@ -65,7 +70,7 @@ export function withTiming<T>(
 export async function timed<T>(
   run: () => Promise<AdapterResult<T>>,
 ): Promise<AdapterResult<T>> {
-  const t0 = Date.now();
+  const t0 = performance.now();
   const result = await run();
-  return withTiming(result, Date.now() - t0);
+  return withTiming(result, performance.now() - t0);
 }

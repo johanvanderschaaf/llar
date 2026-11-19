@@ -30,6 +30,15 @@
     "submit": "Generar vista previa →",
     "genError": "No hemos podido generar el informe. Inténtalo de nuevo en un momento."
   },
+  "registryDown": {
+    "title": "El Catastro no está disponible en este momento",
+    "body": "Cada informe parte de los datos del Catastro, que ahora mismo no responde. Suele durar unas horas. Déjanos tu email y te enviaremos el informe en cuanto vuelva a funcionar.",
+    "emailPlaceholder": "Tu email",
+    "cta": "Envíame el informe",
+    "ok": "Hecho. Te escribiremos en cuanto el Catastro vuelva a funcionar.",
+    "errEmail": "Introduce un email válido.",
+    "errServer": "No hemos podido guardar tu email. Inténtalo de nuevo."
+  },
   "analyzing": {
     "title": "Analizando tu piso",
     "fullTitle": "Preparando tu informe completo",
@@ -413,7 +422,6 @@
     "verdictEyebrow": "Conclusión",
     "overallCaption": "Puntuación global",
     "ringOf": "/ 100",
-    "verdictPreviewNote": "Desbloquea el informe completo para ver qué significa cada hallazgo y los pasos a seguir antes de ofertar.",
     "alertLocked": "Desbloquea para ver qué significa y qué hacer antes de ofertar.",
     "bandGood": "Buena · 70 a 100",
     "bandOk": "Correcta · 50 a 69",
@@ -450,10 +458,20 @@
     "docsFuture": "Próximamente: sube estos documentos y PisoWise los analizará por ti. Aquí es donde encontrarás esta funcionalidad.",
     "footSources": "Fuentes y método",
     "sourceChips": ["Catastro", "Gencat Habitatge", "PGM · Ajuntament de Barcelona", "Catàleg de patrimoni", "SNCZI", "ICAEN"],
+    "teaser": {
+      "locked": "Dónde se sitúa el precio de salida frente a esas ventas, la horquilla realista y cuánto margen tienes para negociar.",
+      "lockedNoAsking": "A qué precio se cierran los pisos de este tamaño, la horquilla realista y cómo plantear tu oferta.",
+      "lockedGeneric": "Qué significa cada hallazgo para este piso y qué hacer antes de ofertar.",
+      "countsHead": "También en el informe completo",
+      "negotiation": "{n, plural, one {# argumento de negociación para este piso} other {# argumentos de negociación para este piso}}",
+      "documents": "{n, plural, one {# documento que pedir al vendedor} other {# documentos que pedir al vendedor}}",
+      "checks": "{n, plural, one {# comprobación antes de ofertar} other {# comprobaciones antes de ofertar}}",
+      "priceLocked": "En el informe completo"
+    },
     "gate": {
       "eyebrow": "El informe completo",
       "head": "Aquí es donde empieza el análisis a fondo.",
-      "sub": "Ya has visto la conclusión, las puntuaciones y los datos básicos. El informe completo desgrana cada hallazgo: qué significa y qué hacer antes de ofertar.",
+      "sub": "Ya has visto los hallazgos importantes, las puntuaciones y los datos básicos. El informe completo desgrana cada hallazgo: qué significa y qué hacer antes de ofertar.",
       "lockedH": "Qué incluye el informe completo",
       "priceSuffix": "pago único",
       "cta": "Desbloquea el informe completo",

@@ -119,7 +119,9 @@ export function fetchGencatBarri(
   }
   const code = hit.properties.code;
   const row = PRICES.byBarri[code];
-  if (!row || row.pricePerM2 == null) {
+  // 0 is not a price: Gencat has published 0 for a low-volume barri
+  // (Baró de Viver), which turned into "Infinity% above the average".
+  if (!row || !row.pricePerM2) {
     return unavailable<GencatBarriData>(
       "gencat-barri",
       `Barri ${code} (${hit.properties.name}) has no €/m² figure for ${PRICES.asOf} — low transaction volume.`,

@@ -314,6 +314,14 @@ export interface Report {
   // --- 12 pre-offer checklist ---
   checklist: Localized[];
 
+  /**
+   * Who wrote the prose sections (bottom line, neighbourhood, negotiation,
+   * checklist): "facts" = the fact-based builders in pipeline/facts-narrative.ts,
+   * "ai" = the AI narrative. Reports stored before this field existed have
+   * none; for them an empty bottom line means "not narrated yet".
+   */
+  narrative?: { source: "facts" | "ai" };
+
   // --- footer ---
   footer: {
     sources: Localized;

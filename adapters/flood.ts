@@ -31,6 +31,32 @@ const LAYERS: Record<"t10" | "t100" | "t500", string> = {
   t500: "NZ.Flood.FluvialT500",
 };
 
+/**
+ * The SNCZI service answers HTTP 503 to roughly 1 request in 6 (measured
+ * 2026-11-19, alone or in parallel alike). A report makes three requests, so
+ * without retries ~4 in 10 reports lost the flood check. Retrying each request
+ * up to 3 times brings that to ~1 in 100. Only server errors and network
+ * failures are retried.
+ */
+const ATTEMPTS = 3;
+const ATTEMPT_TIMEOUT_MS = 6000;
+
+async function fetchWithRetry(url: string): Promise<Response> {
+  let lastError = "";
+  for (let i = 0; i < ATTEMPTS; i++) {
+    if (i > 0) await new Promise((r) => setTimeout(r, 300 * i));
+    try {
+      const res = await fetchWithTimeout(url, ATTEMPT_TIMEOUT_MS);
+      if (res.ok) return res;
+      lastError = `SNCZI HTTP ${res.status}`;
+      if (res.status < 500) break; // a client error won't fix itself
+    } catch (e) {
+      lastError = (e as Error).message;
+    }
+  }
+  throw new Error(`${lastError} (after retries)`);
+}
+
 async function inZone(layer: string, coords: Coordinates): Promise<boolean> {
   const R = 6378137;
   const x = R * ((coords.lon * Math.PI) / 180);
@@ -42,8 +68,7 @@ async function inZone(layer: string, coords: Coordinates): Promise<boolean> {
     `&layers=${layer}&query_layers=${layer}&styles=` +
     `&crs=EPSG:3857&bbox=${bbox}&width=101&height=101&i=50&j=50` +
     `&info_format=application/json`;
-  const res = await fetchWithTimeout(url, 15000);
-  if (!res.ok) throw new Error(`SNCZI HTTP ${res.status}`);
+  const res = await fetchWithRetry(url);
   const json = (await res.json()) as {
     features?: { properties?: { GRAY_INDEX?: number } }[];
   };

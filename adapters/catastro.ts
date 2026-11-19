@@ -6,6 +6,7 @@ import {
   ok,
   unavailable,
 } from "./types";
+import { isCatastroOutage } from "./catastro-outage";
 
 /**
  * Dirección General del Catastro — OVC web service (Consulta_DNPRC).
@@ -44,7 +45,8 @@ export interface CatastroParcelUnit {
 
 export interface CatastroParcel {
   parcelRef: string; // 14-char pc1+pc2
-  unitCount: number; // control.cudnp
+  /** control.cudnp. Undefined when the parcel listing was too slow (see PARCEL_TIMEOUT_MS). */
+  unitCount?: number;
   units: CatastroParcelUnit[];
 }
 
@@ -177,10 +179,18 @@ function parseParcel(
 
   return {
     parcelRef,
-    unitCount: num(control?.cudnp) ?? units.length,
+    unitCount: num(control?.cudnp) ?? (units.length || undefined),
     units,
   };
 }
+
+/**
+ * The parcel listing (every unit in the building) only feeds the "N units"
+ * note, and for big blocks it is slow: a 517-unit parcel took 23 s, which
+ * failed the whole report as "Catastro down". So it gets its own short timeout
+ * and the report goes ahead without the count when it runs out.
+ */
+const PARCEL_TIMEOUT_MS = 6_000;
 
 export async function fetchCatastro(
   rawRef: string,
@@ -198,10 +208,18 @@ export async function fetchCatastro(
   try {
     const [unitRoot, parcelRoot] = await Promise.all([
       callOVC(ref, opts.timeoutMs),
-      callOVC(parcelRef, opts.timeoutMs),
+      callOVC(parcelRef, Math.min(opts.timeoutMs ?? PARCEL_TIMEOUT_MS, PARCEL_TIMEOUT_MS)).catch(() => null),
     ]);
 
     const unitErr = readError(unitRoot);
+    if (unitErr && isCatastroOutage(unitErr.des)) {
+      // Service down (maintenance), not a missing record: report it as a
+      // transient error so it is retried and the cached copy can be used.
+      return failed<CatastroData>(
+        "catastro",
+        `Catastro temporarily down: ${String(unitErr.des).trim()}`,
+      );
+    }
     if (unitErr) {
       return unavailable<CatastroData>(
         "catastro",
@@ -210,7 +228,9 @@ export async function fetchCatastro(
     }
 
     const unit = parseUnit(unitRoot, ref);
-    const parcel = parseParcel(parcelRoot, parcelRef);
+    const parcel: CatastroParcel = parcelRoot
+      ? parseParcel(parcelRoot, parcelRef)
+      : { parcelRef, units: [] };
 
     return ok<CatastroData>("catastro", { unit, parcel });
   } catch (e) {

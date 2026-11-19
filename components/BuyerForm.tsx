@@ -4,6 +4,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { startAnalysisAction } from "@/app/[locale]/actions";
 import { PropertyPicker } from "@/components/PropertyPicker";
 import { AnalyzingScreen } from "@/components/AnalyzingScreen";
+import { RegistryDownNotice } from "@/components/RegistryDownNotice";
 
 export function BuyerForm() {
   const t = useTranslations("form");
@@ -32,6 +33,7 @@ export function BuyerForm() {
       withEmail
       extraHidden={{ locale, source: "buyer" }}
       loadingScreen={<AnalyzingScreen variant="data" />}
+      registryDownNotice={({ address }) => <RegistryDownNotice address={address} />}
     />
   );
 }

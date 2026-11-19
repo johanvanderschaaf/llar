@@ -2114,10 +2114,79 @@ tr.highlight td:last-child {
   margin: 16px 0 0;
   max-width: 60ch;
 }
-.rp .verdict-note {
+/* Free-preview teaser: proof that the price answer exists, not the answer.
+ * Selectors go through .verdict__body so they beat `.verdict__body p`. */
+.rp .verdict__body .teaser {
+  margin: 18px 0 0;
+  padding: 16px 18px;
+  border: 1px dashed var(--pw-ink-100);
+  border-radius: var(--pw-r-lg);
+  background: var(--pw-panel);
+  max-width: 60ch;
+}
+.rp .verdict__body .teaser__blur {
+  display: grid;
+  gap: 9px;
+  filter: blur(3px);
+  user-select: none;
+}
+.rp .verdict__body .teaser__blur span {
+  display: block;
+  height: 11px;
+  border-radius: 6px;
+  background: var(--pw-ink-100);
+}
+.rp .verdict__body .teaser__lock {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin: 14px 0 0;
   font-size: 14px;
   font-weight: 600;
+  line-height: 1.5;
+  color: var(--pw-ink-700);
+}
+.rp .verdict__body .teaser__lock svg {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  margin-top: 3px;
   color: var(--pw-ink-500);
+}
+.rp .verdict__body .teaser__counts {
+  margin: 18px 0 0;
+}
+.rp .verdict__body .teaser__counts-h {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--pw-ink-500);
+  margin: 0 0 10px;
+}
+.rp .verdict__body .teaser__counts ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.rp .verdict__body .teaser__counts li {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  font-size: 14.5px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--pw-ink);
+}
+.rp .verdict__body .teaser__counts li svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  margin-top: 1px;
+  color: var(--pw-blue);
 }
 .rp .verdict__ring {
   display: flex;
@@ -2264,6 +2333,24 @@ tr.highlight td:last-child {
 }
 .rp .scoreband--low .pip {
   background: var(--pw-caution);
+}
+/* Price score in the free preview: its band would give away the price
+ * direction, so a lock sits where the 92px ring would be. */
+.rp .scorecard--locked .scorecard__lock {
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  border: 2px dashed var(--pw-ink-100);
+  display: grid;
+  place-items: center;
+  color: var(--pw-ink-500);
+}
+.rp .scorecard--locked .scorecard__lock svg {
+  width: 24px;
+  height: 24px;
+}
+.rp .scorecard--locked .scoreband--locked {
+  color: var(--pw-ink-500);
 }
 @media (max-width: 880px) {
   .rp .scores {

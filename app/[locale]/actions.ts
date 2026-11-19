@@ -2,12 +2,14 @@
 
 import { redirect } from "next/navigation";
 import { generateReport } from "@/pipeline/generate";
+import { CatastroDownError } from "@/adapters/catastro-outage";
 import { generateNarrative } from "@/pipeline/narrate";
 import { routing } from "@/i18n/routing";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { hasPaidOrder } from "@/lib/orders";
 import { hasAnthropicKey } from "@/lib/anthropic";
+import { needsAiNarrative } from "@/lib/narrative";
 import { getStripe, hasStripe, reportPriceCents, stripeLocale } from "@/lib/stripe";
 import type { ReportInput, ReportRow } from "@/types/db";
 
@@ -47,6 +49,15 @@ export async function startAnalysisAction(formData: FormData) {
   } catch (e) {
     // Never show the buyer a raw 500 — bounce back with a retry message.
     console.error("[startAnalysis] generation failed:", (e as Error)?.message);
+    if (e instanceof CatastroDownError) {
+      // Registry down: offer to email the report when it's back, keeping the
+      // flat they picked (reference + label + asking price, never the email).
+      const q = new URLSearchParams({ error: "registry_down" });
+      if (input.cadastralRef) q.set("ref", input.cadastralRef);
+      if (input.addressOrRef) q.set("label", input.addressOrRef);
+      if (input.askingPriceEur) q.set("ask", String(input.askingPriceEur));
+      redirect(`/${locale}/start?${q}`);
+    }
     redirect(`/${locale}/start?error=generation`);
   }
   redirect(`/${locale}/report/${id}`);
@@ -70,7 +81,7 @@ export async function ensureNarrativeAction(
     .maybeSingle();
   if (!row) return { ok: false };
   const report = row as ReportRow;
-  if (report.data?.verdict?.headline?.en) return { ok: true }; // already generated
+  if (!needsAiNarrative(report.data)) return { ok: true }; // already generated
 
   // Access gate: operator or a paid order.
   const supabase = await createClient();

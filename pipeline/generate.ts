@@ -7,18 +7,26 @@ import {
 } from "@/adapters/catastro";
 import type { AdapterResult, SourceKey } from "@/adapters/types";
 import { createBudget, timed, withDeadline, type Budget } from "./budget";
-import { geocodeRef } from "@/adapters/geo";
+import {
+  fetchParcelPolygon,
+  geocodeRef,
+  type Coordinates,
+  type ParcelPolygon,
+} from "@/adapters/geo";
+import { CatastroDownError } from "@/adapters/catastro-outage";
 import { fetchAmenities, type AmenityData } from "@/adapters/amenities";
 import { fetchUrbanism, type UrbanismData } from "@/adapters/urbanism";
 import { fetchAffectation, type AffectationData } from "@/adapters/affectation";
 import { fetchHeritage, type HeritageData } from "@/adapters/heritage";
+import { buildingYears } from "@/lib/building-years";
 import { fetchEnergy, type EnergyData } from "@/adapters/energy";
 import { fetchIpv } from "@/adapters/ine-ipv";
 import { fetchGencatBarri, type GencatBarriData } from "@/adapters/gencat-barri";
 import { fetchComps, type CompListing } from "@/adapters/idealista";
 import { fetchFlood, type FloodData } from "@/adapters/flood";
 import { computeScores } from "@/config/scoring";
-import { STATIC_RISK_AS_OF } from "@/config/static-risk";
+import { STATIC_RISK_AS_OF, BCN_DISTRICTS } from "@/config/static-risk";
+import { seedFactsNarrative } from "./facts-narrative";
 import {
   emptyReport,
   seedAmenities,
@@ -35,6 +43,7 @@ import {
   seedScores,
   seedUrbanism,
   seedHeritage,
+  seedHeritageUnchecked,
   seedBarriPricing,
   seedPricingUnavailable,
 } from "./template";
@@ -99,36 +108,85 @@ async function geocodeWithRetry(
   return last;
 }
 
-const CACHE_TTL_MS = 1000 * 60 * 60 * 24 * 30; // 30 days
+/*
+ * Cache of Catastro data (source_cache table). Cadastral facts, coordinates and
+ * parcel outlines almost never change, so entries are reused for a year — and
+ * when Catastro is down, an entry of any age is used rather than refusing the
+ * report. Only flats looked up before are covered.
+ */
+const CACHE_TTL_MS = 1000 * 60 * 60 * 24 * 365; // 1 year
 // Bump when the parsed CatastroData shape changes, to auto-invalidate old rows.
 const CATASTRO_CACHE_VERSION = "v2";
+const GEOCODE_CACHE_VERSION = "v1";
+const POLYGON_CACHE_VERSION = "v1";
 // Most Catastro fetch attempts (1 try + retries), if the time budget allows.
 const CATASTRO_ATTEMPTS = 3;
 
-/** Catastro lookup with a 30-day cache keyed by cadastral ref (cost control). */
+interface CacheEntry<T> {
+  payload: T;
+  fetchedAt: string;
+  fresh: boolean;
+}
+
+/** Read a cache entry of any age; `fresh` says whether it is within the TTL. */
+async function readCache<T>(source: string, key: string): Promise<CacheEntry<T> | null> {
+  const db = createAdminClient();
+  const { data } = await db
+    .from("source_cache")
+    .select("payload, fetched_at")
+    .eq("source", source)
+    .eq("cache_key", key)
+    .maybeSingle();
+  if (!data) return null;
+  return {
+    payload: data.payload as T,
+    fetchedAt: data.fetched_at,
+    fresh: Date.now() - new Date(data.fetched_at).getTime() < CACHE_TTL_MS,
+  };
+}
+
+/** Caching is an optimisation: a failed write must not fail the report. */
+async function writeCache(source: string, key: string, payload: unknown, fetchedAt: string) {
+  const db = createAdminClient();
+  await db
+    .from("source_cache")
+    .upsert(
+      { source, cache_key: key, payload, fetched_at: fetchedAt },
+      { onConflict: "source,cache_key" },
+    );
+}
+
+/** A cached copy used because the live source failed, marked for the operator. */
+function fromStaleCache<T>(
+  source: SourceKey,
+  entry: CacheEntry<T>,
+  liveNote: string | undefined,
+): AdapterResult<T> {
+  return {
+    source,
+    status: "ok",
+    data: entry.payload,
+    toVerify: !entry.fresh,
+    fetchedAt: entry.fetchedAt,
+    note: `from cache saved ${entry.fetchedAt.slice(0, 10)}; live lookup failed (${liveNote ?? "error"})`,
+  };
+}
+
+/** Catastro lookup with a 1-year cache keyed by cadastral ref (cost control). */
 async function cachedCatastro(
   ref: string,
   budget: Budget,
 ): Promise<AdapterResult<CatastroData>> {
-  const db = createAdminClient();
   const cacheKey = `${ref}#${CATASTRO_CACHE_VERSION}`;
-  const { data: cached } = await db
-    .from("source_cache")
-    .select("payload, fetched_at")
-    .eq("source", "catastro")
-    .eq("cache_key", cacheKey)
-    .maybeSingle();
+  const cached = await readCache<CatastroData>("catastro", cacheKey);
 
-  if (
-    cached &&
-    Date.now() - new Date(cached.fetched_at).getTime() < CACHE_TTL_MS
-  ) {
+  if (cached?.fresh) {
     return {
       source: "catastro",
       status: "ok",
-      data: cached.payload as CatastroData,
+      data: cached.payload,
       toVerify: false,
-      fetchedAt: cached.fetched_at,
+      fetchedAt: cached.fetchedAt,
       note: "from cache",
     };
   }
@@ -153,18 +211,55 @@ async function cachedCatastro(
     result = await fetchCatastro(ref, { timeoutMs: attemptMs() });
   }
   if (result.status === "ok" && result.data) {
-    // Caching is an optimisation: a failed write must not fail the report.
-    await db.from("source_cache").upsert(
-      {
-        source: "catastro",
-        cache_key: cacheKey,
-        payload: result.data,
-        fetched_at: result.fetchedAt,
-      },
-      { onConflict: "source,cache_key" },
-    );
+    await writeCache("catastro", cacheKey, result.data, result.fetchedAt);
+    return result;
+  }
+  // Catastro down (not "no such record"): an old copy beats refusing the report.
+  if (result.status === "error" && cached) {
+    return fromStaleCache("catastro", cached, result.note);
   }
   return result;
+}
+
+/** Coordinates for a parcel, cached like Catastro (they never move). */
+async function cachedGeocode(
+  ref: string,
+  budget: Budget,
+): Promise<AdapterResult<Coordinates>> {
+  const parcel = ref.slice(0, 14);
+  const key = `${parcel}#${GEOCODE_CACHE_VERSION}`;
+  const cached = await readCache<Coordinates>("geocode", key);
+  if (cached?.fresh) {
+    return { source: "catastro", status: "ok", data: cached.payload, toVerify: false, fetchedAt: cached.fetchedAt, note: "from cache" };
+  }
+  const result = await geocodeWithRetry(ref, budget);
+  if (result.status === "ok" && result.data) {
+    await writeCache("geocode", key, result.data, result.fetchedAt);
+    return result;
+  }
+  return cached ? fromStaleCache("catastro", cached, result.note) : result;
+}
+
+/**
+ * Parcel outline (for whole-parcel planning checks), cached like Catastro.
+ * `null` means no outline: urbanism then checks the single reference point.
+ */
+async function cachedPolygon(parcelRef: string, budget: Budget): Promise<ParcelPolygon | null> {
+  const key = `${parcelRef.slice(0, 14)}#${POLYGON_CACHE_VERSION}`;
+  const cached = await readCache<ParcelPolygon>("parcel-polygon", key);
+  if (cached?.fresh) return cached.payload;
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const live = await Promise.race([
+    fetchParcelPolygon(parcelRef),
+    new Promise<null>((r) => {
+      timer = setTimeout(() => r(null), budget.until(GEO_DEADLINE_MS));
+    }),
+  ]).finally(() => clearTimeout(timer));
+  if (live) {
+    await writeCache("parcel-polygon", key, live, new Date().toISOString());
+    return live;
+  }
+  return cached?.payload ?? null;
 }
 
 /**
@@ -187,10 +282,11 @@ export async function generateReport(input: ReportInput): Promise<string> {
 
   const cat = await timed(() => cachedCatastro(ref, budget));
   // Spine check: never persist (and bill for) a report with no cadastral data.
+  // An outage (status "error", no cached copy) is told apart from an unknown
+  // reference, so the buyer can be offered "we'll email it when it's back".
   if (cat.status !== "ok" || !cat.data) {
-    throw new Error(
-      `Catastro unavailable for "${ref}": ${cat.note ?? cat.status}`,
-    );
+    const msg = `Catastro unavailable for "${ref}": ${cat.note ?? cat.status}`;
+    throw cat.status === "error" ? new CatastroDownError(msg) : new Error(msg);
   }
   const resolvedRef = cat.data.unit.cadastralRef;
   const id = crypto.randomUUID();
@@ -201,7 +297,6 @@ export async function generateReport(input: ReportInput): Promise<string> {
   }
   report = seedPriceRefs(report);
   report = seedCostsTaxes(report, input.askingPriceEur);
-  report = seedBuilding(report, cat.data?.unit.yearBuilt);
   report = seedLegal(report);
 
   // Every source after Catastro must resolve by SOURCES_DEADLINE_MS, or it is
@@ -218,7 +313,8 @@ export async function generateReport(input: ReportInput): Promise<string> {
   // retry loop and earlier deadline, since the geo-dependent sources wait on it.
   const parcelRef = cat.data.parcel.parcelRef ?? resolvedRef;
   const affP = bounded("affectation", () => fetchAffectation(parcelRef));
-  const geoP = timed(() => geocodeWithRetry(resolvedRef, budget));
+  const geoP = timed(() => cachedGeocode(resolvedRef, budget));
+  const polygonP = cachedPolygon(parcelRef, budget);
 
   const [energy, ipv] = await Promise.all([energyP, ipvP]);
   if (energy.status === "ok" && energy.data) {
@@ -248,14 +344,14 @@ export async function generateReport(input: ReportInput): Promise<string> {
   let barri: AdapterResult<GencatBarriData> | null = null;
   const builtM2 = input.builtM2 ?? cat.data?.unit.builtAreaM2;
   {
-    const [geo, aff] = await Promise.all([geoP, affP]);
+    const [geo, aff, polygon] = await Promise.all([geoP, affP, polygonP]);
     affectation = aff;
     const affData = aff.status === "ok" ? aff.data : undefined;
     if (geo.status === "ok" && geo.data) {
       const coords = geo.data;
       [amenities, urbanism, comps, flood, heritage] = await Promise.all([
         bounded("amenities", () => fetchAmenities(coords)),
-        bounded("urbanism", () => fetchUrbanism(coords, { parcelRef })),
+        bounded("urbanism", () => fetchUrbanism(coords, { parcelRef, polygon })),
         bounded("market", () =>
           fetchComps(coords, {
             minSize: builtM2 ? Math.round(builtM2 * 0.6) : undefined,
@@ -263,7 +359,7 @@ export async function generateReport(input: ReportInput): Promise<string> {
           }),
         ),
         bounded("flood", () => fetchFlood(coords)),
-        bounded("heritage", () => fetchHeritage(coords)),
+        bounded("heritage", () => fetchHeritage(coords, { polygon })),
       ]);
       if (amenities.status === "ok" && amenities.data) {
         report = seedAmenities(report, amenities.data);
@@ -276,6 +372,8 @@ export async function generateReport(input: ReportInput): Promise<string> {
       urbanismSeeded = true;
       if (heritage.status === "ok" && heritage.data) {
         report = seedHeritage(report, heritage.data);
+      } else {
+        report = seedHeritageUnchecked(report);
       }
       if (comps.status === "ok" && comps.data && comps.data.length) {
         report = seedComps(report, {
@@ -314,14 +412,25 @@ export async function generateReport(input: ReportInput): Promise<string> {
     // review backstops this, so the buyer must be told).
     if (!urbanismSeeded) {
       report = seedUrbanism(report, EMPTY_URBANISM, affData);
+      // No coordinates, so the heritage catalogue was never queried.
+      report = seedHeritageUnchecked(report);
     }
   }
 
+  // Building section, now that the heritage catalogue may have given the
+  // original build date (Catastro's year can be a full renovation).
+  const years = buildingYears(
+    cat.data?.unit.yearBuilt,
+    heritage?.status === "ok" ? heritage.data?.epoch : undefined,
+  );
+  report = seedBuilding(report, years);
+
   // Risk & Safety: flood (if resolved) + static seismic/radon + district crime.
   report = seedRisks(report, {
-    flood: flood?.data,
+    flood: flood?.status === "ok" ? flood.data : undefined,
+    floodUnchecked: flood?.status !== "ok",
     districtCode: cat.data?.unit.districtCode,
-    yearBuilt: cat.data?.unit.yearBuilt,
+    yearBuilt: years.ageYear,
   });
 
   // Deterministic "Sources & method" + disclaimer (reflects comps presence).
@@ -352,6 +461,37 @@ export async function generateReport(input: ReportInput): Promise<string> {
     overall,
     { year: yearBuilt, energyClass, amenities: amenities?.data, deltaPct },
   );
+
+  // Fact-based bottom line, subtitle, neighbourhood prose, negotiation
+  // playbook and checklist, so they exist in every report (free preview
+  // included). The AI narrative, when it runs after unlock, overwrites them.
+  report = seedFactsNarrative(report, {
+    builtM2,
+    // Original build year when the catalogue has one; Catastro's otherwise.
+    yearBuilt: years.ageYear,
+    renovatedYear: years.original ? years.effective : undefined,
+    yearLabel: years.originalLabel,
+    barri: report.price.pricing?.barri?.name,
+    district: cat.data.unit.districtCode ? BCN_DISTRICTS[cat.data.unit.districtCode] : undefined,
+    askingPriceEur: input.askingPriceEur,
+    energyClass,
+    // "unavailable" = ICAEN answered: no certificate is registered.
+    energyChecked: energy.status !== "error",
+    affectation: {
+      checked: affectation?.status === "ok",
+      category: affectation?.status === "ok" ? affectation.data?.category : undefined,
+    },
+    heritage: {
+      checked: heritage?.status === "ok",
+      level: heritage?.status === "ok" ? heritage.data?.level : undefined,
+      inEnsemble: heritage?.status === "ok" ? heritage.data?.inEnsemble : undefined,
+    },
+    flood: {
+      checked: flood?.status === "ok",
+      level: flood?.status === "ok" ? flood.data?.level : undefined,
+    },
+    amenities: amenities?.status === "ok" ? amenities.data : undefined,
+  });
 
   // Single write, with the complete data. Checked: a silent failure here used to
   // leave the buyer on a report page with nothing in it.

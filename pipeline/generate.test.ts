@@ -15,15 +15,27 @@ const db = vi.hoisted(() => ({
   inserts: [] as Array<{ table: string; row: Record<string, unknown> }>,
   upserts: [] as Array<{ table: string; rows: unknown }>,
   insertError: null as null | { message: string },
+  /** source_cache rows, keyed "source|cache_key". */
+  cache: new Map<string, { payload: unknown; fetched_at: string }>(),
 }));
 
 vi.mock("@/lib/supabase/admin", () => ({
   createAdminClient: () => ({
     from: (table: string) => {
+      const filters: Record<string, unknown> = {};
       const query = {
         select: () => query,
-        eq: () => query,
-        maybeSingle: async () => ({ data: null, error: null }),
+        eq: (col: string, val: unknown) => {
+          filters[col] = val;
+          return query;
+        },
+        maybeSingle: async () => ({
+          data:
+            table === "source_cache"
+              ? (db.cache.get(`${filters.source}|${filters.cache_key}`) ?? null)
+              : null,
+          error: null,
+        }),
       };
       return {
         ...query,
@@ -44,6 +56,7 @@ vi.mock("@/lib/supabase/admin", () => ({
 const src = vi.hoisted(() => ({
   catastro: vi.fn(),
   geocode: vi.fn(),
+  polygon: vi.fn(),
   energy: vi.fn(),
   ipv: vi.fn(),
   affectation: vi.fn(),
@@ -59,7 +72,10 @@ vi.mock("@/adapters/catastro", async (orig) => ({
   ...(await orig<typeof import("@/adapters/catastro")>()),
   fetchCatastro: src.catastro,
 }));
-vi.mock("@/adapters/geo", () => ({ geocodeRef: src.geocode }));
+vi.mock("@/adapters/geo", () => ({
+  geocodeRef: src.geocode,
+  fetchParcelPolygon: src.polygon,
+}));
 vi.mock("@/adapters/energy", () => ({ fetchEnergy: src.energy }));
 vi.mock("@/adapters/ine-ipv", () => ({ fetchIpv: src.ipv }));
 vi.mock("@/adapters/affectation", () => ({ fetchAffectation: src.affectation }));
@@ -71,6 +87,7 @@ vi.mock("@/adapters/heritage", () => ({ fetchHeritage: src.heritage }));
 vi.mock("@/adapters/gencat-barri", () => ({ fetchGencatBarri: src.barri }));
 
 import { generateReport } from "./generate";
+import { CatastroDownError } from "@/adapters/catastro-outage";
 
 const REF = "9648812DF2894H0013RQ";
 const CATASTRO: CatastroData = {
@@ -102,7 +119,9 @@ beforeEach(() => {
   db.inserts.length = 0;
   db.upserts.length = 0;
   db.insertError = null;
+  db.cache.clear();
   for (const fn of Object.values(src)) fn.mockReset();
+  src.polygon.mockResolvedValue(null);
   src.catastro.mockResolvedValue(ok("catastro", CATASTRO));
   allSecondarySourcesDown();
 });
@@ -122,6 +141,19 @@ describe("generateReport — reliability", () => {
     expect(data.urbanism.items.length).toBeGreaterThan(0);
     // A failing geocoder is retried once, not hammered until the deadline.
     expect(src.geocode).toHaveBeenCalledTimes(2);
+    // Prose sections exist without the AI, and unchecked heritage is flagged.
+    const full = saved?.row.data as {
+      verdict: { headline: { en: string } };
+      negotiation: { items: unknown[] };
+      checklist: unknown[];
+      narrative: { source: string };
+      urbanism: { items: Array<{ key: string; tone: string }> };
+    };
+    expect(full.verdict.headline.en).toMatch(/flat in/);
+    expect(full.negotiation.items.length).toBeGreaterThan(0);
+    expect(full.checklist.length).toBeGreaterThanOrEqual(5);
+    expect(full.narrative.source).toBe("facts");
+    expect(full.urbanism.items.find((i) => i.key === "heritage")?.tone).toBe("check");
   });
 
   it("saves nothing when Catastro is down, after retrying", async () => {
@@ -149,7 +181,7 @@ describe("generateReport — reliability", () => {
   });
 
   it("finishes within the time budget when sources hang", async () => {
-    vi.useFakeTimers();
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date", "performance"] });
     src.geocode.mockResolvedValue(ok("catastro", { lat: 41.4, lon: 2.16 }));
     src.energy.mockImplementation(() => hang());
     src.affectation.mockImplementation(() => hang());
@@ -180,7 +212,7 @@ describe("generateReport — reliability", () => {
   });
 
   it("stops retrying Catastro when the budget runs out", async () => {
-    vi.useFakeTimers();
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date", "performance"] });
     // Each attempt hangs until its own timeout, like a dead server would.
     src.catastro.mockImplementation(
       (_ref: string, opts: { timeoutMs: number }) =>
@@ -196,5 +228,55 @@ describe("generateReport — reliability", () => {
     // 10s + 10s + the remaining 4s: all three attempts fit inside 24s.
     const timeouts = src.catastro.mock.calls.map((c) => c[1].timeoutMs);
     expect(timeouts).toEqual([10_000, 10_000, 4_000]);
+  });
+
+  it("uses an old cached copy when Catastro is down", async () => {
+    src.catastro.mockResolvedValue(failed("catastro", "Catastro temporarily down: problemas tecnicos"));
+    db.cache.set(`catastro|${REF}#v2`, { payload: CATASTRO, fetched_at: "2024-01-01T00:00:00Z" });
+    db.cache.set(`geocode|${REF.slice(0, 14)}#v1`, {
+      payload: { lat: 41.4, lon: 2.16 },
+      fetched_at: "2024-01-01T00:00:00Z",
+    });
+    src.amenities.mockResolvedValue(unavailable("amenities", "x"));
+    src.urbanism.mockResolvedValue(unavailable("urbanism", "x"));
+    src.comps.mockResolvedValue(unavailable("market", "x"));
+    src.flood.mockResolvedValue(unavailable("flood", "x"));
+    src.heritage.mockResolvedValue(unavailable("heritage", "x"));
+
+    await generateReport({ addressOrRef: REF, source: "buyer" });
+
+    expect(savedReport()).toBeDefined();
+    const sources = db.upserts.find((u) => u.table === "report_sources")?.rows as Array<{
+      source: string;
+      note: string;
+      to_verify: boolean;
+    }>;
+    const cat = sources.find((s) => s.source === "catastro");
+    expect(cat?.note).toMatch(/from cache saved 2024-01-01/);
+    // Older than the cache lifetime, so flagged.
+    expect(cat?.to_verify).toBe(true);
+    // Coordinates came from the cache too, so the geo sources still ran.
+    expect(src.amenities).toHaveBeenCalled();
+  });
+
+  it("uses a fresh cached copy without calling Catastro", async () => {
+    db.cache.set(`catastro|${REF}#v2`, { payload: CATASTRO, fetched_at: new Date().toISOString() });
+    await generateReport({ addressOrRef: REF, source: "buyer" });
+    expect(src.catastro).not.toHaveBeenCalled();
+    expect(savedReport()).toBeDefined();
+  });
+
+  it("raises CatastroDownError for an outage with nothing cached", async () => {
+    src.catastro.mockResolvedValue(failed("catastro", "Catastro temporarily down: problemas tecnicos"));
+    await expect(generateReport({ addressOrRef: REF, source: "buyer" })).rejects.toBeInstanceOf(
+      CatastroDownError,
+    );
+  });
+
+  it("raises a plain error (not an outage) for an unknown reference", async () => {
+    src.catastro.mockResolvedValue(unavailable("catastro", "no record"));
+    const err = await generateReport({ addressOrRef: REF, source: "buyer" }).catch((e) => e);
+    expect(err).toBeInstanceOf(Error);
+    expect(err).not.toBeInstanceOf(CatastroDownError);
   });
 });

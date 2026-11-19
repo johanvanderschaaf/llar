@@ -1,9 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
+  // useSearchParams needs a Suspense boundary in the App Router.
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
+  );
+}
+
+function LoginForm() {
+  // Set by /auth/callback when a link couldn't be used. Without this the page
+  // silently showed the form again and looked like nothing had happened.
+  const linkFailed = useSearchParams().get("error") === "link";
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -31,10 +44,18 @@ export default function LoginPage() {
       {sent ? (
         <p style={{ color: "var(--ink-soft)" }}>
           Check <strong>{email}</strong> for a magic link. Open it in this
-          browser to sign in.
+          browser to sign in: copy the link and paste it into this
+          browser&apos;s address bar, rather than clicking it in your email.
         </p>
       ) : (
         <form onSubmit={handleSubmit} style={{ display: "grid", gap: 12 }}>
+          {linkFailed ? (
+            <p style={{ color: "var(--low)", fontSize: 14 }}>
+              That sign-in link didn&apos;t work. A link works once, and only in
+              the browser that requested it. Send a new one and open it here,
+              in this same browser.
+            </p>
+          ) : null}
           <p style={{ color: "var(--ink-soft)", fontSize: 14 }}>
             Enter your operator email; we&apos;ll send a sign-in link.
           </p>

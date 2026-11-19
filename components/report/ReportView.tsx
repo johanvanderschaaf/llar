@@ -4,6 +4,7 @@ import type { Report, Fact, Localized, NegReason, TermDef } from "@/types/report
 import { bandFor } from "@/config/scoring";
 import { pricing } from "@/config/brand";
 import { L } from "@/lib/localized";
+import { buildPreviewTeaser } from "@/pipeline/facts-narrative";
 import { reportPriceEur } from "@/lib/stripe";
 import { brand } from "@/config/brand";
 import { UnlockButton } from "./UnlockButton";
@@ -303,6 +304,28 @@ export async function ReportView({
 
   const sourceChips = t.raw("rep.sourceChips") as string[];
 
+  // Free preview: the price answer (gap, direction, the price score) stays
+  // behind the paywall and is never rendered into the preview's HTML. The
+  // preview proves the answer exists (how many registered sales we compared
+  // against) and counts what the full report holds. Serious risks stay free,
+  // in the alerts above.
+  const teaser = preview ? buildPreviewTeaser(report) : null;
+  const heroMeta = preview
+    ? report.hero.meta.filter((m) => m.labelKey !== "meta.vsMarket")
+    : report.hero.meta;
+  const teaserCounts = preview
+    ? [
+        { key: "negotiation", n: report.negotiation?.items?.length ?? 0 },
+        { key: "documents", n: report.legal?.items?.length ?? 0 },
+        { key: "checks", n: report.checklist?.length ?? 0 },
+      ].filter((c) => c.n > 0)
+    : [];
+  const teaserLocked = !report.price.pricing?.barri
+    ? "rep.teaser.lockedGeneric"
+    : report.price.pricing.asking
+      ? "rep.teaser.locked"
+      : "rep.teaser.lockedNoAsking";
+
   return (
     <div className="rp">
       {/* print-only brand header (shown only in the PDF) */}
@@ -328,7 +351,7 @@ export async function ReportView({
           <p className="r-hero__floor fig">{L(report.hero.floorLabel, locale)}</p>
           <p className="r-hero__sub">{L(report.hero.sub, locale)}</p>
           <div className="metastrip">
-            {report.hero.meta.map((m) => (
+            {heroMeta.map((m) => (
               <div className="metastrip__cell" key={m.labelKey}>
                 <div className="metastrip__k">{t(m.labelKey)}</div>
                 <div className="metastrip__v fig">{L(m.value, locale)}</div>
@@ -372,11 +395,42 @@ export async function ReportView({
                 <span className="dot" />
                 <span>{t("rep.verdictEyebrow")}</span>
               </p>
-              <h2>{L(report.verdict.headline, locale)}</h2>
-              <p>{L(report.verdict.body, locale)}</p>
-              {preview ? (
-                <p className="verdict-note">{t("rep.verdictPreviewNote")}</p>
-              ) : null}
+              {teaser ? (
+                <>
+                  <h2>{L(teaser.question, locale)}</h2>
+                  <p>{L(teaser.proof, locale)}</p>
+                  <div className="teaser">
+                    {/* Placeholder bars, not real text: the answer is not in the page. */}
+                    <div className="teaser__blur" aria-hidden="true">
+                      <span style={{ width: "96%" }} />
+                      <span style={{ width: "88%" }} />
+                      <span style={{ width: "62%" }} />
+                    </div>
+                    <p className="teaser__lock">
+                      <IcLock />
+                      {t(teaserLocked)}
+                    </p>
+                  </div>
+                  {teaserCounts.length ? (
+                    <div className="teaser__counts">
+                      <p className="teaser__counts-h">{t("rep.teaser.countsHead")}</p>
+                      <ul>
+                        {teaserCounts.map((c) => (
+                          <li key={c.key}>
+                            <IcCheck />
+                            {t(`rep.teaser.${c.key}`, { n: c.n })}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : null}
+                </>
+              ) : (
+                <>
+                  <h2>{L(report.verdict.headline, locale)}</h2>
+                  <p>{L(report.verdict.body, locale)}</p>
+                </>
+              )}
             </div>
             <div className="verdict__ring">
               <Ring value={overall} size="lg" suffix={t("rep.ringOf")} />
@@ -395,6 +449,19 @@ export async function ReportView({
           />
           <div className="scores fx">
             {report.scores.map((s) => {
+              if (preview && s.key === "price") {
+                // The price score's band (green/amber/red) would give away the
+                // price direction, so the preview shows a lock in its place.
+                return (
+                  <div className="scorecard scorecard--locked" key={s.key}>
+                    <span className="scorecard__lock">
+                      <IcLock />
+                    </span>
+                    <div className="scorecard__label">{t(`scoreNames.${s.key}`)}</div>
+                    <span className="scoreband scoreband--locked">{t("rep.teaser.priceLocked")}</span>
+                  </div>
+                );
+              }
               const band = bandFor(s.value);
               const cap = band === "good" ? "Good" : band === "ok" ? "Ok" : "Low";
               return (

@@ -34,6 +34,17 @@ export interface ParcelPolygon {
   centroid: [number, number];
 }
 
+/** Ray-casting point-in-polygon test (ring in the same CRS as the point). */
+export function pointInRing(pt: [number, number], ring: Array<[number, number]>): boolean {
+  let c = false;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const [xi, yi] = ring[i];
+    const [xj, yj] = ring[j];
+    if (yi > pt[1] !== yj > pt[1] && pt[0] < ((xj - xi) * (pt[1] - yi)) / (yj - yi) + xi) c = !c;
+  }
+  return c;
+}
+
 /** Area-weighted polygon centroid; falls back to the vertex mean if degenerate. */
 function polygonCentroid(ring: Array<[number, number]>): [number, number] {
   let a = 0;

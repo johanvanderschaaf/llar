@@ -1,5 +1,6 @@
 import { XMLParser } from "fast-xml-parser";
 import { fetchWithTimeout } from "./types";
+import { CatastroDownError, isCatastroOutage } from "./catastro-outage";
 
 /**
  * Catastro address-search services (OVCCallejero), Barcelona-scoped.
@@ -24,6 +25,32 @@ const parser = new XMLParser({
 function toArray<T>(v: T | T[] | undefined): T[] {
   if (v === undefined || v === null) return [];
   return Array.isArray(v) ? v : [v];
+}
+
+/**
+ * Fetch an OVC search URL, throwing CatastroDownError when the service is
+ * unreachable, answers with an HTTP error, or reports an outage in its body.
+ * A genuine "nothing found" still comes back as a normal parsed response.
+ */
+async function fetchOvc(url: string): Promise<Record<string, unknown>> {
+  let res: Response;
+  try {
+    res = await fetchWithTimeout(url, 15000);
+  } catch (e) {
+    throw new CatastroDownError(`Catastro unreachable: ${(e as Error).message}`);
+  }
+  if (!res.ok) throw new CatastroDownError(`Catastro HTTP ${res.status}`);
+  const root = parser.parse(await res.text()) as Record<string, unknown>;
+  const body = (root.consulta_callejero ?? root.consulta_dnp) as
+    | Record<string, unknown>
+    | undefined;
+  const err = toArray(
+    (body?.lerr as Record<string, unknown> | undefined)?.err,
+  )[0] as Record<string, unknown> | undefined;
+  if (isCatastroOutage(err?.des)) {
+    throw new CatastroDownError(`Catastro down: ${String(err?.des).trim()}`);
+  }
+  return root;
 }
 
 export interface StreetMatch {
@@ -89,6 +116,7 @@ export interface UnitMatch {
   door?: string;
 }
 
+/** Streets matching `q`. Throws CatastroDownError when Catastro is down. */
 export async function searchStreets(q: string): Promise<StreetMatch[]> {
   const term = streetNameQuery(q);
   if (term.length < 2) return [];
@@ -97,9 +125,7 @@ export async function searchStreets(q: string): Promise<StreetMatch[]> {
   )}&Municipio=${encodeURIComponent(MUNI)}&TipoVia=&NombreVia=${encodeURIComponent(
     term,
   )}`;
-  const res = await fetchWithTimeout(url, 15000);
-  if (!res.ok) return [];
-  const root = parser.parse(await res.text()) as Record<string, unknown>;
+  const root = await fetchOvc(url);
   const cj = (root.consulta_callejero as Record<string, unknown>)?.callejero as
     | Record<string, unknown>
     | undefined;
@@ -124,6 +150,7 @@ export async function searchStreets(q: string): Promise<StreetMatch[]> {
     .slice(0, 12);
 }
 
+/** Units at a street + number. Throws CatastroDownError when Catastro is down. */
 export async function locateUnits(
   tipo: string,
   nombre: string,
@@ -136,11 +163,9 @@ export async function locateUnits(
     `&Calle=${encodeURIComponent(nombre)}` +
     `&Numero=${encodeURIComponent(numero)}` +
     `&Bloque=&Escalera=&Planta=&Puerta=`;
-  const res = await fetchWithTimeout(url, 15000);
-  if (!res.ok) return [];
-  const root = (
-    parser.parse(await res.text()) as Record<string, unknown>
-  ).consulta_dnp as Record<string, unknown> | undefined;
+  const root = (await fetchOvc(url)).consulta_dnp as
+    | Record<string, unknown>
+    | undefined;
   if (!root) return [];
 
   // Catastro error (e.g. no record at that number).

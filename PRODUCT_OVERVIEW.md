@@ -184,7 +184,7 @@ adapters degrade gracefully: a missing source becomes "unavailable," never a cra
 | **Gencat Habitatge** | barri closing €/m² (notarial deeds, second-hand) | High but **coarse** — barri-level, 73 barris only, quarterly |
 | **ICAEN** | energy certificate A–G | High when present; **coverage is sparse** |
 | **ACA / SNCZI** | flood T10/T100/T500 | High — point-queried rasters |
-| **OSM / Overpass** | amenities, transport | Medium — public mirrors are flaky; raced at 8s timeout |
+| **Ajuntament BCN open data** (local file) | amenities, transport | High: official, no network at report time; refreshed monthly |
 | **INE IPV** | Catalonia price index | Low resolution — only a footnote when barri data is missing |
 | **Idealista API** | comparable listings | **Not provisioned** — usually empty |
 | **Live deep links** (Idealista/Fotocasa/Habitaclia) | "see similar listings" | Built but **not currently rendered** |

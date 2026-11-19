@@ -112,7 +112,8 @@ def fetch_gencat_prices() -> dict:
             "name": str(nom).strip(),
             "transactions": int(tx) if tx is not None else None,
             "avgSurfaceM2": round(surf, 1) if surf is not None else None,
-            "pricePerM2": round(ppm) if ppm is not None else None,
+            # 0 means "no figure" (low volume), never a real price.
+            "pricePerM2": round(ppm) if ppm else None,
         }
     print(f"[gencat] parsed {len(rows)} barris")
     return {
@@ -185,14 +186,45 @@ def fetch_barri_polygons() -> dict:
 
 # ---------- main ----------
 
-def main() -> None:
+def check(prices: dict, polys: dict) -> list[str]:
+    """
+    Reasons the new data looks broken, if any. Runs before anything is written
+    (this script also runs unattended in .github/workflows/refresh-data.yml),
+    so a changed spreadsheet layout can't silently replace good prices.
+    """
+    problems = []
+    rows = prices["byBarri"]
+    priced = sum(1 for r in rows.values() if r["pricePerM2"])
+    if len(rows) != 73:
+        problems.append(f"expected 73 barris in the Gencat sheet, parsed {len(rows)}")
+    if priced < 50:
+        problems.append(f"only {priced} barris have a €/m² (expected 50+)")
+    bad = [r["name"] for r in rows.values() if r["pricePerM2"] and not 1000 <= r["pricePerM2"] <= 20000]
+    if bad:
+        problems.append(f"implausible €/m² for: {', '.join(bad[:5])}")
+    if len(polys["features"]) != 73:
+        problems.append(f"expected 73 barri polygons, got {len(polys['features'])}")
+    current = DATA / "bcn-barri-prices.json"
+    if current.exists():
+        old = json.loads(current.read_text(encoding="utf-8"))
+        old_priced = sum(1 for r in old["byBarri"].values() if r.get("pricePerM2"))
+        if priced < old_priced - 10:
+            problems.append(f"{priced} priced barris vs {old_priced} in the current file")
+    return problems
+
+
+def main() -> int:
     DATA.mkdir(exist_ok=True)
     prices = fetch_gencat_prices()
+    polys = fetch_barri_polygons()
+    problems = check(prices, polys)
+    if problems:
+        print("REFUSING TO WRITE, data looks wrong:\n  " + "\n  ".join(problems), file=sys.stderr)
+        return 1
     (DATA / "bcn-barri-prices.json").write_text(
         json.dumps(prices, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )
-    polys = fetch_barri_polygons()
     (DATA / "bcn-barris.json").write_text(
         json.dumps(polys, ensure_ascii=False, separators=(",", ":")) + "\n",
         encoding="utf-8",
@@ -200,6 +232,7 @@ def main() -> None:
     print("\nWrote:")
     print(f"  {DATA / 'bcn-barri-prices.json'}")
     print(f"  {DATA / 'bcn-barris.json'}")
+    return 0
 
 
 if __name__ == "__main__":
