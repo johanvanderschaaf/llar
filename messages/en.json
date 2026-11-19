@@ -508,7 +508,7 @@
         "documents": "{docs} documents to ask the seller for, and {checks} checks before you offer",
         "findings": "What each finding above means, and what to do about it",
         "neighbourhood": "The neighbourhood: transport, schools, shops and parks",
-        "scores": "Exact scores, with the reasons behind them"
+        "scores": "The overall score and the exact scores, with the reasons behind them"
       }
     },
     "docs": [

@@ -508,7 +508,7 @@
         "documents": "{docs} documentos que pedir al vendedor y {checks} comprobaciones antes de ofertar",
         "findings": "Qué significa cada hallazgo anterior y qué hacer al respecto",
         "neighbourhood": "El barrio: transporte, escuelas, comercios y parques",
-        "scores": "Puntuaciones exactas, con sus motivos"
+        "scores": "La puntuación global y las puntuaciones exactas, con sus motivos"
       }
     },
     "docs": [

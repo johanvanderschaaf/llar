@@ -575,10 +575,15 @@ export async function ReportView({
                 </>
               )}
             </div>
-            <div className="verdict__ring">
-              <Ring value={overall} size="lg" suffix={t("rep.ringOf")} bandLabel={preview ? bandText(overall) : undefined} />
-              <p className="verdict__caption">{t("rep.overallCaption")}</p>
-            </div>
+            {/* No overall score in the free preview: it includes the price score,
+                so even its band (next to the other bands) hints at the price,
+                and the price answer is the reason to pay. */}
+            {preview ? null : (
+              <div className="verdict__ring">
+                <Ring value={overall} size="lg" suffix={t("rep.ringOf")} />
+                <p className="verdict__caption">{t("rep.overallCaption")}</p>
+              </div>
+            )}
           </div>
         </section>
 

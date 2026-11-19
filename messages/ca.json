@@ -508,7 +508,7 @@
         "documents": "{docs} documents que cal demanar al venedor i {checks} comprovacions abans de fer una oferta",
         "findings": "Què significa cada troballa anterior i què cal fer-hi",
         "neighbourhood": "El barri: transport, escoles, comerços i parcs",
-        "scores": "Puntuacions exactes, amb els motius"
+        "scores": "La puntuació global i les puntuacions exactes, amb els motius"
       }
     },
     "docs": [

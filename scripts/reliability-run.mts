@@ -96,6 +96,8 @@ async function checkPreview(id: string, report: Report): Promise<string[] | null
   if (p?.deltaPct != null && html.includes(`${p.deltaPct > 0 ? "+" : ""}${p.deltaPct.toFixed(1)}%`))
     out.push("preview leaks the vs-market pill");
   if (/\b(below|above) the neighbourhood average/.test(html)) out.push("preview leaks the price direction");
+  if (html.includes("verdict__ring")) out.push("preview shows the overall score (it hints at the price)");
+  if (/rng__txt"><b class="fig"/.test(html)) out.push("preview shows a score number");
   if (report.scores?.some((s) => s.key === "price") && !html.includes("scorecard--locked"))
     out.push("preview shows the price score");
   return out;
