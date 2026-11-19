@@ -320,7 +320,11 @@ export interface Report {
    * "ai" = the AI narrative. Reports stored before this field existed have
    * none; for them an empty bottom line means "not narrated yet".
    */
-  narrative?: { source: "facts" | "ai" };
+  narrative?: {
+    source: "facts" | "ai";
+    /** AI fields that failed pipeline/narrative-guard.ts and kept the fact-based text. */
+    factsKept?: string[];
+  };
 
   // --- footer ---
   footer: {
