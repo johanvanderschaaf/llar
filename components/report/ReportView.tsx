@@ -275,6 +275,132 @@ function reasonParts(r: NegReason | Localized): { title?: Localized; desc: Local
   return { desc: r as Localized };
 }
 
+/* ---------- key facts + official-records checks ---------- */
+
+type T = Awaited<ReturnType<typeof getTranslations>>;
+const factValue = (report: Report, key: string) =>
+  report.snapshot.facts.find((f) => f.labelKey === key)?.value;
+const firstYear = (v?: Localized | string) =>
+  Number((typeof v === "string" ? v : v?.en)?.match(/\b(1[2-9]\d{2}|20\d{2})\b/)?.[1]) || undefined;
+
+/**
+ * The top key-facts strip. Always size and year (from the snapshot, so it also
+ * works for stored reports), plus asking, €/m², energy and the vs-market pill
+ * when the report has them. The pill is paid: it gives the price answer away.
+ */
+function keyFacts(report: Report, preview: boolean): Report["hero"]["meta"] {
+  const meta = new Map(report.hero.meta.map((m) => [m.labelKey, m]));
+  const size = factValue(report, "snapshot.builtArea");
+  const year = factValue(report, "snapshot.yearBuilt");
+  const out: Report["hero"]["meta"] = [];
+  const add = (m?: Report["hero"]["meta"][number]) => m && out.push(m);
+  add(meta.get("meta.asking"));
+  add(meta.get("meta.pricePerM2"));
+  add(meta.get("meta.size") ?? (size ? { labelKey: "meta.size", value: size } : undefined));
+  add(meta.get("meta.built") ?? (year ? { labelKey: "meta.built", value: year } : undefined));
+  add(meta.get("meta.energy"));
+  if (!preview) add(meta.get("meta.vsMarket"));
+  return out;
+}
+
+type RecordTone = "clear" | "check" | "caution" | "info" | "locked";
+interface RecordRow {
+  key: string;
+  tone: RecordTone;
+  label: string;
+  status: string;
+}
+
+/**
+ * "What the official records say": one status line per official check, built
+ * from the report's own rows so stored reports get it too. Free in the preview
+ * except the price row, which is the paid answer.
+ */
+function recordRows(report: Report, preview: boolean, locale: string, t: T): RecordRow[] {
+  const rows: RecordRow[] = [];
+  const item = (k: string) => report.urbanism?.items?.find((i) => i.key === k);
+  const risk = (k: string) => report.risks?.find((r) => r.labelKey === k);
+  const toTone = (x: string): RecordTone =>
+    x === "caution" ? "caution" : x === "check" ? "check" : x === "clear" ? "clear" : "info";
+
+  const aff = item("affectation");
+  if (aff)
+    rows.push({
+      key: "planning",
+      tone: toTone(aff.tone),
+      label: t("rep.records.planning"),
+      status: aff.tone === "clear" ? t("rep.records.planningClear") : aff.tag ? L(aff.tag, locale) : "",
+    });
+
+  const her = item("heritage");
+  if (her) {
+    const listed = /Nivell/.test(her.tag?.en ?? "");
+    const unchecked = /Not checked/.test(her.tag?.en ?? "");
+    rows.push({
+      key: "heritage",
+      tone: listed ? toTone(her.tone) : unchecked ? "check" : her.tone === "info" && /ensemble/i.test(her.tag?.en ?? "") ? "info" : "clear",
+      label: t("rep.records.heritage"),
+      status: her.tag ? L(her.tag, locale) : "",
+    });
+  }
+
+  const flood = risk("risk.flood");
+  if (flood) {
+    const d = flood.detail.en;
+    const [tone, k]: [RecordTone, string] = /couldn't be checked/.test(d)
+      ? ["check", "floodUnchecked"]
+      : /T10\b/.test(d)
+        ? ["caution", "floodHigh"]
+        : /T100/.test(d)
+          ? ["check", "floodMedium"]
+          : ["clear", "floodNone"];
+    rows.push({ key: "flood", tone, label: t("rep.records.flood"), status: t(`rep.records.${k}`) });
+  }
+
+  const year = firstYear(factValue(report, "snapshot.yearBuilt"));
+  const ite = risk("risk.ite");
+  if (ite) {
+    const age = Number(ite.detail.en.match(/^(\d+)-year/)?.[1]);
+    rows.push({ key: "ite", tone: "check", label: t("rep.records.ite"), status: age ? t("rep.records.iteDue", { age }) : t("rep.records.iteDueNoAge") });
+  } else if (year) {
+    rows.push({ key: "ite", tone: "clear", label: t("rep.records.ite"), status: t("rep.records.iteNotDue") });
+  }
+  if (risk("risk.asbestos")) rows.push({ key: "asbestos", tone: "check", label: t("rep.records.asbestos"), status: t("rep.records.asbestosPossible") });
+  else if (year) rows.push({ key: "asbestos", tone: "clear", label: t("rep.records.asbestos"), status: t("rep.records.asbestosUnlikely") });
+
+  const energy = report.hero.meta.find((m) => m.labelKey === "meta.energy");
+  if (energy) {
+    const v = L(energy.value, locale);
+    const cls = typeof energy.value === "string" ? energy.value : energy.value.en;
+    const certified = /class/i.test(cls);
+    rows.push({
+      key: "energy",
+      tone: !certified ? "check" : /\b[FG]\b/.test(cls) ? "check" : "clear",
+      label: t("rep.records.energy"),
+      status: certified ? t("rep.records.energyClass", { cls: v }) : t("rep.records.energyNone"),
+    });
+  }
+
+  const p = report.price.pricing;
+  if (p?.barri) {
+    rows.push(
+      preview
+        ? { key: "price", tone: "locked", label: t("rep.records.price"), status: t("rep.records.priceLocked", { n: p.barri.transactions ?? 0 }) }
+        : { key: "price", tone: "info", label: t("rep.records.price"), status: L(p.chip.text, locale) },
+    );
+  } else {
+    rows.push({ key: "price", tone: "check", label: t("rep.records.price"), status: t("rep.records.priceNone") });
+  }
+  return rows;
+}
+
+function RecordIcon({ tone }: { tone: RecordTone }) {
+  if (tone === "locked") return <IcLock />;
+  if (tone === "caution") return <IcTriangle />;
+  if (tone === "clear") return <IcCheck />;
+  return <IcInfo />;
+}
+
 /* ---------- main view ---------- */
 
 export async function ReportView({
@@ -310,16 +436,30 @@ export async function ReportView({
   // against) and counts what the full report holds. Serious risks stay free,
   // in the alerts above.
   const teaser = preview ? buildPreviewTeaser(report) : null;
-  const heroMeta = preview
-    ? report.hero.meta.filter((m) => m.labelKey !== "meta.vsMarket")
-    : report.hero.meta;
-  const teaserCounts = preview
-    ? [
-        { key: "negotiation", n: report.negotiation?.items?.length ?? 0 },
-        { key: "documents", n: report.legal?.items?.length ?? 0 },
-        { key: "checks", n: report.checklist?.length ?? 0 },
-      ].filter((c) => c.n > 0)
-    : [];
+  const heroMeta = keyFacts(report, preview);
+  const records = recordRows(report, preview, locale, t);
+  const bandText = (v: number) => {
+    const b = bandFor(v);
+    return t(`rep.bandShort${b === "good" ? "Good" : b === "ok" ? "Ok" : "Low"}`);
+  };
+  // What the full report answers, with this flat's own counts.
+  const p = report.price.pricing;
+  const nNeg = report.negotiation?.items?.length ?? 0;
+  const nDocs = report.legal?.items?.length ?? 0;
+  const nChecks = report.checklist?.length ?? 0;
+  const gateItems = [
+    p?.barri
+      ? p.asking
+        ? t("rep.gate.answers.price", { n: p.barri.transactions ?? 0 })
+        : t("rep.gate.answers.priceNoAsking")
+      : null,
+    nNeg ? t("rep.gate.answers.negotiation", { n: nNeg }) : null,
+    t("rep.gate.answers.costs"),
+    nDocs || nChecks ? t("rep.gate.answers.documents", { docs: nDocs, checks: nChecks }) : null,
+    t("rep.gate.answers.findings"),
+    t("rep.gate.answers.neighbourhood"),
+    t("rep.gate.answers.scores"),
+  ].filter((x): x is string => Boolean(x));
   const teaserLocked = !report.price.pricing?.barri
     ? "rep.teaser.lockedGeneric"
     : report.price.pricing.asking
@@ -387,13 +527,29 @@ export async function ReportView({
           </section>
         ) : null}
 
+        {preview ? (<>
+        {/* ===================== OFFICIAL RECORDS (both states) ===================== */}
+        <section className="r-main r-sec" aria-label={t("rep.records.head")}>
+          <SectionHead label={t("rep.records.eyebrow")} head={t("rep.records.head")} lede={t("rep.records.lede", { date: dateFmt })} />
+          <ul className="records fx">
+            {records.map((r) => (
+              <li className={`record record--${r.tone}`} key={r.key}>
+                <span className="record__ic"><RecordIcon tone={r.tone} /></span>
+                <span className="record__k">{r.label}</span>
+                <span className="record__v">{r.status}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+        </>) : null}
+
         {/* ===================== BOTTOM LINE ===================== */}
         <section className="r-main r-sec">
           <div className="verdict fx">
             <div className="verdict__body measure">
               <p className="r-eyebrow">
                 <span className="dot" />
-                <span>{t("rep.verdictEyebrow")}</span>
+                <span>{teaser ? t("rep.teaser.eyebrow") : t("rep.verdictEyebrow")}</span>
               </p>
               {teaser ? (
                 <>
@@ -411,19 +567,6 @@ export async function ReportView({
                       {t(teaserLocked)}
                     </p>
                   </div>
-                  {teaserCounts.length ? (
-                    <div className="teaser__counts">
-                      <p className="teaser__counts-h">{t("rep.teaser.countsHead")}</p>
-                      <ul>
-                        {teaserCounts.map((c) => (
-                          <li key={c.key}>
-                            <IcCheck />
-                            {t(`rep.teaser.${c.key}`, { n: c.n })}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ) : null}
                 </>
               ) : (
                 <>
@@ -433,11 +576,27 @@ export async function ReportView({
               )}
             </div>
             <div className="verdict__ring">
-              <Ring value={overall} size="lg" suffix={t("rep.ringOf")} />
+              <Ring value={overall} size="lg" suffix={t("rep.ringOf")} bandLabel={preview ? bandText(overall) : undefined} />
               <p className="verdict__caption">{t("rep.overallCaption")}</p>
             </div>
           </div>
         </section>
+
+        {!preview ? (<>
+        {/* ===================== OFFICIAL RECORDS (both states) ===================== */}
+        <section className="r-main r-sec" aria-label={t("rep.records.head")}>
+          <SectionHead label={t("rep.records.eyebrow")} head={t("rep.records.head")} lede={t("rep.records.lede", { date: dateFmt })} />
+          <ul className="records fx">
+            {records.map((r) => (
+              <li className={`record record--${r.tone}`} key={r.key}>
+                <span className="record__ic"><RecordIcon tone={r.tone} /></span>
+                <span className="record__k">{r.label}</span>
+                <span className="record__v">{r.status}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+        </>) : null}
 
         {/* ===================== 01 SCORES ===================== */}
         <section className="r-main r-sec">
@@ -445,7 +604,7 @@ export async function ReportView({
             idx="01"
             label={t("sections.scores")}
             head={t("rep.scoresHead")}
-            lede={t("rep.scoresLede")}
+            lede={preview ? t("rep.scoresLedePreview") : t("rep.scoresLede")}
           />
           <div className="scores fx">
             {report.scores.map((s) => {
@@ -466,12 +625,14 @@ export async function ReportView({
               const cap = band === "good" ? "Good" : band === "ok" ? "Ok" : "Low";
               return (
                 <div className="scorecard" key={s.key}>
-                  <Ring value={s.value} size="sm" />
+                  <Ring value={s.value} size="sm" bandLabel={preview ? bandText(s.value) : undefined} />
                   <div className="scorecard__label">{t(`scoreNames.${s.key}`)}</div>
-                  <span className={`scoreband scoreband--${band}`}>
-                    <span className="pip" />
-                    {t(`rep.bandShort${cap}`)}
-                  </span>
+                  {preview ? null : (
+                    <span className={`scoreband scoreband--${band}`}>
+                      <span className="pip" />
+                      {t(`rep.bandShort${cap}`)}
+                    </span>
+                  )}
                   {preview ? null : (
                     <p className="scorecard__cap">{L(s.caption, locale)}</p>
                   )}
@@ -521,7 +682,7 @@ export async function ReportView({
               <div className="gate__locked">
                 <p className="gate__locked-h">{t("rep.gate.lockedH")}</p>
                 <ul className="gate__list">
-                  {(t.raw("rep.gate.items") as string[]).map((it, i) => (
+                  {gateItems.map((it, i) => (
                     <li key={i}>
                       <IcCheck />
                       {it}

@@ -16,14 +16,21 @@ export function Ring({
   value,
   size,
   suffix,
+  bandLabel,
 }: {
   value: number;
   size: "lg" | "sm";
   /** When set, rendered as the small "/ 100" line under the number (lg rng). */
   suffix?: string;
+  /**
+   * Free preview: show only the band ("Good"), as a full ring in the band's
+   * colour. Neither the number nor the arc length is rendered, so the price
+   * score can't be worked out from the overall and the other pillars.
+   */
+  bandLabel?: string;
 }) {
   const band = bandFor(value);
-  const offset = (CIRCUMFERENCE * (1 - value / 100)).toFixed(2);
+  const offset = bandLabel ? "0" : (CIRCUMFERENCE * (1 - value / 100)).toFixed(2);
   const px = size === "lg" ? 140 : 92;
   return (
     <div
@@ -51,8 +58,14 @@ export function Ring({
         />
       </svg>
       <div className="rng__txt">
-        <b className="fig">{value}</b>
-        {suffix ? <span className="of">{suffix}</span> : null}
+        {bandLabel ? (
+          <b className="rng__band">{bandLabel}</b>
+        ) : (
+          <>
+            <b className="fig">{value}</b>
+            {suffix ? <span className="of">{suffix}</span> : null}
+          </>
+        )}
       </div>
     </div>
   );

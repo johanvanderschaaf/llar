@@ -2334,6 +2334,93 @@ tr.highlight td:last-child {
 .rp .scoreband--low .pip {
   background: var(--pw-caution);
 }
+/* Free preview: band-only rings ("Good") so no score number is rendered. */
+.rp .rng__txt b.rng__band {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.rp .rng--lg .rng__txt b.rng__band {
+  font-size: 16px;
+}
+.rp .rng--good b.rng__band {
+  color: var(--pw-clear-700);
+}
+.rp .rng--ok b.rng__band {
+  color: #8a5413;
+}
+.rp .rng--low b.rng__band {
+  color: var(--pw-caution-700);
+}
+
+/* "What the official records say": one status line per official check. */
+.rp .records {
+  list-style: none;
+  margin: 18px 0 0;
+  padding: 0;
+  border: 1px solid var(--pw-ink-100);
+  border-radius: var(--pw-r-lg);
+  background: var(--pw-panel);
+  box-shadow: var(--pw-sh-1);
+}
+.rp .record {
+  display: grid;
+  grid-template-columns: 22px minmax(150px, 1fr) 2fr;
+  gap: 12px;
+  align-items: start;
+  padding: 13px 18px;
+  border-top: 1px solid var(--pw-ink-100);
+  font-size: 14.5px;
+  line-height: 1.45;
+}
+.rp .record:first-child {
+  border-top: 0;
+}
+.rp .record__ic svg {
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+}
+.rp .record__k {
+  font-weight: 700;
+  color: var(--pw-ink);
+}
+.rp .record__v {
+  color: var(--pw-ink-700);
+}
+.rp .record--clear .record__ic {
+  color: var(--pw-clear);
+}
+.rp .record--check .record__ic {
+  color: var(--pw-check);
+}
+.rp .record--caution .record__ic {
+  color: var(--pw-caution);
+}
+.rp .record--info .record__ic {
+  color: var(--pw-ink-500);
+}
+.rp .record--locked {
+  background: var(--pw-bg, transparent);
+}
+.rp .record--locked .record__ic,
+.rp .record--locked .record__v {
+  color: var(--pw-ink-500);
+}
+.rp .record--locked .record__v {
+  font-weight: 600;
+}
+@media (max-width: 640px) {
+  .rp .record {
+    grid-template-columns: 22px 1fr;
+  }
+  .rp .record__v {
+    grid-column: 2;
+  }
+}
+
 /* Price score in the free preview: its band would give away the price
  * direction, so a lock sits where the 92px ring would be. */
 .rp .scorecard--locked .scorecard__lock {

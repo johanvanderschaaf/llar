@@ -29,9 +29,9 @@ type Resolved =
 
 /**
  * Public report route. Serves the demo sample, plus reports from the database:
- * - published → full report (public).
- * - unpublished → free PREVIEW for anyone with the link (premium sections
- *   locked); the operator sees the full report.
+ * - signed-in operator or a paid order → full report.
+ * - everyone else → free PREVIEW (premium sections locked).
+ * - `?preview` → the free preview for anyone, to check the paywall.
  *
  * The Save-PDF affordance lives in the topbar, so we resolve the report's
  * mode BEFORE rendering the topbar — and pass `<PrintButton>` to it only when
@@ -92,7 +92,9 @@ async function resolveReport(
     data: { user },
   } = await supabase.auth.getUser();
   const paid = await hasPaidOrder(id);
-  const full = Boolean(user) || paid;
+  // `?preview` shows the free version to anyone, operator included, so the
+  // paywall can be checked while signed in. It only ever shows less.
+  const full = !forcePreview && (Boolean(user) || paid);
 
   // Full + AI not generated yet → show the progress screen, which generates the
   // narrative and refreshes into the complete report (no blocking 90s render).
